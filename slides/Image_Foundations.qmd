@@ -40,18 +40,20 @@ How computers store images
 
 ## How Computers "See": The Digital Camera
 
-:::: {.columns}
-::: {.column width="50%"}
+```{=html}
+<iframe class="interactive-demo r-stretch" src="demo_camera_sensor.html" width="100%" height="600px" style="border:none;"></iframe>
+```
+
+## How Computers "See": Step by Step
+
 - **1. Capture**: Just like the eye, the camera captures reflected light.
 - **2. Lens & Aperture**: Light enters through an opening (aperture) and is focused by glass lenses.
 - **3. The Sensor**: Instead of a retina, light hits a **digital sensor** (CMOS/CCD).
-- **4. Digitization**: Millions of sensor *pixels* convert incoming photons into an electrical charge, which is translated into a digital matrix.
+- **4. Digitization**: Millions of sensor *pixels* convert photons into electrical charges, creating a digital matrix.
+
+::: {.callout-note appearance="simple"}
+**Note**: In reality, lenses flip the image upside-down, and color sensors use a **Bayer Filter** to capture Red, Green, or Blue at each pixel.
 :::
-::: {.column width="50%"}
-![](assets/slides/camera_vision_sdaia.png){fig-align="center"}
-<!-- Branded infographic of light reflecting into a digital camera lens -->
-:::
-::::
 
 ## Grayscale Images: Pixels & Coordinates
 

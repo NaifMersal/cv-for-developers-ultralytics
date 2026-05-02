@@ -1,21 +1,21 @@
 <!DOCTYPE html>
 <html lang="en"><head>
-<script src="Image_Foundations_files/libs/clipboard/clipboard.min.js"></script>
-<script src="Image_Foundations_files/libs/quarto-html/tabby.min.js"></script>
-<script src="Image_Foundations_files/libs/quarto-html/popper.min.js"></script>
-<script src="Image_Foundations_files/libs/quarto-html/tippy.umd.min.js"></script>
-<link href="Image_Foundations_files/libs/quarto-html/tippy.css" rel="stylesheet">
-<link href="Image_Foundations_files/libs/quarto-html/light-border.css" rel="stylesheet">
-<link href="Image_Foundations_files/libs/quarto-html/quarto-syntax-highlighting-587c61ba64f3a5504c4d52d930310e48.css" rel="stylesheet" id="quarto-text-highlighting-styles"><meta charset="utf-8">
+<script src="Real_World_Video_Engineering_files/libs/clipboard/clipboard.min.js"></script>
+<script src="Real_World_Video_Engineering_files/libs/quarto-html/tabby.min.js"></script>
+<script src="Real_World_Video_Engineering_files/libs/quarto-html/popper.min.js"></script>
+<script src="Real_World_Video_Engineering_files/libs/quarto-html/tippy.umd.min.js"></script>
+<link href="Real_World_Video_Engineering_files/libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="Real_World_Video_Engineering_files/libs/quarto-html/light-border.css" rel="stylesheet">
+<link href="Real_World_Video_Engineering_files/libs/quarto-html/quarto-syntax-highlighting-587c61ba64f3a5504c4d52d930310e48.css" rel="stylesheet" id="quarto-text-highlighting-styles"><meta charset="utf-8">
   <meta name="generator" content="quarto-1.8.26">
 
-  <meta name="dcterms.date" content="2026-05-03">
-  <title>Digital Image Foundations</title>
+  <meta name="dcterms.date" content="2026-04-26">
+  <title>Real World Video Engineering</title>
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, minimal-ui">
-  <link rel="stylesheet" href="Image_Foundations_files/libs/revealjs/dist/reset.css">
-  <link rel="stylesheet" href="Image_Foundations_files/libs/revealjs/dist/reveal.css">
+  <link rel="stylesheet" href="Real_World_Video_Engineering_files/libs/revealjs/dist/reset.css">
+  <link rel="stylesheet" href="Real_World_Video_Engineering_files/libs/revealjs/dist/reveal.css">
   <style>
     code{white-space: pre-wrap;}
     span.smallcaps{font-variant: small-caps;}
@@ -95,13 +95,13 @@
     code span.vs { color: #20794d; } /* VerbatimString */
     code span.wa { color: #5e5e5e; font-style: italic; } /* Warning */
   </style>
-  <link rel="stylesheet" href="Image_Foundations_files/libs/revealjs/dist/theme/quarto-090e625264d31d7a518ad9f601b8a232.css">
-  <link href="Image_Foundations_files/libs/revealjs/plugin/quarto-line-highlight/line-highlight.css" rel="stylesheet">
-  <link href="Image_Foundations_files/libs/revealjs/plugin/reveal-menu/menu.css" rel="stylesheet">
-  <link href="Image_Foundations_files/libs/revealjs/plugin/reveal-menu/quarto-menu.css" rel="stylesheet">
-  <link href="Image_Foundations_files/libs/revealjs/plugin/reveal-chalkboard/font-awesome/css/all.css" rel="stylesheet">
-  <link href="Image_Foundations_files/libs/revealjs/plugin/reveal-chalkboard/style.css" rel="stylesheet">
-  <link href="Image_Foundations_files/libs/revealjs/plugin/quarto-support/footer.css" rel="stylesheet">
+  <link rel="stylesheet" href="Real_World_Video_Engineering_files/libs/revealjs/dist/theme/quarto-090e625264d31d7a518ad9f601b8a232.css">
+  <link href="Real_World_Video_Engineering_files/libs/revealjs/plugin/quarto-line-highlight/line-highlight.css" rel="stylesheet">
+  <link href="Real_World_Video_Engineering_files/libs/revealjs/plugin/reveal-menu/menu.css" rel="stylesheet">
+  <link href="Real_World_Video_Engineering_files/libs/revealjs/plugin/reveal-menu/quarto-menu.css" rel="stylesheet">
+  <link href="Real_World_Video_Engineering_files/libs/revealjs/plugin/reveal-chalkboard/font-awesome/css/all.css" rel="stylesheet">
+  <link href="Real_World_Video_Engineering_files/libs/revealjs/plugin/reveal-chalkboard/style.css" rel="stylesheet">
+  <link href="Real_World_Video_Engineering_files/libs/revealjs/plugin/quarto-support/footer.css" rel="stylesheet">
   <style type="text/css">
     .reveal div.sourceCode {
       margin: 0;
@@ -197,239 +197,138 @@
     <div class="slides">
 
 <section id="title-slide" data-background-image="slides_template/assets/anim.svg" data-background-opacity="0.15" data-background-size="cover" class="quarto-title-block center">
-  <h1 class="title">Digital Image Foundations</h1>
-  <p class="subtitle">How computers perceive images</p>
+  <h1 class="title">Real World Video Engineering</h1>
+  <p class="subtitle">Concurrency, Streams, and Webcams</p>
 
 <div class="quarto-title-authors">
 </div>
 
-  <p class="date">2026-05-03</p>
+  <p class="date">2026-04-26</p>
 </section>
 <section>
-<section id="digital-image-foundations" class="title-slide slide level1 sdaia-dark center" data-background-gradient="linear-gradient(135deg, #1C355E, #00C9A7)">
-<h1>1. Digital Image Foundations</h1>
-<p>How computers store images</p>
+<section id="the-bottleneck" class="title-slide slide level1 sdaia-dark center" data-background-gradient="linear-gradient(135deg, #1C355E, #00C9A7)">
+<h1>1. The Bottleneck</h1>
+<p>Why your real-time CV app feels slow.</p>
 </section>
-<section id="how-we-see-light-and-the-human-eye" class="slide level2">
-<h2>How We See: Light and The Human Eye</h2>
-<div class="columns">
-<div class="column" style="width:50%;">
-<ul>
-<li><strong>1. Illumination</strong>: Light from a source (e.g., the sun) hits an object.</li>
-<li><strong>2. Reflection</strong>: The object absorbs some colors and reflects others.</li>
-<li><strong>3. Capture</strong>: Reflected light enters the eye through the <strong>pupil</strong>.</li>
-<li><strong>4. Processing</strong>: The lens focuses light onto the <strong>retina</strong>. <em>Photoreceptors</em> (rods and cones) convert it to electrical signals for the brain.</li>
-</ul>
-</div><div class="column" style="width:50%;">
-<p><img data-src="assets/slides/human_vision_sdaia.png" class="quarto-figure quarto-figure-center"> </p>
-</div></div>
+<section id="the-standard-loop" class="slide level2">
+<h2>The Standard Loop</h2>
+<p>A standard OpenCV inference loop looks like this:</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb1"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href=""></a><span class="im">import</span> cv2</span>
+<span id="cb1-2"><a href=""></a><span class="im">from</span> ultralytics <span class="im">import</span> YOLO</span>
+<span id="cb1-3"><a href=""></a></span>
+<span id="cb1-4"><a href=""></a>cap <span class="op">=</span> cv2.VideoCapture(<span class="dv">0</span>)</span>
+<span id="cb1-5"><a href=""></a>model <span class="op">=</span> YOLO(<span class="st">'yolov8n.pt'</span>)</span>
+<span id="cb1-6"><a href=""></a></span>
+<span id="cb1-7"><a href=""></a><span class="cf">while</span> <span class="va">True</span>:</span>
+<span id="cb1-8"><a href=""></a>    ret, frame <span class="op">=</span> cap.read()       <span class="co"># Block 1</span></span>
+<span id="cb1-9"><a href=""></a>    <span class="cf">if</span> <span class="kw">not</span> ret: <span class="cf">break</span></span>
+<span id="cb1-10"><a href=""></a>    </span>
+<span id="cb1-11"><a href=""></a>    results <span class="op">=</span> model(frame)        <span class="co"># Block 2</span></span>
+<span id="cb1-12"><a href=""></a>    annotated <span class="op">=</span> results[<span class="dv">0</span>].plot() <span class="co"># Block 3</span></span>
+<span id="cb1-13"><a href=""></a>    </span>
+<span id="cb1-14"><a href=""></a>    cv2.imshow(<span class="st">"Camera"</span>, annotated)</span>
+<span id="cb1-15"><a href=""></a>    <span class="cf">if</span> cv2.waitKey(<span class="dv">1</span>) <span class="op">==</span> <span class="bu">ord</span>(<span class="st">'q'</span>): <span class="cf">break</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </section>
-<section id="how-computers-see-the-digital-camera" class="slide level2">
-<h2>How Computers “See”: The Digital Camera</h2>
-<iframe class="interactive-demo r-stretch" src="demo_camera_sensor.html" width="100%" height="600px" style="border:none;"></iframe>
+<section id="where-time-goes" class="slide level2">
+<h2>Where Time Goes</h2>
+<p>In a synchronous <code>while</code> loop, every operation waits for the previous one to finish.</p>
+<ul>
+<li><strong><code>cap.read()</code></strong>: ~30ms (Waiting for the camera sensor or network packet)</li>
+<li><strong><code>model(frame)</code></strong>: ~20ms (Inference on GPU)</li>
+<li><strong><code>cv2.imshow()</code></strong>: ~5ms (Rendering)</li>
+</ul>
+<p><strong>Total Time per Frame:</strong> ~55ms (Max ~18 FPS)</p>
+<p>If you are reading an RTSP stream (e.g.&nbsp;from an IP Camera) that sends 30 FPS, reading frames slower than they arrive causes a <strong>buffer overflow</strong> resulting in massive delay (lag).</p>
+</section></section>
+<section>
+<section id="concurrency-with-threads" class="title-slide slide level1 sdaia-dark center" data-background-gradient="linear-gradient(135deg, #1C355E, #00C9A7)">
+<h1>2. Concurrency with Threads</h1>
+<p>Doing two things at once.</p>
 </section>
-<section id="how-computers-see-step-by-step" class="slide level2">
-<h2>How Computers “See”: Step by Step</h2>
+<section id="multithreading-in-python" class="slide level2">
+<h2>Multithreading in Python</h2>
+<p>To prevent the model inference from slowing down the camera reading, we can put them on separate <strong>Threads</strong>.</p>
 <ul>
-<li><strong>1. Capture</strong>: Just like the eye, the camera captures reflected light.</li>
-<li><strong>2. Lens &amp; Aperture</strong>: Light enters through an opening (aperture) and is focused by glass lenses.</li>
-<li><strong>3. The Sensor</strong>: Instead of a retina, light hits a <strong>digital sensor</strong> (CMOS/CCD).</li>
-<li><strong>4. Digitization</strong>: Millions of sensor <em>pixels</em> convert photons into electrical charges, creating a digital matrix.</li>
+<li><strong>Thread 1 (Producer)</strong>: Constantly reads frames from the camera as fast as possible.</li>
+<li><strong>Thread 2 (Consumer)</strong>: Takes the latest frame and runs YOLO inference on it.</li>
 </ul>
-<div class="callout callout-note callout-style-simple">
-<div class="callout-body">
-<div class="callout-icon-container">
-<i class="callout-icon"></i>
-</div>
-<div class="callout-content">
-<p><strong>Note</strong>: In reality, lenses flip the image upside-down, and color sensors use a <strong>Bayer Filter</strong> to capture Red, Green, or Blue at each pixel.</p>
-</div>
-</div>
-</div>
 </section>
-<section id="grayscale-images-pixels-coordinates" class="slide level2">
-<h2>Grayscale Images: Pixels &amp; Coordinates</h2>
-<ul>
-<li>Images are 2D matrices of numbers. The origin <code>(0,0)</code> is top-left.</li>
-<li>Example: an 8x8 matrix where <code>0</code> is black and <code>1</code> is white.</li>
-</ul>
-<div class="columns">
-<div class="column" style="width:50%;">
-<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb1"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href=""></a><span class="co"># 8x8 matrix (0=black, 1=white)</span></span>
-<span id="cb1-2"><a href=""></a>img <span class="op">=</span> np.array([</span>
-<span id="cb1-3"><a href=""></a>    [<span class="dv">0</span>,<span class="dv">0</span>,<span class="dv">0</span>,<span class="dv">0</span>,<span class="dv">0</span>,<span class="dv">0</span>,<span class="dv">0</span>,<span class="dv">0</span>],</span>
-<span id="cb1-4"><a href=""></a>    [<span class="dv">0</span>,<span class="dv">1</span>,<span class="dv">1</span>,<span class="dv">0</span>,<span class="dv">0</span>,<span class="dv">1</span>,<span class="dv">1</span>,<span class="dv">0</span>],</span>
-<span id="cb1-5"><a href=""></a>    [<span class="dv">0</span>,<span class="dv">1</span>,<span class="dv">1</span>,<span class="dv">0</span>,<span class="dv">0</span>,<span class="dv">1</span>,<span class="dv">1</span>,<span class="dv">0</span>],</span>
-<span id="cb1-6"><a href=""></a>    [<span class="dv">0</span>,<span class="dv">0</span>,<span class="dv">0</span>,<span class="dv">0</span>,<span class="dv">0</span>,<span class="dv">0</span>,<span class="dv">0</span>,<span class="dv">0</span>],</span>
-<span id="cb1-7"><a href=""></a>    [<span class="dv">0</span>,<span class="dv">1</span>,<span class="dv">0</span>,<span class="dv">0</span>,<span class="dv">0</span>,<span class="dv">0</span>,<span class="dv">1</span>,<span class="dv">0</span>],</span>
-<span id="cb1-8"><a href=""></a>    [<span class="dv">0</span>,<span class="dv">0</span>,<span class="dv">1</span>,<span class="dv">1</span>,<span class="dv">1</span>,<span class="dv">1</span>,<span class="dv">0</span>,<span class="dv">0</span>],</span>
-<span id="cb1-9"><a href=""></a>    [<span class="dv">0</span>,<span class="dv">1</span>,<span class="dv">0</span>,<span class="dv">0</span>,<span class="dv">0</span>,<span class="dv">0</span>,<span class="dv">1</span>,<span class="dv">0</span>],</span>
-<span id="cb1-10"><a href=""></a>    [<span class="dv">0</span>,<span class="dv">0</span>,<span class="dv">0</span>,<span class="dv">0</span>,<span class="dv">0</span>,<span class="dv">0</span>,<span class="dv">0</span>,<span class="dv">0</span>]</span>
-<span id="cb1-11"><a href=""></a>])</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
-</div><div class="column" style="width:50%;">
-<div id="769bfcdb" class="cell" data-execution_count="1">
-<div class="cell-output cell-output-display">
-<div class="quarto-figure quarto-figure-center">
-<figure>
-<p><img data-src="Image_Foundations_files/figure-revealjs/cell-2-output-1.png" class="quarto-figure quarto-figure-center" width="315" height="315"></p>
-</figure>
-</div>
-</div>
-</div>
-</div></div>
+<section id="the-producer-consumer-pattern" class="slide level2">
+<h2>The Producer-Consumer Pattern</h2>
+<p>We need a safe way for Thread 1 to hand the frame to Thread 2. We use a <strong>Thread-Safe Queue</strong> (<code>queue.Queue</code>).</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb2"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href=""></a><span class="im">from</span> queue <span class="im">import</span> Queue</span>
+<span id="cb2-2"><a href=""></a><span class="im">from</span> threading <span class="im">import</span> Thread</span>
+<span id="cb2-3"><a href=""></a></span>
+<span id="cb2-4"><a href=""></a><span class="co"># A queue to hold our frames</span></span>
+<span id="cb2-5"><a href=""></a>frame_queue <span class="op">=</span> Queue(maxsize<span class="op">=</span><span class="dv">1</span>) </span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>Why <code>maxsize=1</code>? For real-time applications (like security cameras), we only care about the <em>most recent</em> frame. If inference is slow, we want to <strong>drop</strong> old frames, not process a backlog of delayed footage.</p>
 </section>
-<section id="color-images-the-rgb-channels" class="slide level2 smaller">
-<h2>Color Images: The RGB Channels</h2>
-<ul>
-<li>Images are 3D matrices (height × width × <strong>3 channels</strong>).</li>
-<li><strong>RGB</strong>: Red, Green, Blue. Values range from <code>0</code> (dark) to <code>255</code> (bright).</li>
-</ul>
-<div id="e206d7a1" class="cell" data-execution_count="2">
-<div class="cell-output cell-output-display">
-<div class="quarto-figure quarto-figure-center">
-<figure>
-<p><img data-src="Image_Foundations_files/figure-revealjs/cell-3-output-1.png" class="quarto-figure quarto-figure-center" width="479" height="463"></p>
-</figure>
-</div>
-</div>
-</div>
-</section>
-<section id="essential-image-libraries" class="slide level2">
-<h2>Essential Image Libraries</h2>
-<p><br></p>
-<div class="columns">
-<div class="column" style="width:33%;">
-<div class="callout callout-note no-icon callout-style-simple">
-<div class="callout-body">
-<div class="callout-content">
-<div style="text-align: center; font-size: 3rem; margin-bottom: 0.5rem;">
-📷
-</div>
-<div style="text-align: center; font-size: 1.2rem; font-weight: bold; margin-bottom: 1rem; color: #1C355E;">
-OpenCV
-</div>
-<p>Very fast C++ library mapped to Python.</p>
-<ul>
-<li>Uses <strong>BGR</strong> channel order</li>
-<li>Great for video streams</li>
-<li>Low-level transforms</li>
-</ul>
-</div>
-</div>
-</div>
-</div><div class="column" style="width:33%;">
-<div class="callout callout-tip no-icon callout-style-simple">
-<div class="callout-body">
-<div class="callout-content">
-<div style="text-align: center; font-size: 3rem; margin-bottom: 0.5rem;">
-🖼️
-</div>
-<div style="text-align: center; font-size: 1.2rem; font-weight: bold; margin-bottom: 1rem; color: #1C355E;">
-Pillow (PIL)
-</div>
-<p>Standard Python image library.</p>
-<ul>
-<li>Uses <strong>RGB</strong> channel order</li>
-<li>Simple drawing &amp; resizing</li>
-<li>(Our primary tool)</li>
-</ul>
-</div>
-</div>
-</div>
-</div><div class="column" style="width:33%;">
-<div class="callout callout-warning no-icon callout-style-simple">
-<div class="callout-body">
-<div class="callout-content">
-<div style="text-align: center; font-size: 3rem; margin-bottom: 0.5rem;">
-🔢
-</div>
-<div style="text-align: center; font-size: 1.2rem; font-weight: bold; margin-bottom: 1rem; color: #1C355E;">
-NumPy
-</div>
-<p>The core math library.</p>
-<ul>
-<li>Images are fundamentally <code>numpy</code> tensors</li>
-<li>Multi-dimensional array operations</li>
-</ul>
-</div>
-</div>
-</div>
-</div></div>
-</section>
-<section id="coordinates-vs.-array-indexing" class="slide level2">
-<h2>Coordinates vs.&nbsp;Array Indexing</h2>
-<div class="columns">
-<div class="column" style="width:50%;">
-<ul>
-<li>We think in geometry: <code>(x, y)</code> = <code>(width, height)</code>.</li>
-<li><strong>NumPy</strong> thinks in matrices: <code>matrix[row, col]</code> = <code>matrix[y, x]</code>.</li>
-<li>This causes endless confusion when cropping with bounding boxes <code>(x1, y1, x2, y2)</code>.</li>
-</ul>
-</div><div class="column" style="width:50%;">
-<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb2"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href=""></a><span class="co"># Assuming a bounding box (x1, y1, x2, y2)</span></span>
-<span id="cb2-2"><a href=""></a></span>
-<span id="cb2-3"><a href=""></a><span class="co"># WRONG (Crops wrong area or crashes)</span></span>
-<span id="cb2-4"><a href=""></a>crop <span class="op">=</span> img[x1:x2, y1:y2] </span>
-<span id="cb2-5"><a href=""></a></span>
-<span id="cb2-6"><a href=""></a><span class="co"># CORRECT (y = row, x = col)</span></span>
-<span id="cb2-7"><a href=""></a>crop <span class="op">=</span> img[y1:y2, x1:x2] </span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
-</div></div>
-</section>
-<section id="the-smurf-effect-bgr-vs.-rgb" class="slide level2">
-<h2>The “Smurf Effect”: BGR vs.&nbsp;RGB</h2>
-<div class="columns">
-<div class="column" style="width:50%;">
-<ul>
-<li>OpenCV historically uses <strong>B</strong>lue-<strong>G</strong>reen-<strong>R</strong>ed (<strong>BGR</strong>).</li>
-<li>Most other libraries (Matplotlib, Pillow) expect <strong>R</strong>ed-<strong>G</strong>reen-<strong>B</strong>lue (<strong>RGB</strong>).</li>
-<li>If you read an image with <code>cv2.imread()</code> and plot it directly in matplotlib, Red and Blue channels are swapped!</li>
-<li><em>Faces look blue, skies look red.</em></li>
-</ul>
-</div><div class="column" style="width:50%;">
-<h4 id="basic-io-operations">Basic I/O Operations</h4>
+<section id="the-async-reader-class" class="slide level2">
+<h2>The Async Reader Class</h2>
 <div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb3"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a href=""></a><span class="im">import</span> cv2</span>
-<span id="cb3-2"><a href=""></a><span class="im">import</span> matplotlib.pyplot <span class="im">as</span> plt</span>
-<span id="cb3-3"><a href=""></a></span>
-<span id="cb3-4"><a href=""></a><span class="co"># 1. Read image (OpenCV loads BGR)</span></span>
-<span id="cb3-5"><a href=""></a>img_bgr <span class="op">=</span> cv2.imread(<span class="st">'dog.jpg'</span>)</span>
-<span id="cb3-6"><a href=""></a></span>
-<span id="cb3-7"><a href=""></a><span class="co"># 2. Convert to RGB for accurate display</span></span>
-<span id="cb3-8"><a href=""></a>img_rgb <span class="op">=</span> cv2.cvtColor(img_bgr, cv2.COLOR_BGR2RGB)</span>
-<span id="cb3-9"><a href=""></a></span>
-<span id="cb3-10"><a href=""></a><span class="co"># 3. Display</span></span>
-<span id="cb3-11"><a href=""></a>plt.imshow(img_rgb)</span>
-<span id="cb3-12"><a href=""></a>plt.axis(<span class="st">'off'</span>)</span>
-<span id="cb3-13"><a href=""></a>plt.show()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
-</div></div>
+<span id="cb3-2"><a href=""></a><span class="im">from</span> threading <span class="im">import</span> Thread</span>
+<span id="cb3-3"><a href=""></a><span class="im">from</span> queue <span class="im">import</span> Queue</span>
+<span id="cb3-4"><a href=""></a></span>
+<span id="cb3-5"><a href=""></a><span class="kw">class</span> AsyncCamera:</span>
+<span id="cb3-6"><a href=""></a>    <span class="kw">def</span> <span class="fu">__init__</span>(<span class="va">self</span>, src<span class="op">=</span><span class="dv">0</span>):</span>
+<span id="cb3-7"><a href=""></a>        <span class="va">self</span>.cap <span class="op">=</span> cv2.VideoCapture(src)</span>
+<span id="cb3-8"><a href=""></a>        <span class="va">self</span>.q <span class="op">=</span> Queue(maxsize<span class="op">=</span><span class="dv">1</span>)</span>
+<span id="cb3-9"><a href=""></a>        <span class="va">self</span>.running <span class="op">=</span> <span class="va">True</span></span>
+<span id="cb3-10"><a href=""></a>        <span class="co"># Start the background thread</span></span>
+<span id="cb3-11"><a href=""></a>        Thread(target<span class="op">=</span><span class="va">self</span>._reader, daemon<span class="op">=</span><span class="va">True</span>).start()</span>
+<span id="cb3-12"><a href=""></a></span>
+<span id="cb3-13"><a href=""></a>    <span class="kw">def</span> _reader(<span class="va">self</span>):</span>
+<span id="cb3-14"><a href=""></a>        <span class="cf">while</span> <span class="va">self</span>.running:</span>
+<span id="cb3-15"><a href=""></a>            ret, frame <span class="op">=</span> <span class="va">self</span>.cap.read()</span>
+<span id="cb3-16"><a href=""></a>            <span class="cf">if</span> <span class="kw">not</span> ret: <span class="cf">break</span></span>
+<span id="cb3-17"><a href=""></a>            </span>
+<span id="cb3-18"><a href=""></a>            <span class="co"># Clear queue if full (drop old frame)</span></span>
+<span id="cb3-19"><a href=""></a>            <span class="cf">if</span> <span class="va">self</span>.q.full():</span>
+<span id="cb3-20"><a href=""></a>                <span class="cf">try</span>: <span class="va">self</span>.q.get_nowait()</span>
+<span id="cb3-21"><a href=""></a>                <span class="cf">except</span>: <span class="cf">pass</span></span>
+<span id="cb3-22"><a href=""></a>                </span>
+<span id="cb3-23"><a href=""></a>            <span class="co"># Put new frame in queue</span></span>
+<span id="cb3-24"><a href=""></a>            <span class="va">self</span>.q.put(frame)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</section>
+<section id="consuming-the-queue" class="slide level2">
+<h2>Consuming the Queue</h2>
+<p>Now our main loop only asks the Queue for frames, never blocking on the camera!</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb4"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb4-1"><a href=""></a>camera <span class="op">=</span> AsyncCamera(<span class="dv">0</span>)</span>
+<span id="cb4-2"><a href=""></a>model <span class="op">=</span> YOLO(<span class="st">'yolov8n.pt'</span>)</span>
+<span id="cb4-3"><a href=""></a></span>
+<span id="cb4-4"><a href=""></a><span class="cf">while</span> <span class="va">True</span>:</span>
+<span id="cb4-5"><a href=""></a>    <span class="co"># Get the latest frame from the background thread</span></span>
+<span id="cb4-6"><a href=""></a>    frame <span class="op">=</span> camera.q.get() </span>
+<span id="cb4-7"><a href=""></a>    </span>
+<span id="cb4-8"><a href=""></a>    <span class="co"># Run inference</span></span>
+<span id="cb4-9"><a href=""></a>    results <span class="op">=</span> model(frame)</span>
+<span id="cb4-10"><a href=""></a>    annotated <span class="op">=</span> results[<span class="dv">0</span>].plot()</span>
+<span id="cb4-11"><a href=""></a>    </span>
+<span id="cb4-12"><a href=""></a>    cv2.imshow(<span class="st">"Async Cam"</span>, annotated)</span>
+<span id="cb4-13"><a href=""></a>    <span class="cf">if</span> cv2.waitKey(<span class="dv">1</span>) <span class="op">==</span> <span class="bu">ord</span>(<span class="st">'q'</span>): </span>
+<span id="cb4-14"><a href=""></a>        <span class="cf">break</span></span>
+<span id="cb4-15"><a href=""></a>        </span>
+<span id="cb4-16"><a href=""></a>camera.running <span class="op">=</span> <span class="va">False</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </section></section>
 <section>
 <section id="conclusion" class="title-slide slide level1 sdaia-dark center" data-background-gradient="linear-gradient(135deg, #1C355E, #00C9A7)">
 <h1>Conclusion</h1>
-<p>Wrapping up Image Foundations</p>
+
 </section>
 <section id="summary" class="slide level2">
 <h2>Summary</h2>
 <ul>
-<li><strong>Light &amp; Cameras</strong>: How digital sensors capture light and turn it into data.</li>
-<li><strong>Pixels &amp; Channels</strong>: Grayscale (2D) vs.&nbsp;Color RGB (3D) representations.</li>
-<li><strong>Libraries</strong>: Pillow and NumPy basics.</li>
-<li><strong>Gotchas</strong>: BGR vs RGB (The Smurf Effect) and Array Indexing vs Coordinates.</li>
+<li>Synchronous loops (<code>cap.read()</code> + <code>inference()</code>) cause lag on live streams.</li>
+<li><strong>Producer-Consumer Pattern</strong>: Separating reading and processing solves this.</li>
+<li><strong><code>queue.Queue</code> (maxsize=1)</strong>: The safest way to pass frames between threads and enforce dropping old frames to maintain real-time performance.</li>
 </ul>
 </section>
 <section id="next-steps" class="slide level2">
 <h2>Next Steps</h2>
-<p>Next up: <strong>YOLO Inference</strong></p>
+<p>Let’s head to the lab to build our own <code>AsyncCamera</code> class and test it!</p>
 <ul>
-<li>Using these images with state-of-the-art Computer Vision models.</li>
-<li>Running inference directly out-of-the-box.</li>
+<li>Open <strong><code>labs/02b_video_engineering.ipynb</code></strong></li>
 </ul>
-</section>
-<section id="qa" class="slide level2 sdaia-dark" data-background-color="#1C355E">
-<h2>Q&amp;A</h2>
-<div class="r-fit-text">
-<p><strong>Thank You!</strong></p>
-<p>Any questions?</p>
-</div>
 
 </section></section>
     </div>
@@ -441,20 +340,20 @@ NumPy
 </div></div>
 
   <script>window.backupDefine = window.define; window.define = undefined;</script>
-  <script src="Image_Foundations_files/libs/revealjs/dist/reveal.js"></script>
+  <script src="Real_World_Video_Engineering_files/libs/revealjs/dist/reveal.js"></script>
   <!-- reveal.js plugins -->
-  <script src="Image_Foundations_files/libs/revealjs/plugin/quarto-line-highlight/line-highlight.js"></script>
-  <script src="Image_Foundations_files/libs/revealjs/plugin/pdf-export/pdfexport.js"></script>
-  <script src="Image_Foundations_files/libs/revealjs/plugin/reveal-menu/menu.js"></script>
-  <script src="Image_Foundations_files/libs/revealjs/plugin/reveal-menu/quarto-menu.js"></script>
-  <script src="Image_Foundations_files/libs/revealjs/plugin/reveal-chalkboard/plugin.js"></script>
-  <script src="Image_Foundations_files/libs/revealjs/plugin/quarto-support/support.js"></script>
+  <script src="Real_World_Video_Engineering_files/libs/revealjs/plugin/quarto-line-highlight/line-highlight.js"></script>
+  <script src="Real_World_Video_Engineering_files/libs/revealjs/plugin/pdf-export/pdfexport.js"></script>
+  <script src="Real_World_Video_Engineering_files/libs/revealjs/plugin/reveal-menu/menu.js"></script>
+  <script src="Real_World_Video_Engineering_files/libs/revealjs/plugin/reveal-menu/quarto-menu.js"></script>
+  <script src="Real_World_Video_Engineering_files/libs/revealjs/plugin/reveal-chalkboard/plugin.js"></script>
+  <script src="Real_World_Video_Engineering_files/libs/revealjs/plugin/quarto-support/support.js"></script>
   
 
-  <script src="Image_Foundations_files/libs/revealjs/plugin/notes/notes.js"></script>
-  <script src="Image_Foundations_files/libs/revealjs/plugin/search/search.js"></script>
-  <script src="Image_Foundations_files/libs/revealjs/plugin/zoom/zoom.js"></script>
-  <script src="Image_Foundations_files/libs/revealjs/plugin/math/math.js"></script>
+  <script src="Real_World_Video_Engineering_files/libs/revealjs/plugin/notes/notes.js"></script>
+  <script src="Real_World_Video_Engineering_files/libs/revealjs/plugin/search/search.js"></script>
+  <script src="Real_World_Video_Engineering_files/libs/revealjs/plugin/zoom/zoom.js"></script>
+  <script src="Real_World_Video_Engineering_files/libs/revealjs/plugin/math/math.js"></script>
   <script>window.define = window.backupDefine; window.backupDefine = undefined;</script>
 
   <script>
