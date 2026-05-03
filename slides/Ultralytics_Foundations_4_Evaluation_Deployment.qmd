@@ -2020,7 +2020,7 @@ You don't need complex deployment code to use your exported models. The Ultralyt
 
 ### CLI
 ```bash
-yolo predict model=best.onnx source="https://ultralytics.com/images/assets/bus.jpg"
+yolo predict model=best.onnx source="https://ultralytics.com/assets/bus.jpg"
 ```
 
 ### Python
@@ -2028,7 +2028,7 @@ yolo predict model=best.onnx source="https://ultralytics.com/images/assets/bus.j
 from ultralytics import YOLO
 
 model = YOLO("best.onnx")
-results = model.predict(source="https://ultralytics.com/images/assets/bus.jpg")
+results = model.predict(source="https://ultralytics.com/assets/bus.jpg")
 print(results[0].boxes) 
 ```
 

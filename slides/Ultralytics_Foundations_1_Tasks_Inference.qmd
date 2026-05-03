@@ -207,7 +207,7 @@ We just read `top1` that is **single-class** (one winner). But because `probs` s
 Identify what the entire image contains.
 
 ```bash
-yolo task=classify mode=predict model=yolo26n-cls.pt source="https://ultralytics.com/images/assets/bus.jpg"
+yolo task=classify mode=predict model=yolo26n-cls.pt source="https://ultralytics.com/assets/bus.jpg"
 ```
 
 ```python
@@ -215,7 +215,7 @@ yolo task=classify mode=predict model=yolo26n-cls.pt source="https://ultralytics
 from ultralytics import YOLO
 
 model = YOLO("yolo26n-cls.pt")
-results = model.predict(source="https://ultralytics.com/images/assets/bus.jpg")
+results = model.predict(source="https://ultralytics.com/assets/bus.jpg")
 
 # Access Output Format
 probs = results[0].probs
@@ -388,7 +388,7 @@ Find and localize objects using bounding boxes.
 
 ```bash
 # Live Example: Try this in your terminal!
-yolo task=detect mode=predict model=yolo26n.pt source="https://ultralytics.com/images/assets/bus.jpg"
+yolo task=detect mode=predict model=yolo26n.pt source="https://ultralytics.com/assets/bus.jpg"
 ```
 
 ```python
@@ -400,7 +400,7 @@ model_path = "yolo26n.pt"
 if not os.path.exists(model_path):
     model_path = "../yolo26n.pt"
 model = YOLO(model_path)
-results = model.predict(source="https://ultralytics.com/images/assets/bus.jpg")
+results = model.predict(source="https://ultralytics.com/assets/bus.jpg")
 
 # Access Output Shape and Data
 boxes = results[0].boxes
@@ -441,7 +441,7 @@ x1, y1, x2, y2 = boxes[0].tolist()
 Why not just train the model on absolute pixel values like `w = 8.0`?
 
 ::: {.r-stack}
-![](https://ultralytics.com/images/assets/bus.jpg){.fragment width="400" height="300" style="margin-bottom: 20px;"}
+![](https://ultralytics.com/assets/bus.jpg){.fragment width="400" height="300" style="margin-bottom: 20px;"}
 
 ![](https://ultralytics.com/images/zidane.jpg){.fragment width="500" height="280" style="margin-bottom: 20px;"}
 :::
@@ -545,7 +545,7 @@ Outline the exact shape (pixels) of each object instance.
 
 ```bash
 # Live Example: See the masks!
-yolo task=segment mode=predict model=yolo26n-seg.pt source="https://ultralytics.com/images/assets/bus.jpg"
+yolo task=segment mode=predict model=yolo26n-seg.pt source="https://ultralytics.com/assets/bus.jpg"
 ```
 
 ```python
@@ -553,7 +553,7 @@ yolo task=segment mode=predict model=yolo26n-seg.pt source="https://ultralytics.
 from ultralytics import YOLO
 
 model = YOLO("yolo26n-seg.pt")
-results = model.predict(source="https://ultralytics.com/images/assets/bus.jpg")
+results = model.predict(source="https://ultralytics.com/assets/bus.jpg")
 
 # Access Output Shape and Data
 masks = results[0].masks
@@ -625,7 +625,7 @@ Estimate human body keypoints (elbows, knees).
 
 ```bash
 # Live Example: Track keypoints!
-yolo task=pose mode=predict model=yolo26n-pose.pt source="https://ultralytics.com/images/assets/bus.jpg"
+yolo task=pose mode=predict model=yolo26n-pose.pt source="https://ultralytics.com/assets/bus.jpg"
 ```
 
 ```python
@@ -633,7 +633,7 @@ yolo task=pose mode=predict model=yolo26n-pose.pt source="https://ultralytics.co
 from ultralytics import YOLO
 
 model = YOLO("yolo26n-pose.pt")
-results = model.predict(source="https://ultralytics.com/images/assets/bus.jpg")
+results = model.predict(source="https://ultralytics.com/assets/bus.jpg")
 
 # Access Output Shape and Data
 keypoints = results[0].keypoints
@@ -768,7 +768,7 @@ model = YOLO("weights/yolo26n.pt")
 
 # Option 1: A list of specific sources
 sources = [
-    "https://ultralytics.com/images/assets/bus.jpg",
+    "https://ultralytics.com/assets/bus.jpg",
     "path/to/local/image.jpg",
     "another_image.png"
 ]
