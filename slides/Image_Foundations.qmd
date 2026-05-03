@@ -49,7 +49,7 @@ How computers store images
 - **1. Capture**: Just like the eye, the camera captures reflected light.
 - **2. Lens & Aperture**: Light enters through an opening (aperture) and is focused by glass lenses.
 - **3. The Sensor**: Instead of a retina, light hits a **digital sensor** (CMOS/CCD).
-- **4. Digitization**: Millions of sensor *pixels* convert photons into electrical charges, creating a digital matrix.
+- **4. Digitization**: Millions of sensor *pixels* convert photons into electrical charges, creating a digital matrix (usually 8-bit).
 
 ::: {.callout-note appearance="simple"}
 **Note**: In reality, lenses flip the image upside-down, and color sensors use a **Bayer Filter** to capture Red, Green, or Blue at each pixel.
@@ -58,7 +58,7 @@ How computers store images
 ## Grayscale Images: Pixels & Coordinates
 
 - Images are 2D matrices of numbers. The origin `(0,0)` is top-left.
-- Example: an 8x8 matrix where `0` is black and `1` is white.
+- **8-bit Grayscale**: Each pixel is a number from `0` (black) to `255` (white).
 
 
 ::::: {.columns}
@@ -66,18 +66,17 @@ How computers store images
 :::: {.column width="50%"}
 
 ```python
-# 8x8 matrix (0=black, 1=white)
+# 8x8 matrix (8-bit grayscale: 0-255)
 img = np.array([
-    [0,0,0,0,0,0,0,0],
-    [0,1,1,0,0,1,1,0],
-    [0,1,1,0,0,1,1,0],
-    [0,0,0,0,0,0,0,0],
-    [0,1,0,0,0,0,1,0],
-    [0,0,1,1,1,1,0,0],
-    [0,1,0,0,0,0,1,0],
-    [0,0,0,0,0,0,0,0]
-])
-
+    [0,  0,  0,  0,  0,  0,  0,  0],
+    [0,255,255,  0,  0,255,255,  0],
+    [0,255,255,  0,  0,255,255,  0],
+    [0,  0,  0,  0,  0,  0,  0,  0],
+    [0,150,  0,  0,  0,  0,150,  0],
+    [0,  0,255,255,255,255,  0,  0],
+    [0,150,  0,  0,  0,  0,150,  0],
+    [0,  0,  0,  0,  0,  0,  0,  0]
+], dtype=np.uint8)
 ```
 
 ::::
@@ -91,26 +90,27 @@ img = np.array([
 import numpy as np
 import matplotlib.pyplot as plt
 
-# 8x8 matrix (0=black, 1=white)
+# 8x8 matrix (8-bit grayscale: 0-255)
 img = np.array([
-    [0,0,0,0,0,0,0,0],
-    [0,1,1,0,0,1,1,0],
-    [0,1,1,0,0,1,1,0],
-    [0,0,0,0,0,0,0,0],
-    [0,1,0,0,0,0,1,0],
-    [0,0,1,1,1,1,0,0],
-    [0,1,0,0,0,0,1,0],
-    [0,0,0,0,0,0,0,0]
-])
+    [0,  0,  0,  0,  0,  0,  0,  0],
+    [0,255,255,  0,  0,255,255,  0],
+    [0,255,255,  0,  0,255,255,  0],
+    [0,  0,  0,  0,  0,  0,  0,  0],
+    [0,150,  0,  0,  0,  0,150,  0],
+    [0,  0,255,255,255,255,  0,  0],
+    [0,150,  0,  0,  0,  0,150,  0],
+    [0,  0,  0,  0,  0,  0,  0,  0]
+], dtype=np.uint8)
 
 fig, ax = plt.subplots(figsize=(4, 4))
-ax.imshow(img, cmap='gray')
+ax.imshow(img, cmap='gray', vmin=0, vmax=255)
 
 # Annotate pixels with their values
 for i in range(8):
     for j in range(8):
-        color = 'black' if img[i, j] == 1 else 'white'
-        ax.text(j, i, img[i, j], ha='center', va='center', color=color)
+        # Choose text color for readability (white text on dark pixels, black on light)
+        color = 'white' if img[i, j] < 128 else 'black'
+        ax.text(j, i, img[i, j], ha='center', va='center', color=color, fontsize=8)
 
 ax.axis('off')
 plt.show()
@@ -118,10 +118,42 @@ plt.show()
 ::::
 :::::
 
-## Color Images: The RGB Channels {.smaller}
+## Coordinates vs. Array Indexing
 
-- Images are 3D matrices (height × width × **3 channels**).
-- **RGB**: Red, Green, Blue. Values range from `0` (dark) to `255` (bright).
+:::: {.columns}
+::: {.column width="50%"}
+- We think in geometry: `(x, y)` = `(width, height)`.
+- **NumPy** thinks in matrices: `matrix[row, col]` = `matrix[y, x]`.
+- This causes endless confusion when cropping with bounding boxes `(x1, y1, x2, y2)`.
+:::
+::: {.column width="50%"}
+```python
+# Assuming a bounding box (x1, y1, x2, y2)
+
+# WRONG (Crops wrong area or crashes)
+crop = img[x1:x2, y1:y2] 
+
+# CORRECT (y = row, x = col)
+crop = img[y1:y2, x1:x2] 
+```
+:::
+::::
+
+## Color Images: The RGB Pixel {.smaller}
+
+- In a color image, every pixel is a combination of 3 primary colors.
+- A pixel at position $(x, y)$ is a **vector** of 3 values: $[R, G, B]$.
+- Each value ranges from `0` to `255` (8-bit).
+
+```{=html}
+<iframe class="interactive-demo r-stretch" src="demo_rgb_pixel.html" width="100%" height="500px" style="border:none;"></iframe>
+```
+
+## Color Images: The ML Perspective {.smaller}
+
+- **Alternative View**: Instead of "pixels with 3 values", we see **3 separate layers**.
+- This is how **Machine Learning** models (CNNs) "see" images as **Tensors**.
+- Data structure: $(Height \times Width \times 3)$ or $(3 \times Height \times Width)$.
 
 ```{python}
 #| echo: false
@@ -133,40 +165,38 @@ import matplotlib.pyplot as plt
 # 4x4 image, 3 channels
 H, W, C = 4, 4, 3
 
-fig = plt.figure(figsize=(6, 6))
+fig = plt.figure(figsize=(7, 7))
 ax = fig.add_subplot(111, projection='3d')
 
 # Voxels need to be boolean arrays
-# Channels on X, Width on Y, Height on Z
 voxels = np.ones((C, W, H), dtype=bool)
 
 # Define colors for each voxel
 colors = np.empty(voxels.shape, dtype=object)
 
-# Assign colors for each channel layer
-colors[0, :, :] = '#ff6666'  # Red channel
-colors[1, :, :] = '#66ff66'  # Green channel
-colors[2, :, :] = '#6666ff'  # Blue channel
+# Assign colors for each channel layer (using vibrant SDAIA palette style)
+colors[0, :, :] = '#ff5e5e'  # Red channel
+colors[1, :, :] = '#5eff5e'  # Green channel
+colors[2, :, :] = '#5e5eff'  # Blue channel
 
-# Plot voxels
-# Note: alpha adds slight transparency so back layers are partially visible
-ax.voxels(voxels, facecolors=colors, edgecolor='black', linewidth=0.5, alpha=0.8)
+# Plot voxels with transparency
+ax.voxels(voxels, facecolors=colors, edgecolor='black', linewidth=0.3, alpha=0.7)
 
 # Labels
-ax.set_xlabel('Channels (X)', labelpad=10)
-ax.set_ylabel('Width (Y)', labelpad=10)
-ax.set_zlabel('Height (Z)', labelpad=10)
+ax.set_xlabel('Channels', labelpad=10, fontweight='bold')
+ax.set_ylabel('Width', labelpad=10, fontweight='bold')
+ax.set_zlabel('Height', labelpad=10, fontweight='bold')
 
-# Adjust 3D view angle to favor looking at the screen (Y-Z plane)
-ax.view_init(elev=20, azim=-35)
+# Adjust 3D view angle
+ax.view_init(elev=25, azim=-45)
 
-# Remove grid and panes for cleaner look
+# Clean up axes
 ax.grid(False)
-# Remove tick labels but keep ticks so axis labels are drawn accurately
 ax.set_xticklabels([])
 ax.set_yticklabels([])
 ax.set_zticklabels([])
 
+# Transparent panes
 ax.xaxis.pane.fill = False
 ax.yaxis.pane.fill = False
 ax.zaxis.pane.fill = False
@@ -181,7 +211,6 @@ plt.show()
 
 ## Essential Image Libraries
 
-<br>
 
 :::: {.columns}
 
@@ -223,28 +252,6 @@ The core math library.
 :::
 :::
 
-::::
-
-
-## Coordinates vs. Array Indexing
-
-:::: {.columns}
-::: {.column width="50%"}
-- We think in geometry: `(x, y)` = `(width, height)`.
-- **NumPy** thinks in matrices: `matrix[row, col]` = `matrix[y, x]`.
-- This causes endless confusion when cropping with bounding boxes `(x1, y1, x2, y2)`.
-:::
-::: {.column width="50%"}
-```python
-# Assuming a bounding box (x1, y1, x2, y2)
-
-# WRONG (Crops wrong area or crashes)
-crop = img[x1:x2, y1:y2] 
-
-# CORRECT (y = row, x = col)
-crop = img[y1:y2, x1:x2] 
-```
-:::
 ::::
 
 ## The "Smurf Effect": BGR vs. RGB
