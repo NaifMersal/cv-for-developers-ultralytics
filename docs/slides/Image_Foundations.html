@@ -234,7 +234,7 @@
 <li><strong>1. Capture</strong>: Just like the eye, the camera captures reflected light.</li>
 <li><strong>2. Lens &amp; Aperture</strong>: Light enters through an opening (aperture) and is focused by glass lenses.</li>
 <li><strong>3. The Sensor</strong>: Instead of a retina, light hits a <strong>digital sensor</strong> (CMOS/CCD).</li>
-<li><strong>4. Digitization</strong>: Millions of sensor <em>pixels</em> convert photons into electrical charges, creating a digital matrix.</li>
+<li><strong>4. Digitization</strong>: Millions of sensor <em>pixels</em> convert photons into electrical charges, creating a digital matrix (usually 8-bit).</li>
 </ul>
 <div class="callout callout-note callout-style-simple">
 <div class="callout-body">
@@ -251,23 +251,23 @@
 <h2>Grayscale Images: Pixels &amp; Coordinates</h2>
 <ul>
 <li>Images are 2D matrices of numbers. The origin <code>(0,0)</code> is top-left.</li>
-<li>Example: an 8x8 matrix where <code>0</code> is black and <code>1</code> is white.</li>
+<li><strong>8-bit Grayscale</strong>: Each pixel is a number from <code>0</code> (black) to <code>255</code> (white).</li>
 </ul>
 <div class="columns">
 <div class="column" style="width:50%;">
-<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb1"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href=""></a><span class="co"># 8x8 matrix (0=black, 1=white)</span></span>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb1"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href=""></a><span class="co"># 8x8 matrix (8-bit grayscale: 0-255)</span></span>
 <span id="cb1-2"><a href=""></a>img <span class="op">=</span> np.array([</span>
-<span id="cb1-3"><a href=""></a>    [<span class="dv">0</span>,<span class="dv">0</span>,<span class="dv">0</span>,<span class="dv">0</span>,<span class="dv">0</span>,<span class="dv">0</span>,<span class="dv">0</span>,<span class="dv">0</span>],</span>
-<span id="cb1-4"><a href=""></a>    [<span class="dv">0</span>,<span class="dv">1</span>,<span class="dv">1</span>,<span class="dv">0</span>,<span class="dv">0</span>,<span class="dv">1</span>,<span class="dv">1</span>,<span class="dv">0</span>],</span>
-<span id="cb1-5"><a href=""></a>    [<span class="dv">0</span>,<span class="dv">1</span>,<span class="dv">1</span>,<span class="dv">0</span>,<span class="dv">0</span>,<span class="dv">1</span>,<span class="dv">1</span>,<span class="dv">0</span>],</span>
-<span id="cb1-6"><a href=""></a>    [<span class="dv">0</span>,<span class="dv">0</span>,<span class="dv">0</span>,<span class="dv">0</span>,<span class="dv">0</span>,<span class="dv">0</span>,<span class="dv">0</span>,<span class="dv">0</span>],</span>
-<span id="cb1-7"><a href=""></a>    [<span class="dv">0</span>,<span class="dv">1</span>,<span class="dv">0</span>,<span class="dv">0</span>,<span class="dv">0</span>,<span class="dv">0</span>,<span class="dv">1</span>,<span class="dv">0</span>],</span>
-<span id="cb1-8"><a href=""></a>    [<span class="dv">0</span>,<span class="dv">0</span>,<span class="dv">1</span>,<span class="dv">1</span>,<span class="dv">1</span>,<span class="dv">1</span>,<span class="dv">0</span>,<span class="dv">0</span>],</span>
-<span id="cb1-9"><a href=""></a>    [<span class="dv">0</span>,<span class="dv">1</span>,<span class="dv">0</span>,<span class="dv">0</span>,<span class="dv">0</span>,<span class="dv">0</span>,<span class="dv">1</span>,<span class="dv">0</span>],</span>
-<span id="cb1-10"><a href=""></a>    [<span class="dv">0</span>,<span class="dv">0</span>,<span class="dv">0</span>,<span class="dv">0</span>,<span class="dv">0</span>,<span class="dv">0</span>,<span class="dv">0</span>,<span class="dv">0</span>]</span>
-<span id="cb1-11"><a href=""></a>])</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<span id="cb1-3"><a href=""></a>    [<span class="dv">0</span>,  <span class="dv">0</span>,  <span class="dv">0</span>,  <span class="dv">0</span>,  <span class="dv">0</span>,  <span class="dv">0</span>,  <span class="dv">0</span>,  <span class="dv">0</span>],</span>
+<span id="cb1-4"><a href=""></a>    [<span class="dv">0</span>,<span class="dv">255</span>,<span class="dv">255</span>,  <span class="dv">0</span>,  <span class="dv">0</span>,<span class="dv">255</span>,<span class="dv">255</span>,  <span class="dv">0</span>],</span>
+<span id="cb1-5"><a href=""></a>    [<span class="dv">0</span>,<span class="dv">255</span>,<span class="dv">255</span>,  <span class="dv">0</span>,  <span class="dv">0</span>,<span class="dv">255</span>,<span class="dv">255</span>,  <span class="dv">0</span>],</span>
+<span id="cb1-6"><a href=""></a>    [<span class="dv">0</span>,  <span class="dv">0</span>,  <span class="dv">0</span>,  <span class="dv">0</span>,  <span class="dv">0</span>,  <span class="dv">0</span>,  <span class="dv">0</span>,  <span class="dv">0</span>],</span>
+<span id="cb1-7"><a href=""></a>    [<span class="dv">0</span>,<span class="dv">150</span>,  <span class="dv">0</span>,  <span class="dv">0</span>,  <span class="dv">0</span>,  <span class="dv">0</span>,<span class="dv">150</span>,  <span class="dv">0</span>],</span>
+<span id="cb1-8"><a href=""></a>    [<span class="dv">0</span>,  <span class="dv">0</span>,<span class="dv">255</span>,<span class="dv">255</span>,<span class="dv">255</span>,<span class="dv">255</span>,  <span class="dv">0</span>,  <span class="dv">0</span>],</span>
+<span id="cb1-9"><a href=""></a>    [<span class="dv">0</span>,<span class="dv">150</span>,  <span class="dv">0</span>,  <span class="dv">0</span>,  <span class="dv">0</span>,  <span class="dv">0</span>,<span class="dv">150</span>,  <span class="dv">0</span>],</span>
+<span id="cb1-10"><a href=""></a>    [<span class="dv">0</span>,  <span class="dv">0</span>,  <span class="dv">0</span>,  <span class="dv">0</span>,  <span class="dv">0</span>,  <span class="dv">0</span>,  <span class="dv">0</span>,  <span class="dv">0</span>]</span>
+<span id="cb1-11"><a href=""></a>], dtype<span class="op">=</span>np.uint8)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div><div class="column" style="width:50%;">
-<div id="769bfcdb" class="cell" data-execution_count="1">
+<div id="892a0bde" class="cell" data-execution_count="1">
 <div class="cell-output cell-output-display">
 <div class="quarto-figure quarto-figure-center">
 <figure>
@@ -278,17 +278,46 @@
 </div>
 </div></div>
 </section>
-<section id="color-images-the-rgb-channels" class="slide level2 smaller">
-<h2>Color Images: The RGB Channels</h2>
+<section id="coordinates-vs.-array-indexing" class="slide level2">
+<h2>Coordinates vs.&nbsp;Array Indexing</h2>
+<div class="columns">
+<div class="column" style="width:50%;">
 <ul>
-<li>Images are 3D matrices (height × width × <strong>3 channels</strong>).</li>
-<li><strong>RGB</strong>: Red, Green, Blue. Values range from <code>0</code> (dark) to <code>255</code> (bright).</li>
+<li>We think in geometry: <code>(x, y)</code> = <code>(width, height)</code>.</li>
+<li><strong>NumPy</strong> thinks in matrices: <code>matrix[row, col]</code> = <code>matrix[y, x]</code>.</li>
+<li>This causes endless confusion when cropping with bounding boxes <code>(x1, y1, x2, y2)</code>.</li>
 </ul>
-<div id="e206d7a1" class="cell" data-execution_count="2">
+</div><div class="column" style="width:50%;">
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb2"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href=""></a><span class="co"># Assuming a bounding box (x1, y1, x2, y2)</span></span>
+<span id="cb2-2"><a href=""></a></span>
+<span id="cb2-3"><a href=""></a><span class="co"># WRONG (Crops wrong area or crashes)</span></span>
+<span id="cb2-4"><a href=""></a>crop <span class="op">=</span> img[x1:x2, y1:y2] </span>
+<span id="cb2-5"><a href=""></a></span>
+<span id="cb2-6"><a href=""></a><span class="co"># CORRECT (y = row, x = col)</span></span>
+<span id="cb2-7"><a href=""></a>crop <span class="op">=</span> img[y1:y2, x1:x2] </span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div></div>
+</section>
+<section id="color-images-the-rgb-pixel" class="slide level2 smaller">
+<h2>Color Images: The RGB Pixel</h2>
+<ul>
+<li>In a color image, every pixel is a combination of 3 primary colors.</li>
+<li>A pixel at position <span class="math inline">\((x, y)\)</span> is a <strong>vector</strong> of 3 values: <span class="math inline">\([R, G, B]\)</span>.</li>
+<li>Each value ranges from <code>0</code> to <code>255</code> (8-bit).</li>
+</ul>
+<iframe class="interactive-demo r-stretch" src="demo_rgb_pixel.html" width="100%" height="500px" style="border:none;"></iframe>
+</section>
+<section id="color-images-the-ml-perspective" class="slide level2 smaller">
+<h2>Color Images: The ML Perspective</h2>
+<ul>
+<li><strong>Alternative View</strong>: Instead of “pixels with 3 values”, we see <strong>3 separate layers</strong>.</li>
+<li>This is how <strong>Machine Learning</strong> models (CNNs) “see” images as <strong>Tensors</strong>.</li>
+<li>Data structure: <span class="math inline">\((Height \times Width \times 3)\)</span> or <span class="math inline">\((3 \times Height \times Width)\)</span>.</li>
+</ul>
+<div id="97b5e39b" class="cell" data-execution_count="2">
 <div class="cell-output cell-output-display">
 <div class="quarto-figure quarto-figure-center">
 <figure>
-<p><img data-src="Image_Foundations_files/figure-revealjs/cell-3-output-1.png" class="quarto-figure quarto-figure-center" width="479" height="463"></p>
+<p><img data-src="Image_Foundations_files/figure-revealjs/cell-3-output-1.png" class="quarto-figure quarto-figure-center" width="552" height="537"></p>
 </figure>
 </div>
 </div>
@@ -296,7 +325,6 @@
 </section>
 <section id="essential-image-libraries" class="slide level2">
 <h2>Essential Image Libraries</h2>
-<p><br></p>
 <div class="columns">
 <div class="column" style="width:33%;">
 <div class="callout callout-note no-icon callout-style-simple">
@@ -354,25 +382,6 @@ NumPy
 </div>
 </div>
 </div>
-</div></div>
-</section>
-<section id="coordinates-vs.-array-indexing" class="slide level2">
-<h2>Coordinates vs.&nbsp;Array Indexing</h2>
-<div class="columns">
-<div class="column" style="width:50%;">
-<ul>
-<li>We think in geometry: <code>(x, y)</code> = <code>(width, height)</code>.</li>
-<li><strong>NumPy</strong> thinks in matrices: <code>matrix[row, col]</code> = <code>matrix[y, x]</code>.</li>
-<li>This causes endless confusion when cropping with bounding boxes <code>(x1, y1, x2, y2)</code>.</li>
-</ul>
-</div><div class="column" style="width:50%;">
-<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb2"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href=""></a><span class="co"># Assuming a bounding box (x1, y1, x2, y2)</span></span>
-<span id="cb2-2"><a href=""></a></span>
-<span id="cb2-3"><a href=""></a><span class="co"># WRONG (Crops wrong area or crashes)</span></span>
-<span id="cb2-4"><a href=""></a>crop <span class="op">=</span> img[x1:x2, y1:y2] </span>
-<span id="cb2-5"><a href=""></a></span>
-<span id="cb2-6"><a href=""></a><span class="co"># CORRECT (y = row, x = col)</span></span>
-<span id="cb2-7"><a href=""></a>crop <span class="op">=</span> img[y1:y2, x1:x2] </span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div></div>
 </section>
 <section id="the-smurf-effect-bgr-vs.-rgb" class="slide level2">
