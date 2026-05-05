@@ -9,7 +9,7 @@
 <link href="../site_libs/quarto-html/quarto-syntax-highlighting-587c61ba64f3a5504c4d52d930310e48.css" rel="stylesheet" id="quarto-text-highlighting-styles"><meta charset="utf-8">
   <meta name="generator" content="quarto-1.8.26">
 
-  <meta name="dcterms.date" content="2026-05-05">
+  <meta name="dcterms.date" content="2026-05-06">
   <title>Ultralytics YOLO Foundations: Part 4</title>
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -203,7 +203,7 @@
 <div class="quarto-title-authors">
 </div>
 
-  <p class="date">2026-05-05</p>
+  <p class="date">2026-05-06</p>
 </section>
 <section>
 <section id="model-evaluation" class="title-slide slide level1 sdaia-dark center" data-background-gradient="linear-gradient(135deg, #1C355E, #00C9A7)">
@@ -308,7 +308,7 @@
 <p><strong>What if our model catches every car, but is “trigger-happy”?</strong></p>
 <div class="columns">
 <div class="column" style="width:55%;">
-<div id="00bc01d8" class="cell" data-execution_count="1">
+<div id="19c994e7" class="cell" data-execution_count="1">
 <div class="cell-output cell-output-display">
 <div class="quarto-figure quarto-figure-center">
 <figure>
@@ -366,7 +366,7 @@
 <section id="model-a-over-sensitive" class="slide level2">
 <h2>Model A: “Over-Sensitive”</h2>
 <p><em>Flags everything — never misses a car</em></p>
-<div id="95876399" class="cell" data-execution_count="2">
+<div id="566efe35" class="cell" data-execution_count="2">
 <div class="cell-output cell-output-display">
 <div class="quarto-figure quarto-figure-center">
 <figure>
@@ -385,7 +385,7 @@
 <section id="model-b-cautious" class="slide level2">
 <h2>Model B: “Cautious”</h2>
 <p><em>Only flags when very confident</em></p>
-<div id="9d1f8c34" class="cell" data-execution_count="3">
+<div id="0841a604" class="cell" data-execution_count="3">
 <div class="cell-output cell-output-display">
 <div class="quarto-figure quarto-figure-center">
 <figure>
@@ -469,7 +469,7 @@
 </section>
 <section id="f1-score-model-comparison" class="slide level2">
 <h2>F1 Score: Model Comparison</h2>
-<div id="519b5f9b" class="cell" data-execution_count="4">
+<div id="d1d68187" class="cell" data-execution_count="4">
 <div class="cell-output cell-output-display">
 <div class="quarto-figure quarto-figure-center">
 <figure>
@@ -488,7 +488,7 @@
 </section>
 <section id="choosing-the-right-threshold" class="slide level2">
 <h2>Choosing the Right Threshold</h2>
-<div id="ae57a794" class="cell" data-execution_count="5">
+<div id="17aa5414" class="cell" data-execution_count="5">
 <div class="cell-output cell-output-display">
 <div class="quarto-figure quarto-figure-center">
 <figure>
@@ -625,7 +625,7 @@
 <section id="the-cost-curve" class="slide level2">
 <h2>The Cost Curve</h2>
 <p>Just like we plotted the F1 curve, we can plot a <strong>Cost Curve</strong> to find the optimal threshold for deployment.</p>
-<div id="7dd585c6" class="cell" data-execution_count="6">
+<div id="5ed0666b" class="cell" data-execution_count="6">
 <div class="cell-output cell-output-display">
 <div class="quarto-figure quarto-figure-center">
 <figure>
@@ -695,7 +695,7 @@
 </div>
 <p><br></p>
 </div><div class="column" style="width:50%;">
-<div id="4dbcf2c1" class="cell" data-execution_count="7">
+<div id="6570db6d" class="cell" data-execution_count="7">
 <div class="cell-output cell-output-display">
 <div class="quarto-figure quarto-figure-center">
 <figure>
@@ -718,6 +718,96 @@
 </div>
 </div></div>
 </section>
+<section id="from-binary-to-multi-class-one-vs-rest-most-common" class="slide level2">
+<h2>From Binary to Multi-Class: One-vs-Rest (most common)</h2>
+<p>When we have many classes, we reduce the problem to binary by isolating each class.</p>
+<div class="fragment fade-up" style="text-align: center; font-size: 1.1em; margin: 1rem 0;">
+<blockquote>
+<p>Pick <strong>one class</strong> as <em>Positive</em> — everything else is <em>Negative</em>. Repeat for every class.</p>
+</blockquote>
+</div>
+<div class="fragment fade-up">
+<blockquote>
+<p>This logic applies to <strong>any</strong> binary metric like Precision, Recall, AP, etc.</p>
+</blockquote>
+</div>
+</section>
+<section id="per-class-recall-formula" class="slide level2">
+<h2>Per-Class Recall Formula</h2>
+<p>For a specific class <span class="math inline">\(i\)</span>, treat it as <strong>“positive”</strong> and all others as <strong>“negative”</strong>:</p>
+<p><span class="math display">\[Recall_i = \frac{TP_i}{TP_i + FN_i}\]</span></p>
+<div class="fragment fade-up" style="margin-top: 1.5rem;">
+<div class="columns">
+<div class="column" style="width:50%;">
+<div class="callout callout-note no-icon callout-style-simple">
+<div class="callout-body">
+<div class="callout-content">
+<p><strong><span class="math inline">\(TP_i\)</span></strong> — instances of class <span class="math inline">\(i\)</span> correctly predicted as class <span class="math inline">\(i\)</span></p>
+</div>
+</div>
+</div>
+</div><div class="column" style="width:50%;">
+<div class="callout callout-warning no-icon callout-style-simple">
+<div class="callout-body">
+<div class="callout-content">
+<p><strong><span class="math inline">\(FN_i\)</span></strong> — instances of class <span class="math inline">\(i\)</span> predicted as <strong>any other class</strong></p>
+</div>
+</div>
+</div>
+</div></div>
+</div>
+</section>
+<section id="ways-to-aggregate-per-class-scores" class="slide level2">
+<h2>Ways to Aggregate Per-Class Scores</h2>
+<p>Once you have a score per class, you combine them into a single number:</p>
+<div class="fragment fade-up" style="margin-top: 0.5rem;">
+<table class="caption-top">
+<colgroup>
+<col style="width: 33%">
+<col style="width: 33%">
+<col style="width: 33%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>Strategy</th>
+<th>Formula</th>
+<th>Character</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><strong>Macro</strong></td>
+<td><span class="math inline">\(\frac{\sum M_i}{n}\)</span></td>
+<td>All classes equally weighted</td>
+</tr>
+<tr class="even">
+<td><strong>Micro</strong></td>
+<td><span class="math inline">\(\frac{\sum \text{Num}_i}{\sum \text{Denom}_i}\)</span></td>
+<td>Pooled counts (treats every sample equally)</td>
+</tr>
+<tr class="odd">
+<td><strong>Weighted</strong></td>
+<td><span class="math inline">\(\frac{\sum M_i \cdot S_i}{\sum S_i}\)</span></td>
+<td>Weighted by class size (Support)</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="fragment fade-up" style="font-size: 0.75em; text-align: center; opacity: 0.85; margin-top: 0.5rem;">
+<p><strong><span class="math inline">\(M_i\)</span></strong>: Metric per class (<span class="math inline">\(P, R, AP\)</span>) <br> <strong><span class="math inline">\(S_i\)</span></strong>: Support (class size) <br> <strong><span class="math inline">\(\text{Num}_i / \text{Denom}_i\)</span></strong>: Numerator / Denominator (e.g., <span class="math inline">\(TP / (TP+FP)\)</span>)</p>
+</div>
+<div class="fragment fade-up">
+<div style="margin-top: 1rem;">
+<div class="callout callout-tip no-icon callout-style-simple">
+<div class="callout-body">
+<div class="callout-content">
+<p><strong>mAP = Macro-Average of per-class AP scores.</strong> Every class contributes equally.</p>
+</div>
+</div>
+</div>
+</div>
+</div>
+</section>
 <section id="but-does-location-matter" class="slide level2">
 <h2>But Does Location Matter?</h2>
 <p>Precision and Recall measure <strong>whether</strong> a classification is correct.</p>
@@ -734,7 +824,7 @@
 <section id="intersection-over-union-iou" class="slide level2">
 <h2>Intersection over Union (IoU)</h2>
 <p>How perfectly does the predicted bounding box overlap the <em>ground truth</em> box?</p>
-<div id="deb837ca" class="cell" data-execution_count="8">
+<div id="39872fda" class="cell" data-execution_count="8">
 <div class="cell-output cell-output-display">
 <div class="quarto-figure quarto-figure-center">
 <figure>
@@ -750,7 +840,7 @@
 <p>A prediction must be <strong>accurate in location</strong> (<span class="math inline">\(IoU \ge 0.5\)</span>) to count as a <strong>True Positive (TP)</strong>.</p>
 <div class="columns">
 <div class="column" style="width:55%;">
-<div id="5fe54434" class="cell" data-execution_count="9">
+<div id="e5c558b6" class="cell" data-execution_count="9">
 <div class="cell-output cell-output-display">
 <div class="quarto-figure quarto-figure-center">
 <figure>
@@ -780,7 +870,7 @@
 <p>A common question is: <em>“What if the model predicts multiple boxes for the exact same object?”</em></p>
 <div class="columns">
 <div class="column" style="width:50%;">
-<div id="aaf72ffc" class="cell" data-execution_count="10">
+<div id="6ab7cee4" class="cell" data-execution_count="10">
 <div class="cell-output cell-output-display">
 <div class="quarto-figure quarto-figure-center">
 <figure>
@@ -799,8 +889,6 @@
 </section>
 <section id="mean-average-precision-map" class="slide level2">
 <h2>Mean Average Precision (mAP)</h2>
-<p>Once we have the AP for every class (Cars, Pedestrians, Trees, etc.), we simply take the arithmetic mean.</p>
-<p><span class="math display">\[mAP = \frac{AP_{cars} + AP_{pedestrians} + AP_{trees} + ...}{Total\ Number\ of\ Classes}\]</span></p>
 <ul>
 <li><strong>mAP50:</strong> Accuracy considering only “easy” detections (IoU &gt; 0.50).</li>
 <li><strong>mAP50-95:</strong> The strict evaluation averaged across multiple IoU thresholds (from 0.50 to 0.95).</li>
@@ -811,7 +899,7 @@
 <p>For segmentation, we evaluate how well the <strong>pixels</strong> overlap, not just bounding boxes.</p>
 <div class="columns">
 <div class="column" style="width:50%;">
-<div id="637d74dd" class="cell" data-execution_count="11">
+<div id="190b54de" class="cell" data-execution_count="11">
 <div class="cell-output cell-output-display">
 <div class="quarto-figure quarto-figure-center">
 <figure>
@@ -842,7 +930,7 @@
 <p>The most common metric in <strong>Medical AI</strong>. It is mathematically identical to the <strong>F1-score</strong> at the pixel level.</p>
 <div class="columns">
 <div class="column" style="width:50%;">
-<div id="6dc789c7" class="cell" data-execution_count="12">
+<div id="69757627" class="cell" data-execution_count="12">
 <div class="cell-output cell-output-display">
 <div class="quarto-figure quarto-figure-center">
 <figure>
@@ -919,7 +1007,7 @@
 <section id="class-imbalance-fixing-the-bias" class="slide level2">
 <h2>Class Imbalance: Fixing the Bias</h2>
 <p>How do we stop the model from ignoring rare classes during training?</p>
-<div id="c4bfaedc" class="cell" data-execution_count="13">
+<div id="0b58556b" class="cell" data-execution_count="13">
 <div class="cell-output cell-output-display">
 <div class="quarto-figure quarto-figure-center">
 <figure>
@@ -1010,7 +1098,7 @@
 <li>Growing gap between the two curves</li>
 </ul>
 </div><div class="column" style="width:58%;">
-<div id="35dbe150" class="cell" data-execution_count="14">
+<div id="6594e7b6" class="cell" data-execution_count="14">
 <div class="cell-output cell-output-display">
 <div class="quarto-figure quarto-figure-center">
 <figure>
@@ -1065,7 +1153,7 @@
 <li>Curves close together — but both stuck high</li>
 </ul>
 </div><div class="column" style="width:55%;">
-<div id="57f3a022" class="cell" data-execution_count="15">
+<div id="bd30f69c" class="cell" data-execution_count="15">
 <div class="cell-output cell-output-display">
 <div class="quarto-figure quarto-figure-center">
 <figure>
@@ -1105,7 +1193,7 @@
 <li>Model generalizes — performs well on unseen data</li>
 </ul>
 </div><div class="column" style="width:55%;">
-<div id="55e21c5a" class="cell" data-execution_count="16">
+<div id="e1bafbfb" class="cell" data-execution_count="16">
 <div class="cell-output cell-output-display">
 <div class="quarto-figure quarto-figure-center">
 <figure>
@@ -1199,7 +1287,7 @@
 <section id="what-data-augmentation-does" class="slide level2">
 <h2>What Data Augmentation Does</h2>
 <p><strong>Concept:</strong> Artificially increase training data variety by applying transformations to existing images.</p>
-<div id="e0c01e23" class="cell" data-execution_count="17">
+<div id="c7f9b47c" class="cell" data-execution_count="17">
 <div class="cell-output cell-output-display">
 <div class="quarto-figure quarto-figure-center">
 <figure>
@@ -1242,7 +1330,7 @@
 <div class="column" style="width:45%;">
 <p>🔴 <strong>Too High</strong>: Spikes/noise. Model “jumps” over the optimal solution.</p>
 </div><div class="column" style="width:55%;">
-<div id="a94e3f05" class="cell" data-fig-height="1.6" data-execution_count="18">
+<div id="6799db59" class="cell" data-fig-height="1.6" data-execution_count="18">
 <div class="cell-output cell-output-display">
 <div class="quarto-figure quarto-figure-center">
 <figure>
@@ -1256,7 +1344,7 @@
 <div class="column" style="width:45%;">
 <p>🔵 <strong>Too Small</strong>: Flat line. Model is too “timid” to learn.</p>
 </div><div class="column" style="width:55%;">
-<div id="adfc4a54" class="cell" data-fig-height="1.6" data-execution_count="19">
+<div id="58a70768" class="cell" data-fig-height="1.6" data-execution_count="19">
 <div class="cell-output cell-output-display">
 <div class="quarto-figure quarto-figure-center">
 <figure>
@@ -1270,7 +1358,7 @@
 <div class="column" style="width:45%;">
 <p>🟢 <strong>Just Right</strong>: Smooth, rapid decay to a low plateau.</p>
 </div><div class="column" style="width:55%;">
-<div id="c75042f3" class="cell" data-fig-height="1.6" data-execution_count="20">
+<div id="af675c88" class="cell" data-fig-height="1.6" data-execution_count="20">
 <div class="cell-output cell-output-display">
 <div class="quarto-figure quarto-figure-center">
 <figure>
@@ -1285,7 +1373,7 @@
 <h2>Hyperparameters: Weight Decay</h2>
 <div class="columns">
 <div class="column" style="width:55%;">
-<div id="c7d65b54" class="cell" data-execution_count="21">
+<div id="1e2efe07" class="cell" data-execution_count="21">
 <div class="cell-output cell-output-display">
 <div class="quarto-figure quarto-figure-center">
 <figure>
@@ -1331,7 +1419,7 @@
 <span id="cb9-6"><a></a>            epochs<span class="op">=</span><span class="dv">100</span>, </span>
 <span id="cb9-7"><a></a>            patience<span class="op">=</span><span class="dv">10</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div><div class="column" style="width:55%;">
-<div id="b83b6789" class="cell" data-execution_count="22">
+<div id="5286bdb9" class="cell" data-execution_count="22">
 <div class="cell-output cell-output-display">
 <div class="quarto-figure quarto-figure-center">
 <figure>

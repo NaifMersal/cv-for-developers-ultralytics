@@ -1,0 +1,608 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Per-Class Evaluation Demo</title>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body {
+    height: 100%; overflow: hidden;
+    font-family: "Helvetica Neue", "Segoe UI", Arial, sans-serif;
+    background: #ffffff; color: #101820;
+  }
+
+  :root {
+    --navy:   #1C355E;
+    --teal:   #00AE8D;
+    --orange: #E96852;
+    --green:  #6ABF4B;
+    --yellow: #FFB548;
+    --muted:  #5b6678;
+    --border: #dbe2ea;
+    --bg-soft:#f7f9fc;
+    --tp: #00AE8D;
+    --fp: #E96852;
+    --fn: #FFB548;
+  }
+
+  /* ── Layout ── */
+  .shell {
+    display: grid;
+    grid-template-rows: auto 1fr auto;
+    height: 100vh;
+    gap: 0;
+  }
+
+  /* ── Top bar ── */
+  .top-bar {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    padding: 9px 20px 8px;
+    background: var(--bg-soft);
+    border-bottom: 2px solid var(--border);
+    flex-shrink: 0;
+  }
+  .top-bar .question {
+    font-size: 0.82em; font-weight: 700; color: var(--navy);
+    white-space: nowrap;
+  }
+  .top-bar .question span {
+    color: var(--teal);
+  }
+  .top-bar .arrow {
+    font-size: 0.9em; color: var(--muted); margin: 0 2px;
+  }
+  .class-pill {
+    display: inline-flex; align-items: center; gap: 5px;
+    padding: 5px 14px; border-radius: 999px; border: 2px solid var(--navy);
+    font-size: 0.9em; font-weight: 800; cursor: pointer;
+    background: white; color: var(--navy);
+    transition: all 0.2s ease;
+  }
+  .class-pill.active {
+    background: var(--navy); color: white;
+    box-shadow: 0 2px 8px rgba(28,53,94,0.25);
+  }
+  .class-pill:hover:not(.active) {
+    background: rgba(28,53,94,0.08);
+  }
+
+  /* ── Main content area ── */
+  .main {
+    display: grid;
+    grid-template-columns: 1fr 210px;
+    gap: 12px;
+    padding: 10px 14px;
+    min-height: 0;
+    overflow: hidden;
+  }
+
+  /* ── Prediction table ── */
+  .table-wrap {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+    overflow: hidden;
+  }
+
+  .col-headers {
+    display: grid;
+    grid-template-columns: 30px 1fr 1fr 1fr 1fr;
+    gap: 6px;
+    padding: 0 6px;
+    font-size: 0.62em;
+    font-weight: 700;
+    color: var(--muted);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
+
+  .pred-rows {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+    flex: 1;
+    overflow: hidden;
+  }
+
+  .pred-row {
+    display: grid;
+    grid-template-columns: 30px 1fr 1fr 1fr 1fr;
+    gap: 6px;
+    align-items: center;
+    padding: 7px 8px;
+    border-radius: 10px;
+    border: 2px solid var(--border);
+    background: white;
+    opacity: 0;
+    transform: translateX(-12px);
+    transition: opacity 0.35s ease, transform 0.35s ease,
+                border-color 0.3s ease, background 0.3s ease;
+    flex-shrink: 0;
+  }
+  .pred-row.revealed {
+    opacity: 1;
+    transform: translateX(0);
+  }
+  /* Fix #1: dim entire skipped row */
+  .pred-row.verdict-skip {
+    opacity: 0.35;
+    background: #f7f9fc;
+    border-color: var(--border);
+    filter: grayscale(0.3);
+  }
+  .pred-row.verdict-tp { border-color: var(--tp); background: rgba(0,174,141,0.06); }
+  .pred-row.verdict-fp { border-color: var(--fp); background: rgba(233,104,82,0.06); }
+  .pred-row.verdict-fn { border-color: var(--fn); background: rgba(255,181,72,0.06); }
+
+  .cell-rank {
+    font-size: 0.68em; font-weight: 700; color: var(--muted);
+    text-align: center;
+  }
+  .cell-object {
+    display: flex; align-items: center; gap: 6px;
+    font-size: 0.8em; font-weight: 600; color: var(--navy);
+  }
+  .cell-object .icon { font-size: 1.35em; line-height: 1; }
+  .cell-said {
+    font-size: 0.8em; font-weight: 700;
+    display: flex; align-items: center; gap: 5px;
+  }
+  .conf-badge {
+    display: inline-block;
+    padding: 2px 6px; border-radius: 6px;
+    font-size: 0.75em; font-weight: 800;
+    background: rgba(28,53,94,0.08); color: var(--navy);
+  }
+  .cell-gt {
+    font-size: 0.8em; font-weight: 600; color: var(--navy);
+    display: flex; align-items: center; gap: 5px;
+  }
+
+  /* Fix #2: verdict chip now has reason tooltip */
+  .verdict-chip {
+    display: inline-flex; flex-direction: column;
+    align-items: center; justify-content: center;
+    padding: 4px 6px; border-radius: 8px;
+    font-size: 0.68em; font-weight: 900; letter-spacing: 0.02em;
+    color: white; opacity: 0;
+    transform: scale(0.6);
+    transition: opacity 0.25s ease 0.15s, transform 0.25s ease 0.15s;
+    text-align: center; line-height: 1.3;
+    cursor: default;
+  }
+  .verdict-chip .chip-label { font-size: 1em; font-weight: 900; }
+  .verdict-chip .chip-reason {
+    font-size: 0.78em; font-weight: 600; opacity: 0.88;
+    letter-spacing: 0;
+  }
+  .pred-row.revealed .verdict-chip { opacity: 1; transform: scale(1); }
+  .chip-tp { background: var(--tp); }
+  .chip-fp { background: var(--fp); }
+  .chip-fn { background: var(--fn); color: #101820; }
+  .chip-skip { background: #c8d0db; color: #5b6678; }
+
+  /* ── Right panel ── */
+  .counter-panel {
+    display: flex;
+    flex-direction: column;
+    gap: 7px;
+    justify-content: flex-start;
+    padding-top: 2px;
+  }
+
+  .counter-box {
+    border-radius: 12px;
+    border: 2px solid var(--border);
+    background: white;
+    padding: 7px 10px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1px;
+    transition: border-color 0.3s ease;
+  }
+  .counter-box.tp-box { border-color: var(--tp); }
+  .counter-box.fp-box { border-color: var(--fp); }
+  .counter-box.fn-box { border-color: var(--fn); }
+
+  .counter-label {
+    font-size: 0.6em; font-weight: 700;
+    text-transform: uppercase; letter-spacing: 0.06em;
+  }
+  .counter-label.tp { color: var(--tp); }
+  .counter-label.fn { color: var(--fn); }
+  .counter-label.fp { color: var(--fp); }
+
+  .counter-num {
+    font-size: 1.7em; font-weight: 900; color: var(--navy);
+    transition: transform 0.15s ease;
+    line-height: 1;
+  }
+  .counter-num.bump { transform: scale(1.45); }
+  .counter-sub {
+    font-size: 0.58em; color: var(--muted);
+    text-align: center; line-height: 1.3;
+  }
+
+  /* Fix #3: larger, clearer formula box */
+  .formula-box {
+    border-radius: 10px;
+    border: 2px solid var(--border);
+    background: var(--bg-soft);
+    padding: 8px 10px;
+    font-size: 0.74em;
+    color: var(--navy);
+    text-align: center;
+    line-height: 1.9;
+  }
+  .formula-box .frac {
+    display: inline-flex; flex-direction: column;
+    align-items: center; vertical-align: middle;
+    font-size: 0.95em;
+  }
+  .formula-box .num { border-bottom: 1.5px solid var(--navy); padding: 0 3px 1px; }
+  .formula-box .den { padding: 1px 3px 0; }
+  .formula-summary {
+    font-size: 0.62em; color: var(--muted);
+    text-align: center; line-height: 1.35;
+    margin-top: 4px;
+    min-height: 2.7em;
+    padding: 0 2px;
+  }
+
+  /* ── Bottom controls ── */
+  .bottom-bar {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    padding: 8px 20px 10px;
+    border-top: 2px solid var(--border);
+    background: var(--bg-soft);
+    flex-shrink: 0;
+  }
+  .btn {
+    display: inline-flex; align-items: center; gap: 5px;
+    padding: 6px 16px; border-radius: 8px; border: none; cursor: pointer;
+    font-size: 0.8em; font-weight: 800; letter-spacing: 0.02em;
+    transition: all 0.18s ease; outline: none;
+  }
+  .btn-primary { background: var(--navy); color: white; }
+  .btn-primary:hover { background: #253f72; }
+  .btn-primary:disabled { background: #c8d0db; color: #8a96a3; cursor: default; }
+  .btn-ghost { background: white; color: var(--navy); border: 2px solid var(--navy); }
+  .btn-ghost:hover { background: rgba(28,53,94,0.07); }
+  /* Fix #4: Reveal All button style */
+  .btn-reveal-all { background: #e8f5f1; color: var(--teal); border: 2px solid var(--teal); }
+  .btn-reveal-all:hover { background: #d0ede6; }
+  .btn-reveal-all:disabled { background: #f0f0f0; color: #b0b0b0; border-color: #ccc; cursor: default; }
+
+  .step-indicator {
+    font-size: 0.72em; font-weight: 600; color: var(--muted);
+    min-width: 80px; text-align: center;
+  }
+</style>
+</head>
+<body>
+<div class="shell">
+
+  <!-- ── TOP BAR ── Fix #5: binary question framing -->
+  <div class="top-bar">
+    <span class="question">Evaluating: <span id="questionSpan">"Is this object a 🚗 Car?"</span></span>
+    <span class="arrow">→</span>
+    <button class="class-pill active" data-cls="car"  onclick="switchClass('car')" >🚗 Car</button>
+    <button class="class-pill"        data-cls="bus"  onclick="switchClass('bus')" >🚌 Bus</button>
+    <button class="class-pill"        data-cls="bike" onclick="switchClass('bike')">🚲 Bike</button>
+  </div>
+
+  <!-- ── MAIN ── -->
+  <div class="main">
+
+    <!-- prediction table -->
+    <div class="table-wrap">
+      <div class="col-headers">
+        <div>#</div>
+        <div>Object in scene</div>
+        <div>Model said</div>
+        <div>Ground truth</div>
+        <div style="text-align:center;">Verdict</div>
+      </div>
+      <div class="pred-rows" id="predRows"></div>
+    </div>
+
+    <!-- right panel -->
+    <div class="counter-panel">
+      <div class="counter-box tp-box">
+        <div class="counter-label tp">True Positive</div>
+        <div class="counter-num" id="cntTP">0</div>
+        <div class="counter-sub">Said ✓ &amp; is ✓</div>
+      </div>
+      <div class="counter-box fp-box">
+        <div class="counter-label fp">False Positive</div>
+        <div class="counter-num" id="cntFP">0</div>
+        <div class="counter-sub">Said ✓ but is ✗</div>
+      </div>
+      <div class="counter-box fn-box">
+        <div class="counter-label fn">False Negative</div>
+        <div class="counter-num" id="cntFN">0</div>
+        <div class="counter-sub">Is ✓ but said ✗</div>
+      </div>
+
+      <!-- Fix #3: improved formula box -->
+      <div class="formula-box" id="formulaBox">
+        <strong>Precision</strong> =
+        <span class="frac">
+          <span class="num" id="fPrecNum">TP</span>
+          <span class="den" id="fPrecDen">TP+FP</span>
+        </span>
+        &nbsp;=&nbsp;<span id="fPrecVal" style="font-weight:900;">—</span>
+        <br>
+        <strong>Recall</strong>&nbsp;&nbsp;&nbsp;=
+        <span class="frac">
+          <span class="num" id="fRecNum">TP</span>
+          <span class="den" id="fRecDen">TP+FN</span>
+        </span>
+        &nbsp;=&nbsp;<span id="fRecVal" style="font-weight:900;">—</span>
+      </div>
+      <div class="formula-summary" id="formulaSummary"></div>
+    </div>
+  </div><!-- /.main -->
+
+  <!-- ── BOTTOM CONTROLS ── Fix #4: added Reveal All button -->
+  <div class="bottom-bar">
+    <button class="btn btn-ghost" onclick="reset()">↺ Reset</button>
+    <span class="step-indicator" id="stepIndicator">Step 0 / 8</span>
+    <button class="btn btn-reveal-all" id="btnRevealAll" onclick="revealAll()">Show All ⚡</button>
+    <button class="btn btn-primary" id="btnNext" onclick="nextStep()">Next →</button>
+  </div>
+
+</div><!-- /.shell -->
+
+<script>
+// ── Dataset ──────────────────────────────────────────────────────────────────
+const SCENE = [
+  { icon:'🚗', truth:'Car',  said:'Car',  conf:0.93 },
+  { icon:'🚗', truth:'Car',  said:'Car',  conf:0.87 },
+  { icon:'🚌', truth:'Bus',  said:'Car',  conf:0.81 },
+  { icon:'🚗', truth:'Car',  said:'Car',  conf:0.74 },
+  { icon:'🚲', truth:'Bike', said:'Car',  conf:0.61 },
+  { icon:'🚗', truth:'Car',  said:'Car',  conf:0.48 },
+  { icon:'🚗', truth:'Car',  said:null,   conf:null  },
+  { icon:'🚌', truth:'Bus',  said:null,   conf:null  },
+];
+
+// Label + emoji map
+const CLASS_META = {
+  car:  { label: 'Car',  emoji: '🚗' },
+  bus:  { label: 'Bus',  emoji: '🚌' },
+  bike: { label: 'Bike', emoji: '🚲' },
+};
+
+let activeClass = 'car';
+let step = 0;
+const TOTAL = SCENE.length;
+
+function getVerdict(entry, cls) {
+  const truthMatch = entry.truth.toLowerCase() === cls;
+  if (entry.said === null) {
+    return truthMatch ? 'fn' : 'skip';
+  }
+  const saidMatch = entry.said.toLowerCase() === cls;
+  if (saidMatch &&  truthMatch) return 'tp';
+  if (saidMatch && !truthMatch) return 'fp';
+  if (!saidMatch && truthMatch) return 'fn';
+  return 'skip';
+}
+
+// Fix #2: human-readable reason for each verdict
+function getVerdictReason(entry, cls, verdict) {
+  const meta = CLASS_META[cls];
+  if (!meta) return '';
+  if (verdict === 'tp') return `Said ${meta.label}, is ${meta.label}`;
+  if (verdict === 'fp') return `Said ${meta.label}, not ${meta.label}`;
+  if (verdict === 'fn') return `Is ${meta.label}, missed`;
+  if (verdict === 'skip') return `Not ${meta.label}`;
+  return '';
+}
+
+function fmt(n) { return n.toFixed(2); }
+
+function bumpCounter(el) {
+  el.classList.add('bump');
+  setTimeout(() => el.classList.remove('bump'), 160);
+}
+
+function updateCounters() {
+  let tp=0, fp=0, fn=0;
+  document.querySelectorAll('.pred-row.revealed').forEach(row => {
+    const v = row.dataset.verdict;
+    if (v === 'tp') tp++;
+    else if (v === 'fp') fp++;
+    else if (v === 'fn') fn++;
+  });
+
+  const elTP = document.getElementById('cntTP');
+  const elFP = document.getElementById('cntFP');
+  const elFN = document.getElementById('cntFN');
+  if (parseInt(elTP.textContent) !== tp) { elTP.textContent = tp; bumpCounter(elTP); }
+  if (parseInt(elFP.textContent) !== fp) { elFP.textContent = fp; bumpCounter(elFP); }
+  if (parseInt(elFN.textContent) !== fn) { elFN.textContent = fn; bumpCounter(elFN); }
+
+  const prec = (tp + fp) > 0 ? tp / (tp + fp) : null;
+  const rec  = (tp + fn) > 0 ? tp / (tp + fn) : null;
+
+  document.getElementById('fPrecNum').textContent = tp;
+  document.getElementById('fPrecDen').textContent = `${tp}+${fp}`;
+  document.getElementById('fRecNum').textContent  = tp;
+  document.getElementById('fRecDen').textContent  = `${tp}+${fn}`;
+  document.getElementById('fPrecVal').textContent = prec !== null ? fmt(prec) : '—';
+  document.getElementById('fRecVal').textContent  = rec  !== null ? fmt(rec)  : '—';
+
+  // Fix #3: plain-English summary sentence
+  const meta = CLASS_META[activeClass];
+  const sumEl = document.getElementById('formulaSummary');
+  const total = tp + fp + fn;
+  if (total === 0 || step === 0) {
+    sumEl.textContent = '';
+  } else if (prec !== null && rec !== null) {
+    sumEl.textContent =
+      `${tp} of ${tp+fp} "${meta.label}" predictions were correct. ${fn} ${meta.label}${fn===1?'':'s'} were missed.`;
+  } else {
+    sumEl.textContent = '';
+  }
+}
+
+function buildRows() {
+  const container = document.getElementById('predRows');
+  container.innerHTML = '';
+
+  SCENE.forEach((entry, i) => {
+    const verdict = getVerdict(entry, activeClass);
+    const row = document.createElement('div');
+    row.className = 'pred-row';
+    row.dataset.verdict = verdict;
+    row._verdictClass = verdict !== 'skip' ? `verdict-${verdict}` : 'verdict-skip';
+
+    // rank
+    const rank = document.createElement('div');
+    rank.className = 'cell-rank';
+    rank.textContent = i + 1;
+
+    // object in scene
+    const obj = document.createElement('div');
+    obj.className = 'cell-object';
+    obj.innerHTML = `<span class="icon">${entry.icon}</span> ${entry.truth}`;
+
+    // model said
+    const said = document.createElement('div');
+    said.className = 'cell-said';
+    if (entry.said) {
+      const isTarget = entry.said.toLowerCase() === activeClass;
+      said.innerHTML = `
+        <strong style="color:${isTarget ? 'var(--navy)' : 'var(--muted)'}">${entry.said}</strong>
+        <span class="conf-badge">${fmt(entry.conf)}</span>`;
+    } else {
+      said.innerHTML = `<span style="color:var(--muted); font-style:italic;">no prediction</span>`;
+    }
+
+    // ground truth
+    const gt = document.createElement('div');
+    gt.className = 'cell-gt';
+    const isMatch = entry.truth.toLowerCase() === activeClass;
+    gt.innerHTML = `<span class="icon">${entry.icon}</span>
+      <strong style="color:${isMatch ? 'var(--teal)' : 'var(--muted)'}">${entry.truth}</strong>`;
+
+    // Fix #2: verdict chip with reason
+    const chip = document.createElement('div');
+    chip.className = 'verdict-chip';
+    const reason = getVerdictReason(entry, activeClass, verdict);
+    if (verdict === 'tp') {
+      chip.classList.add('chip-tp');
+      chip.innerHTML = `<span class="chip-label">TP ✅</span><span class="chip-reason">${reason}</span>`;
+    } else if (verdict === 'fp') {
+      chip.classList.add('chip-fp');
+      chip.innerHTML = `<span class="chip-label">FP ❌</span><span class="chip-reason">${reason}</span>`;
+    } else if (verdict === 'fn') {
+      chip.classList.add('chip-fn');
+      chip.innerHTML = `<span class="chip-label">FN ⚠️</span><span class="chip-reason">${reason}</span>`;
+    } else {
+      chip.classList.add('chip-skip');
+      chip.innerHTML = `<span class="chip-label">—</span><span class="chip-reason">${reason}</span>`;
+    }
+
+    row.appendChild(rank);
+    row.appendChild(obj);
+    row.appendChild(said);
+    row.appendChild(gt);
+    row.appendChild(chip);
+    container.appendChild(row);
+  });
+}
+
+function applyRevealedRows() {
+  document.querySelectorAll('.pred-row').forEach((row, i) => {
+    if (i < step) {
+      row.classList.add('revealed');
+      if (row._verdictClass) row.classList.add(row._verdictClass);
+    }
+  });
+}
+
+function updateStepIndicator() {
+  document.getElementById('stepIndicator').textContent = `Step ${step} / ${TOTAL}`;
+  document.getElementById('btnNext').disabled = step >= TOTAL;
+  document.getElementById('btnRevealAll').disabled = step >= TOTAL;
+}
+
+// Fix #5: update the binary question label in the top bar
+function updateQuestion() {
+  const meta = CLASS_META[activeClass];
+  document.getElementById('questionSpan').textContent =
+    `"Is this object a ${meta.emoji} ${meta.label}?"`;
+}
+
+function nextStep() {
+  if (step >= TOTAL) return;
+  step++;
+  const rows = document.querySelectorAll('.pred-row');
+  const row = rows[step - 1];
+  if (row) {
+    row.classList.add('revealed');
+    if (row._verdictClass) {
+      setTimeout(() => row.classList.add(row._verdictClass), 120);
+    }
+  }
+  updateCounters();
+  updateStepIndicator();
+}
+
+// Fix #4: Reveal All
+function revealAll() {
+  const rows = document.querySelectorAll('.pred-row');
+  const start = step;
+  step = TOTAL;
+  rows.forEach((row, i) => {
+    if (i >= start) {
+      const delay = (i - start) * 60;
+      setTimeout(() => {
+        row.classList.add('revealed');
+        if (row._verdictClass) {
+          setTimeout(() => row.classList.add(row._verdictClass), 80);
+        }
+      }, delay);
+    }
+  });
+  setTimeout(() => {
+    updateCounters();
+    updateStepIndicator();
+  }, (rows.length - start) * 60 + 100);
+}
+
+function reset() {
+  step = 0;
+  buildRows();
+  updateCounters();
+  updateStepIndicator();
+}
+
+function switchClass(cls) {
+  activeClass = cls;
+  document.querySelectorAll('.class-pill').forEach(p => {
+    p.classList.toggle('active', p.dataset.cls === cls);
+  });
+  updateQuestion();
+  reset();
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+  buildRows();
+  updateCounters();
+  updateStepIndicator();
+  updateQuestion();
+});
+</script>
+</body>
+</html>
