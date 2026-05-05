@@ -5,133 +5,204 @@ format:
   html:
     theme: [default, slides/template/assets/sdaia.scss]
     toc: false
+    include-in-header:
+      text: |
+        <style>
+          .course-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2rem 1rem;
+          }
+          .course-grid {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 1.5rem;
+            justify-content: flex-start;
+          }
+          .card {
+            border: 1px solid #dbe2ea;
+            border-radius: 12px;
+            padding: 1.5rem;
+            background: #fff;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+            transition: transform 0.2s, box-shadow 0.2s;
+            display: flex;
+            flex-direction: column;
+            flex: 1 1 100%;
+            max-width: 100%;
+            min-width: 300px;
+            box-sizing: border-box;
+          }
+          @media (max-width: 768px) {
+            .card {
+              max-width: 100%;
+            }
+          }
+          .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 15px rgba(0,0,0,0.1);
+          }
+          .card h3 {
+            color: #1C355E;
+            font-weight: 800;
+            margin-bottom: 0.75rem;
+            font-size: 1.25rem;
+            border-bottom: 2px solid rgba(0, 174, 141, 0.2);
+            padding-bottom: 0.5rem;
+            margin-top: 0;
+          }
+          .card-desc {
+            color: #5b6678;
+            font-size: 0.95rem;
+            margin-bottom: 1.25rem;
+            flex-grow: 1;
+          }
+          .card-links {
+            display: flex;
+            flex-direction: column;
+            gap: 0.8rem;
+          }
+          .card-links a {
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.6rem;
+            color: #00AE8D;
+            font-weight: 600;
+            line-height: 1.2;
+          }
+          .card-links a:hover {
+            color: #E96852;
+          }
+          .card-links img {
+            height: 20px;
+            width: auto;
+          }
+        </style>
 ---
+
+Welcome to the **Ultralytics & Computer Vision For Developers** course. Follow the modules below in order to build your foundation in modern computer vision.
 
 **GitHub Repository:** [NaifMersal/cv-for-developers-ultralytics](https://github.com/NaifMersal/cv-for-developers-ultralytics)
 
----
+:::: {.course-container}
+:::: {.course-grid}
 
-## 🖼️ Preparatory Module: Image Foundations
+::: {.card}
+### 🖼️ Preparatory Module
 
 *How computers perceive images.*
 
-### Slides
+::: {.card-desc}
+Learn about pixels, color channels, coordinate systems, and the basics behind digital cameras and computer vision libraries.
+:::
 
-| Session | Link |
-|---------|------|
-| Image Foundations: Pixels, Color & Coordinate Systems | [View Slides](slides/0_Image_Foundations.html) |
+::: {.card-links}
+[**Presentation Slides**](slides/0_Image_Foundations.qmd)
 
-### Labs
+[**Lab:** Images as N-Dimensional Arrays](https://colab.research.google.com/github/NaifMersal/cv-for-developers-ultralytics/blob/main/labs/00_images.ipynb) [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/NaifMersal/cv-for-developers-ultralytics/blob/main/labs/00_images.ipynb)
+:::
 
-| Lab | Colab |
-|-----|-------|
-| Lab 00: Images as N-Dimensional Arrays | [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/NaifMersal/cv-for-developers-ultralytics/blob/main/labs/00_images.ipynb) |
+:::
 
----
-
-## 🚀 Part 1: Tasks & Inference
+::: {.card}
+### 🚀 Part 1: Tasks & Inference
 
 *Discover what YOLO can do out of the box.*
 
-### Slides
+::: {.card-desc}
+Covers running inference for Object Detection, Instance Segmentation, Classification, and Pose Estimation using CLI and Python.
+:::
 
-| Session | Link |
-|---------|------|
-| Tasks & Inference: Detection, Segmentation, Classification, Pose | [View Slides](slides/1_Tasks_Inference.html) |
+::: {.card-links}
+[**Presentation Slides**](slides/1_Tasks_Inference.qmd)
 
-### Labs
+[**Lab:** YOLO Tasks & Inference](https://colab.research.google.com/github/NaifMersal/cv-for-developers-ultralytics/blob/main/labs/01_tasks_inference.ipynb) [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/NaifMersal/cv-for-developers-ultralytics/blob/main/labs/01_tasks_inference.ipynb)
+:::
+:::
 
-| Lab | Colab |
-|-----|-------|
-| Lab 01: YOLO Tasks & Inference | [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/NaifMersal/cv-for-developers-ultralytics/blob/main/labs/01_tasks_inference.ipynb) |
-
----
-
-## 🔍 Part 2: Use Cases & Solutions
+::: {.card}
+### 🔍 Part 2: Use Cases & Solutions
 
 *Beyond bounding boxes: actionable insights.*
 
-### Slides
+::: {.card-desc}
+Solutions for region analytics, kinematic tracking, video heatmaps, and setting up external integrations.
+:::
 
-| Session | Link |
-|---------|------|
-| Real-World Use Cases & Solutions | [View Slides](slides/2_Real_World_Use_Cases.html) |
+::: {.card-links}
+[**Presentation Slides**](slides/2_Real_World_Use_Cases.qmd)
 
-### Labs
+[**Lab:** Real-World Solutions](https://colab.research.google.com/github/NaifMersal/cv-for-developers-ultralytics/blob/main/labs/02_solutions_expanded.ipynb) [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/NaifMersal/cv-for-developers-ultralytics/blob/main/labs/02_solutions_expanded.ipynb)
+:::
+:::
 
-| Lab | Colab |
-|-----|-------|
-| Lab 02: Real-World Solutions | [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/NaifMersal/cv-for-developers-ultralytics/blob/main/labs/02_solutions_expanded.ipynb) |
-
----
-
-## 🎥 Part 2B: Video Engineering *(BONUS)*
+::: {.card}
+### 🎥 Part 2B: Video Engineering (BONUS)
 
 *Handling RTSP and Concurrency.*
 
-### Slides
+::: {.card-desc}
+Overcome I/O bottlenecks using Threading and Queues to ensure your inference loops remain real-time without blocking the UI.
+:::
 
-| Session | Link |
-|---------|------|
-| Real-World Video Engineering: Threading & Queues | [View Slides](slides/Real_World_Video_Engineering.html) |
+::: {.card-links}
+[**Presentation Slides**](slides/2B_Real_World_Video_Engineering.qmd)
 
-### Labs
+[**BONUS Lab:** Async Video Streaming](https://colab.research.google.com/github/NaifMersal/cv-for-developers-ultralytics/blob/main/labs/02b_video_engineering.ipynb) [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/NaifMersal/cv-for-developers-ultralytics/blob/main/labs/02b_video_engineering.ipynb)
+:::
+:::
 
-| Lab | Colab |
-|-----|-------|
-| BONUS Lab: Async Video Streaming | [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/NaifMersal/cv-for-developers-ultralytics/blob/main/labs/02b_video_engineering.ipynb) |
-
----
-
-## 🛠️ Part 3: Custom Data & Training
+::: {.card}
+### 🛠️ Part 3: Custom Data & Training
 
 *Teaching the model your custom data.*
 
-### Slides
+::: {.card-desc}
+Proper data formatting, utilizing labeling tools natively, setting hyperparameters, and initiating training runs.
+:::
 
-| Session | Link |
-|---------|------|
-| Custom Data & Training: Labeling, Hyperparameters & Runs | [View Slides](slides/3_Custom_Data_Training.html) |
+::: {.card-links}
+[**Presentation Slides**](slides/3_Custom_Data_Training.qmd)
 
-### Labs
+[**Lab:** Custom Training: Fine-tune on COCO8](https://colab.research.google.com/github/NaifMersal/cv-for-developers-ultralytics/blob/main/labs/03_custom_training.ipynb) [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/NaifMersal/cv-for-developers-ultralytics/blob/main/labs/03_custom_training.ipynb)
+:::
+:::
 
-| Lab | Colab |
-|-----|-------|
-| Lab 03: Custom Training — Fine-tune on COCO8 | [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/NaifMersal/cv-for-developers-ultralytics/blob/main/labs/03_custom_training.ipynb) |
-
----
-
-## 📊 Part 4: Evaluation & Deployment
+::: {.card}
+### 📊 Part 4: Evaluation & Deployment
 
 *How good is your model and how to use it?*
 
-### Slides
+::: {.card-desc}
+Understanding confusion matrices, IoU, Precision, Recall, mAP metrics, and exporting to optimized formats like ONNX.
+:::
 
-| Session | Link |
-|---------|------|
-| Evaluation & Deployment: Metrics, Confusion Matrix & ONNX Export | [View Slides](slides/4_Evaluation_Deployment.html) |
+::: {.card-links}
+[**Presentation Slides**](slides/4_Evaluation_Deployment.qmd)
 
-### Labs
+[**Lab 4A:** ROI-Driven Evaluation](https://colab.research.google.com/github/NaifMersal/cv-for-developers-ultralytics/blob/main/labs/04a_roi_evaluation.ipynb) [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/NaifMersal/cv-for-developers-ultralytics/blob/main/labs/04a_roi_evaluation.ipynb)
 
-| Lab | Colab |
-|-----|-------|
-| Lab 04A: ROI-Driven Evaluation | [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/NaifMersal/cv-for-developers-ultralytics/blob/main/labs/04a_roi_evaluation.ipynb) |
-| Lab 04B: Technical Metrics & Diagnosis | [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/NaifMersal/cv-for-developers-ultralytics/blob/main/labs/04b_evaluation_technical.ipynb) |
+[**Lab 4B:** Technical Metrics & Diagnosis](https://colab.research.google.com/github/NaifMersal/cv-for-developers-ultralytics/blob/main/labs/04b_evaluation_technical.ipynb) [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/NaifMersal/cv-for-developers-ultralytics/blob/main/labs/04b_evaluation_technical.ipynb)
+:::
+:::
 
----
-
-## 🤗 Part 5: HuggingFace for Computer Vision
+::: {.card}
+### 🤗 Part 5: HuggingFace for Computer Vision
 
 *Expanding your toolkit with the HF Hub.*
 
-### Slides
+::: {.card-desc}
+Learn to use SAM 3 for zero-shot segmentation, visual embeddings for similarity search, and Vision LLMs for multimodal reasoning.
+:::
 
-| Session | Link |
-|---------|------|
-| HuggingFace CV: SAM 3, Visual Embeddings & Vision LLMs | [View Slides](slides/5_HuggingFace_CV.html) |
+::: {.card-links}
+[**Presentation Slides**](slides/5_HuggingFace_CV.qmd)
 
-### Labs
+[**Lab 5:** HuggingFace for CV](https://colab.research.google.com/github/NaifMersal/cv-for-developers-ultralytics/blob/main/labs/05_huggingface_cv.ipynb) [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/NaifMersal/cv-for-developers-ultralytics/blob/main/labs/05_huggingface_cv.ipynb)
+:::
+:::
 
-| Lab | Colab |
-|-----|-------|
-| Lab 05: HuggingFace for CV | [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/NaifMersal/cv-for-developers-ultralytics/blob/main/labs/05_huggingface_cv.ipynb) |
+::::
+
+::::
