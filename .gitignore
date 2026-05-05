@@ -1,4 +1,9 @@
+.venv
+*.pt
 **/__pycache__
+
+datasets/
+runs/
 
 /.quarto/
 **/*.quarto_ipynb
