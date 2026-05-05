@@ -4,8 +4,8 @@ subtitle: "How computers perceive images"
 date: today
 format:
   revealjs:
-    theme: [default, slides_template/assets/sdaia.scss]
-    logo: slides_template/assets/sdaia.svg
+    theme: [default, template/assets/sdaia.scss]
+    logo: template/assets/sdaia.svg
     transition: slide
     background-transition: fade
     slide-number: true
@@ -13,7 +13,7 @@ format:
     progress: true
     center-title-slide: true
     title-slide-attributes:
-      data-background-image: "slides_template/assets/anim.svg"
+      data-background-image: "template/assets/anim.svg"
       data-background-opacity: "0.15"
 resources:
   - "assets/**"
@@ -41,7 +41,7 @@ How computers store images
 ## How Computers "See": The Digital Camera
 
 ```{=html}
-<iframe class="interactive-demo r-stretch" src="demo_camera_sensor.html" width="100%" height="600px" style="border:none;"></iframe>
+<iframe class="interactive-demo r-stretch" src="assets/html/demo_camera_sensor.html" width="100%" height="600px" style="border:none;"></iframe>
 ```
 
 ## How Computers "See": Step by Step
@@ -146,7 +146,7 @@ crop = img[y1:y2, x1:x2]
 - Each value ranges from `0` to `255` (8-bit).
 
 ```{=html}
-<iframe class="interactive-demo r-stretch" src="demo_rgb_pixel.html" width="100%" height="500px" style="border:none;"></iframe>
+<iframe class="interactive-demo r-stretch" src="assets/html/demo_rgb_pixel.html" width="100%" height="500px" style="border:none;"></iframe>
 ```
 
 ## Color Images: The ML Perspective {.smaller}

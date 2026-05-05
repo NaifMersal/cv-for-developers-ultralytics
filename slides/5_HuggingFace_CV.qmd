@@ -4,8 +4,8 @@ subtitle: "SAM · Embeddings · Vision LLMs"
 date: today
 format:
   revealjs:
-    theme: [default, slides_template/assets/sdaia.scss]
-    logo: slides_template/assets/sdaia.svg
+    theme: [default, template/assets/sdaia.scss]
+    logo: template/assets/sdaia.svg
     transition: slide
     background-transition: fade
     slide-number: true
@@ -13,7 +13,7 @@ format:
     progress: true
     center-title-slide: true
     title-slide-attributes:
-      data-background-image: "slides_template/assets/anim.svg"
+      data-background-image: "template/assets/anim.svg"
       data-background-opacity: "0.15"
 resources:
   - "assets/**"

@@ -3,79 +3,82 @@ title: "Ultralytics & Computer Vision For Developers"
 subtitle: "Course Master Index"
 format:
   html:
-    theme: [default, slides/slides_template/assets/sdaia.scss]
+    theme: [default, slides/template/assets/sdaia.scss]
     toc: false
-    css: |
-      .course-container {
-        max-width: 1200px;
-        margin: 0 auto;
-        padding: 2rem 1rem;
-      }
-      .course-grid {
-        display: flex;
-        flex-wrap: wrap;
-        gap: 1.5rem;
-        justify-content: flex-start;
-      }
-      .card {
-        border: 1px solid #dbe2ea;
-        border-radius: 12px;
-        padding: 1.5rem;
-        background: #fff;
-        box-shadow: 0 4px 6px rgba(0,0,0,0.05);
-        transition: transform 0.2s, box-shadow 0.2s;
-        display: flex;
-        flex-direction: column;
-        flex: 1 1 320px;
-        max-width: calc(50% - 0.75rem);
-        min-width: 300px;
-        box-sizing: border-box;
-      }
-      @media (max-width: 768px) {
-        .card {
-          max-width: 100%;
-        }
-      }
-      .card:hover {
-        transform: translateY(-5px);
-        box-shadow: 0 10px 15px rgba(0,0,0,0.1);
-      }
-      .card h3 {
-        color: #1C355E;
-        font-weight: 800;
-        margin-bottom: 0.75rem;
-        font-size: 1.25rem;
-        border-bottom: 2px solid rgba(0, 174, 141, 0.2);
-        padding-bottom: 0.5rem;
-        margin-top: 0;
-      }
-      .card-desc {
-        color: #5b6678;
-        font-size: 0.95rem;
-        margin-bottom: 1.25rem;
-        flex-grow: 1;
-      }
-      .card-links {
-        display: flex;
-        flex-direction: column;
-        gap: 0.8rem;
-      }
-      .card-links a {
-        text-decoration: none;
-        display: inline-flex;
-        align-items: center;
-        gap: 0.6rem;
-        color: #00AE8D;
-        font-weight: 600;
-        line-height: 1.2;
-      }
-      .card-links a:hover {
-        color: #E96852;
-      }
-      .card-links img {
-        height: 20px;
-        width: auto;
-      }
+    include-in-header:
+      text: |
+        <style>
+          .course-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2rem 1rem;
+          }
+          .course-grid {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 1.5rem;
+            justify-content: flex-start;
+          }
+          .card {
+            border: 1px solid #dbe2ea;
+            border-radius: 12px;
+            padding: 1.5rem;
+            background: #fff;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+            transition: transform 0.2s, box-shadow 0.2s;
+            display: flex;
+            flex-direction: column;
+            flex: 1 1 320px;
+            max-width: calc(50% - 0.75rem);
+            min-width: 300px;
+            box-sizing: border-box;
+          }
+          @media (max-width: 768px) {
+            .card {
+              max-width: 100%;
+            }
+          }
+          .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 15px rgba(0,0,0,0.1);
+          }
+          .card h3 {
+            color: #1C355E;
+            font-weight: 800;
+            margin-bottom: 0.75rem;
+            font-size: 1.25rem;
+            border-bottom: 2px solid rgba(0, 174, 141, 0.2);
+            padding-bottom: 0.5rem;
+            margin-top: 0;
+          }
+          .card-desc {
+            color: #5b6678;
+            font-size: 0.95rem;
+            margin-bottom: 1.25rem;
+            flex-grow: 1;
+          }
+          .card-links {
+            display: flex;
+            flex-direction: column;
+            gap: 0.8rem;
+          }
+          .card-links a {
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.6rem;
+            color: #00AE8D;
+            font-weight: 600;
+            line-height: 1.2;
+          }
+          .card-links a:hover {
+            color: #E96852;
+          }
+          .card-links img {
+            height: 20px;
+            width: auto;
+          }
+        </style>
 ---
 
 Welcome to the **Ultralytics & Computer Vision For Developers** course. Follow the modules below in order to build your foundation in modern computer vision.
@@ -93,11 +96,9 @@ Learn about pixels, color channels, coordinate systems, and the basics behind di
 :::
 
 ::: {.card-links}
-[**Presentation Slides**](slides/Image_Foundations.html)
+[**Presentation Slides**](slides/0_Image_Foundations.qmd)
 
-[**Exercise:** Interactive Image Challenges](https://colab.research.google.com/github/NaifMersal/cv-for-developers-ultralytics/blob/main/labs/exercises/00_images_exercises.ipynb) [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/NaifMersal/cv-for-developers-ultralytics/blob/main/labs/exercises/00_images_exercises.ipynb)
-
-[**Answer:** Images as N-Dimensional Arrays](https://colab.research.google.com/github/NaifMersal/cv-for-developers-ultralytics/blob/main/labs/00_images.ipynb) [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/NaifMersal/cv-for-developers-ultralytics/blob/main/labs/00_images.ipynb)
+[**Lab:** Images as N-Dimensional Arrays](https://colab.research.google.com/github/NaifMersal/cv-for-developers-ultralytics/blob/main/labs/00_images.ipynb) [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/NaifMersal/cv-for-developers-ultralytics/blob/main/labs/00_images.ipynb)
 :::
 
 :::
@@ -112,7 +113,7 @@ Covers running inference for Object Detection, Instance Segmentation, Classifica
 :::
 
 ::: {.card-links}
-[**Presentation Slides**](slides/Ultralytics_Foundations_1_Tasks_Inference.html)
+[**Presentation Slides**](slides/1_Tasks_Inference.qmd)
 
 [**Lab:** YOLO Tasks & Inference](https://colab.research.google.com/github/NaifMersal/cv-for-developers-ultralytics/blob/main/labs/01_tasks_inference.ipynb) [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/NaifMersal/cv-for-developers-ultralytics/blob/main/labs/01_tasks_inference.ipynb)
 :::
@@ -128,7 +129,7 @@ Solutions for region analytics, kinematic tracking, video heatmaps, and setting 
 :::
 
 ::: {.card-links}
-[**Presentation Slides**](slides/Ultralytics_Foundations_2_Real_World_Use_Cases.html)
+[**Presentation Slides**](slides/2_Real_World_Use_Cases.qmd)
 
 [**Lab:** Real-World Solutions](https://colab.research.google.com/github/NaifMersal/cv-for-developers-ultralytics/blob/main/labs/02_solutions_expanded.ipynb) [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/NaifMersal/cv-for-developers-ultralytics/blob/main/labs/02_solutions_expanded.ipynb)
 :::
@@ -144,7 +145,7 @@ Overcome I/O bottlenecks using Threading and Queues to ensure your inference loo
 :::
 
 ::: {.card-links}
-[**Presentation Slides**](slides/Real_World_Video_Engineering.html)
+[**Presentation Slides**](slides/Real_World_Video_Engineering.qmd)
 
 [**BONUS Lab:** Async Video Streaming](https://colab.research.google.com/github/NaifMersal/cv-for-developers-ultralytics/blob/main/labs/02b_video_engineering.ipynb) [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/NaifMersal/cv-for-developers-ultralytics/blob/main/labs/02b_video_engineering.ipynb)
 :::
@@ -160,7 +161,7 @@ Proper data formatting, utilizing labeling tools natively, setting hyperparamete
 :::
 
 ::: {.card-links}
-[**Presentation Slides**](slides/Ultralytics_Foundations_3_Custom_Data_Training.html)
+[**Presentation Slides**](slides/3_Custom_Data_Training.qmd)
 
 [**Lab:** Custom Training: Fine-tune on COCO8](https://colab.research.google.com/github/NaifMersal/cv-for-developers-ultralytics/blob/main/labs/03_custom_training.ipynb) [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/NaifMersal/cv-for-developers-ultralytics/blob/main/labs/03_custom_training.ipynb)
 :::
@@ -176,7 +177,7 @@ Understanding confusion matrices, IoU, Precision, Recall, mAP metrics, and expor
 :::
 
 ::: {.card-links}
-[**Presentation Slides**](slides/Ultralytics_Foundations_4_Evaluation_Deployment.html)
+[**Presentation Slides**](slides/4_Evaluation_Deployment.qmd)
 
 [**Lab 4A:** ROI-Driven Evaluation](https://colab.research.google.com/github/NaifMersal/cv-for-developers-ultralytics/blob/main/labs/04a_roi_evaluation.ipynb) [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/NaifMersal/cv-for-developers-ultralytics/blob/main/labs/04a_roi_evaluation.ipynb)
 
@@ -194,7 +195,7 @@ Learn to use SAM 3 for zero-shot segmentation, visual embeddings for similarity 
 :::
 
 ::: {.card-links}
-[**Presentation Slides**](slides/HuggingFace_CV_Part5.html)
+[**Presentation Slides**](slides/5_HuggingFace_CV.qmd)
 
 [**Lab 5:** HuggingFace for CV](https://colab.research.google.com/github/NaifMersal/cv-for-developers-ultralytics/blob/main/labs/05_huggingface_cv.ipynb) [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/NaifMersal/cv-for-developers-ultralytics/blob/main/labs/05_huggingface_cv.ipynb)
 :::
