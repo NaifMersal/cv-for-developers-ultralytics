@@ -1,27 +1,4 @@
-# Ignore everything
-*
-
-# Except the docs directory
-!docs/
-!docs/**
-
-# And this file
-!.gitignore
-
-!labs/
-!labs/**
-!
-!assets/
-!assets/**
-!slides/
-!slides/**
-!scripts/
-!scripts/**
-
-!_quarto.yml
-
-# And the README
-!README.md
+**/__pycache__
 
 /.quarto/
 **/*.quarto_ipynb
