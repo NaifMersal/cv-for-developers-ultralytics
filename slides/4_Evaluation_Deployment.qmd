@@ -810,6 +810,69 @@ plt.show()
 ::::
 
 
+## From Binary to Multi-Class: One-vs-Rest (most common)
+
+When we have many classes, we reduce the problem to binary by isolating each class.
+
+::: {.fragment .fade-up style="text-align: center; font-size: 1.1em; margin: 1rem 0;"}
+> Pick **one class** as *Positive* — everything else is *Negative*. Repeat for every class.
+:::
+
+::: {.fragment .fade-up}
+> This logic applies to **any** binary metric like Precision, Recall, AP, etc.
+:::
+
+
+## Per-Class Recall Formula
+
+For a specific class $i$, treat it as **"positive"** and all others as **"negative"**:
+
+$$Recall_i = \frac{TP_i}{TP_i + FN_i}$$
+
+::: {.fragment .fade-up style="margin-top: 1.5rem;"}
+:::: {.columns}
+
+::: {.column width="50%"}
+::: {.callout-note appearance="minimal"}
+**$TP_i$** — instances of class $i$ correctly predicted as class $i$
+:::
+:::
+
+::: {.column width="50%"}
+::: {.callout-warning appearance="minimal"}
+**$FN_i$** — instances of class $i$ predicted as **any other class**
+:::
+:::
+
+::::
+:::
+
+
+## Ways to Aggregate Per-Class Scores
+
+Once you have a score per class, you combine them into a single number:
+
+::: {.fragment .fade-up style="margin-top: 0.5rem;"}
+| Strategy | Formula | Character |
+|---|---|---|
+| **Macro** | $\frac{\sum M_i}{n}$ | All classes equally weighted |
+| **Micro** | $\frac{\sum \text{Num}_i}{\sum \text{Denom}_i}$ | Pooled counts (treats every sample equally) |
+| **Weighted** | $\frac{\sum M_i \cdot S_i}{\sum S_i}$ | Weighted by class size (Support) |
+:::
+ 
+::: {.fragment .fade-up style="font-size: 0.75em; text-align: center; opacity: 0.85; margin-top: 0.5rem;"}
+**$M_i$**: Metric per class ($P, R, AP$) <br>
+**$S_i$**: Support (class size) <br>
+**$\text{Num}_i / \text{Denom}_i$**: Numerator / Denominator (e.g., $TP / (TP+FP)$)
+:::
+ 
+::: {.fragment .fade-up}
+::: {.callout-tip appearance="minimal" style="margin-top: 1rem;"}
+**mAP = Macro-Average of per-class AP scores.** Every class contributes equally.
+:::
+:::
+
+
 ## But Does Location Matter?
 
 Precision and Recall measure **whether** a classification is correct.
@@ -1039,9 +1102,7 @@ plt.show()
 
 ## Mean Average Precision (mAP)
 
-Once we have the AP for every class (Cars, Pedestrians, Trees, etc.), we simply take the arithmetic mean.
 
-$$mAP = \frac{AP_{cars} + AP_{pedestrians} + AP_{trees} + ...}{Total\ Number\ of\ Classes}$$
 
 - **mAP50:** Accuracy considering only "easy" detections (IoU > 0.50).
 - **mAP50-95:** The strict evaluation averaged across multiple IoU thresholds (from 0.50 to 0.95).
