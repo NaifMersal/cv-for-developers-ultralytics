@@ -2,6 +2,8 @@
 *.pt
 **/__pycache__
 
+docs/
+
 datasets/
 runs/
 
