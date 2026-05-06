@@ -16,177 +16,93 @@ format:
       data-background-image: "template/assets/anim.svg"
       data-background-opacity: "0.15"
 ---
-# 6. Training & ML Fundamentals {.sdaia-dark background-gradient="linear-gradient(135deg, #1C355E, #00C9A7)"}
 
-Teaching the model your custom data.
+# The "Learning" Intuition {.sdaia-dark background-gradient="linear-gradient(135deg, #1C355E, #00C9A7)"}
 
-## Key Training Concepts 
+Teaching the model to write its own function.
 
-Before we dive in, let's lock down the terminology:
+## Recap: Traditional vs. Machine Learning
 
-- **Model**: The mathematical structure with learned weights (e.g., `weights/yolo26n.pt`).
-- **Epoch**: One complete pass through your *entire* training dataset.
-- **mAP (Mean Average Precision)**: The ultimate grading score (0-100%). It grades how well the model finds the object AND correctly identifies it!
+In **Part 1**, we saw that Machine Learning flips the paradigm. Instead of writing the logic, we let the data "train" the function.
 
-## Train vs. Validation
+```{dot}
+//| echo: false
+//| fig-width: 10
+//| fig-height: 4.2
+digraph concept {
+    graph [rankdir=LR fontname="Helvetica" nodesep=0.4 ranksep=1.5]
+    node  [fontname="Helvetica" fontcolor=white style=filled shape=box penwidth=0 margin="0.25,0.15" fontsize=13]
+    edge  [penwidth=2.5 arrowsize=1.0 fontname="Helvetica" fontsize=12]
 
-To train a robust AI, split your data:
+    // ── Traditional row ──
+    subgraph cluster_trad {
+        label="Traditional Programming" fontcolor="#8899bb" fontsize=13 style=dashed color="#3A5070" margin=18
+        ti [label="Input" fillcolor="#2D4E7E"]
+        tf [label="f(x)\nyou write it" fillcolor="#4a4a6a"]
+        to [label="Output" fillcolor="#2D4E7E"]
+        ti -> tf [color="#8899bb"]
+        tf -> to [color="#8899bb"]
+    }
 
-- **Train Set (~80%)**: Data the model actively learns from.
-- **Validation Set (~20%)**: Unseen data evaluated *during* training to measure performance (`mAP`).
+    // ── Machine Learning row ──
+    subgraph cluster_ml {
+        label="Machine Learning" fontcolor="#00C9A7" fontsize=13 style=dashed color="#00C9A7" margin=18
+        mi   [label="Input" fillcolor="#2D4E7E"]
+        mf   [label="f(x)\nlearned from data" fillcolor="#00C9A7" fontcolor="#1C355E" fontname="Helvetica-Bold"]
+        mo   [label="Output" fillcolor="#2D4E7E"]
+        data [label="Data" fillcolor="#1a4060" shape=cylinder]
+        { rank=same; mf; data }
+        mi   -> mf [color="#00C9A7"]
+        mf   -> mo [color="#00C9A7"]
+        data -> mf [label="trains" color="#5599aa" style=dashed fontcolor="#5599aa" fontsize=11]
+    }
+}
+```
 
-**Crucial**: Never train on validation data! This causes **Data Leakage** where the model memorizes answers but fails in the real world.
-
-Split your data into train and validation sets [using Ultralytics Data Split](https://docs.ultralytics.com/reference/data/split/#ultralytics.data.split.autosplit) or [using thier Platform](https://docs.ultralytics.com/platform/data/datasets/)
-
-## Data Leakage: The Silent Killer
-
-**The Problem:** Validation/test data accidentally ends up in the training set.
-
-**Common Causes:** Duplicate images, wrong temporal splits, or preprocessing before splitting.
-
-**The Danger:** Val metrics look "perfect," but the model fails in production.
-
-**How to Avoid:**
-
-- Use `autosplit()` for automatic, safe partitioning.
-- Avoid manually copying images between split folders.
-- Check for duplicates/hashes before training.
-
-::: {.callout-warning appearance="simple" icon="false"}
-**Suspiciously perfect metrics? Check for leakage!**
+::: {.fragment .fade-up}
+**Goal:** We provide **Input** (Images) and **Ground Truth** (Labels). The model adjusts itself until its **Output** matches the Ground Truth.
 :::
 
-## Transfer Learning
+## The Feedback Loop: How a Model Learns
 
-- **`.pt` (Pretrained weights):** Starts with general features (edges, shapes) from large datasets. Fast training, needs little data. (*Always recommended!*)
-- **`.yaml` (Architecture Definition):** Blank blueprint. Random weights, meaning you train entirely from scratch.
+Learning is a cycle of making a guess, seeing how wrong it is, and adjusting.
 
-*Use a `.pt` model for all custom dataset training to leverage Transfer Learning.*
+::: {.fragment .fade-up}
+1. **Predict:** Model guesses where the objects are.
+2. **Compare:** We compare the guess to the **Ground Truth** labels.
+3. **Loss:** We calculate a "Loss" score (how wrong the guess was).
+4. **Update:** We adjust the model's weights to make the loss smaller next time.
+:::
 
-## Understanding the Data Setup
+::: {.callout-note appearance="minimal" .fragment}
+This cycle repeats thousands of times over **Epochs** (one pass through the full dataset).
+:::
 
-Different formats for different tasks:
+# Why We Need "Loss" {.sdaia-dark background-gradient="linear-gradient(135deg, #1C355E, #00C9A7)"}
 
-- **Classification**: Relies *entirely* on folder structure (e.g., `train/cat/`, `train/dog/`). No label files needed!
-- **Detection & Segmentation**: Uses standard **YOLO format**, pairing images with `.txt` label files.
+The math that drives the learning.
 
-```text
-my_dataset/
-├── images/
-│   ├── train/
-│   └── val/
-└── labels/
-    ├── train/
-    └── val/
-```
+## Business Metrics vs. Training Loss
 
-## Inside the Labels
+In **Part 3**, we used metrics like **mAP, Precision, and Recall**. Why can't the model just use those to learn?
 
-- **Object Detection** (`.txt` Bounding Box):
-  `<class_index> <x_center> <y_center> <width> <height>`
+::: {.fragment .fade-up}
+**The Problem:** Business metrics are **"jumpy"** (discrete). 
+- If a bounding box moves 1 pixel, the IoU might drop from 0.51 to 0.49.
+- Suddenly, a "Success" becomes a "Failure."
+- This "cliff" makes it impossible for the model to know which way to improve.
+:::
 
-- **Instance Segmentation** (`.txt` Polygon):
-  `<class_index> <x1> <y1> <x2> <y2> ... <xn> <yn>`
-
-- **Pose Estimation** (`.txt` Keypoints):
-  `<class_index> <x_center> <y_center> <width> <height> <px1> <py1> <p1_vis> ...`
-
-**⚠ Note:** Coordinates must **always be normalized** (0.0 to 1.0) to keep annotations independent of image resolution!
-
-## The `data.yaml` File
-
-Linking indices to names.
-
-```yaml
-# data.yaml
-path: ../my_dataset
-train: images/train
-val: images/val
-
-names:
-  0: my_custom_object
-  1: another_object
-```
-
-
-# 7. Custom Data Labeling {.sdaia-dark background-gradient="linear-gradient(135deg, #1C355E, #00C9A7)"}
-
-The Ultralytics Platform
-
-## Labeling Your Own Data {.sdaia-dark background-color="#1C355E"}
-
-Typing coordinates manually is impossible. Use **Ultralytics HUB**, Roboflow, or CVAT.
-
-1. Upload your images.
-2. Draw bounding boxes or polygons visually.
-3. Export in **YOLO format** for a ready-to-train dataset structure!
-
-*Docs Reference: [Ultralytics HUB](https://docs.ultralytics.com/hub/)*
-
-## AutoLabeling with SAM
-
-Speed up the labeling process using foundational models:
-
-1. **Zero-Shot Labeling:** Bypass manual labeling using **SAM** (Segment Anything Model) or **FastSAM**.
-2. Run the model on your raw dataset to automatically generate masks and bounding boxes.
-3. These models understand objects generically without needing custom training!
-4. Simply review and correct the auto-generated labels—drastically faster than drawing every box or polygon manually!
-
-*Docs Reference: [Segment Anything Models (SAM)](https://docs.ultralytics.com/models/sam/)*
-
-
-
-# 8. Kickoff Training {.sdaia-dark background-gradient="linear-gradient(135deg, #1C355E, #00C9A7)"}
-
-Hyperparameters and Configs
-
-## Training
-
-We can start training directly from the command line or Python API:
-
-```bash
-yolo train model=weights/yolo26n.pt data=data.yaml epochs=100 imgsz=640 batch=-1
-```
-
-```python
-# Python Equivalent
-from ultralytics import YOLO
-
-model = YOLO("weights/yolo26n.pt")
-results = model.train(data="data.yaml", epochs=100, imgsz=640, batch=-1)
-```
-
-## Resuming Training
-
-If your training is interrupted (e.g., power outage or Colab timeout), you can easily resume it from the last saved weights without losing progress!
-
-```bash
-# Resume training from the last saved checkpoint
-yolo train resume model=path/to/runs/train/exp/weights/last.pt
-```
-
-```python
-# Python Equivalent
-from ultralytics import YOLO
-
-# Load the last checkpoint
-model = YOLO("path/to/runs/train/exp/weights/last.pt")
-
-# Resume training
-results = model.train(resume=True)
-```
+::: {.fragment .fade-up}
+**The Solution:** We need a **"Smooth" Metric** (Loss Function) that gives a gradient—telling the model exactly how much better or worse it's getting with every tiny adjustment.
+:::
 
 ## What is a Loss Function?
 
 > A **single number** that measures how wrong the model's prediction is — the lower, the better.
 
 ::: {.fragment .fade-up}
-Training works by defining a mathematical **loss function** that acts as our objective, and we tell the model: *"Minimize this number."*
-:::
-
-::: {.fragment .fade-up}
-```{=html}
+``` {=html}
 <div style="display:flex; align-items:stretch; gap:1.2rem; margin-top:1rem; font-size:0.88em; justify-content:center;">
   <div style="background:rgba(28,53,94,0.08); border-radius:10px; padding:0.8rem 1.2rem; text-align:center; min-width:140px;">
     🧠 <strong>Prediction</strong><br>
@@ -206,11 +122,6 @@ Training works by defining a mathematical **loss function** that acts as our obj
 ```
 :::
 
-::: {.callout-note appearance="minimal" .fragment .fade-up}
-**Validation metrics** (mAP, Precision, Recall) tell you how good the model is **after** training. The **loss** is what the model optimizes **during** training.
-:::
-
-
 ## MSE — The Most Intuitive Loss
 
 **Mean Squared Error** is the simplest, most widely used loss in machine learning.
@@ -225,35 +136,16 @@ $$\mathcal{L}_{\text{MSE}} = \frac{1}{n}\sum_{i=1}^{n}\bigl(y_i - \hat{y}_i\bigr
 | $(y_i - \hat{y}_i)^2$ | Squared error — big mistakes hurt **much more** |
 :::
 
-::: {.fragment .fade-up}
-```{=html}
-<div style="display:flex; gap:1rem; margin-top:0.8rem; font-size:0.85em; justify-content:center; flex-wrap:wrap;">
-  <div style="background:rgba(0,201,167,0.10); border-radius:8px; padding:0.6rem 1rem; text-align:center; min-width:130px;">
-    ✅ <strong>Regression</strong><br><span style="color:#64748b;">predict box coordinates</span>
-  </div>
-  <div style="background:rgba(0,201,167,0.10); border-radius:8px; padding:0.6rem 1rem; text-align:center; min-width:130px;">
-    ✅ <strong>Scoring</strong><br><span style="color:#64748b;">confidence, IoU head</span>
-  </div>
-  <div style="background:rgba(0,201,167,0.10); border-radius:8px; padding:0.6rem 1rem; text-align:center; min-width:130px;">
-    ✅ <strong>General</strong><br><span style="color:#64748b;">a great default baseline</span>
-  </div>
-</div>
-```
-:::
-
 ::: {.callout-tip appearance="minimal" .fragment .fade-up}
 Each task eventually gets a better-tuned loss (cross-entropy for classes, IoU-based for boxes) — but **MSE is the intuition** behind all of them.
 :::
-
 
 ## Following the Gradient
 
 > How does the model actually use the loss to improve?
 
 ::: {.fragment .fade-up}
-It finds the **direction that decreases the loss the fastest** — the gradient — and takes a small step that way.
-
-This is called **gradient descent**: imagine a ball rolling downhill on the loss curve.
+It finds the **direction that decreases the loss the fastest** — the gradient — and takes a small step that way. This is called **gradient descent**.
 :::
 
 ::: {.fragment .fade-up}
@@ -265,11 +157,6 @@ This is called **gradient descent**: imagine a ball rolling downhill on the loss
 </iframe>
 ```
 :::
-
-::: {.callout-note appearance="minimal" .fragment .fade-up}
-The **learning rate (lr)** controls step size — too large and the ball overshoots, too small and training is slow.
-:::
-
 
 ## YOLO's Loss: Three Signals
 
@@ -287,431 +174,7 @@ YOLO's training loss is the **sum of three components**, each measuring a differ
 $$\mathcal{L}_{total} = \lambda_{box}\,\mathcal{L}_{box} + \lambda_{cls}\,\mathcal{L}_{cls} + \lambda_{dfl}\,\mathcal{L}_{dfl}$$
 :::
 
-::: {.callout-tip appearance="minimal" .fragment .fade-up}
-In Ultralytics, all three curves are saved automatically to `results.csv` and `results.png` in your `runs/detect/train` folder. Watch them — they each tell a different story.
-:::
-
-
-## Important Hyperparameters
-
-- `epochs` (Default: 100): Pass through the ENTIRE dataset. More = learns more, but risks overfitting.
-- `batch` (Default: 16): Images processed at once.
-  - Higher = faster, stable, takes more GPU memory.
-  - Smaller = adds noise, longer training.
-  - *Pro-tip*: Use `batch: -1` for **AutoBatch** to maximize your GPU memory without crashing!
-
-## Hyperparameters: Image Size and Hardware
-
-- `imgsz` (Default: 640): Target image size. Larger sizes (e.g., 1024) capture more detail (great for tiny objects!) but use more RAM and are slower.
-- `device` (Default: ''): Specify GPUs (e.g., `device=0,1`) to trigger multi-GPU training!
-
-## Hyperparameters: Learning Rate (lr0)
-
-:::: {.columns .fragment .fade-up style="margin-bottom: -15px;"}
-::: {.column width="45%"}
-🔴 **Too High**: Spikes/noise. Model "jumps" over the optimal solution.
-:::
-::: {.column width="55%"}
-```{python}
-#| echo: false
-#| fig-align: center
-#| fig-height: 1.6
-import matplotlib.pyplot as plt
-import numpy as np
-epochs = np.arange(1, 51)
-brand_dark = '#1C355E'
-
-high_lr_loss = 0.5 * np.exp(-epochs/20) + 0.2 * np.random.randn(50)
-high_lr_loss[30:] = high_lr_loss[30:] + 0.1 * np.power(np.arange(20), 1.5)
-
-fig, ax = plt.subplots(figsize=(6, 1.8))
-fig.patch.set_alpha(0.0)
-ax.patch.set_alpha(0.0)
-ax.plot(epochs, high_lr_loss, color='#FF5252', linewidth=3)
-ax.set_title('TOO HIGH: Diverging / Spiking', fontsize=10, fontweight='bold', color=brand_dark)
-ax.set_ylim(0, 5)
-ax.spines['top'].set_visible(False); ax.spines['right'].set_visible(False)
-ax.spines['bottom'].set_color(brand_dark); ax.spines['left'].set_color(brand_dark)
-ax.tick_params(colors=brand_dark, labelsize=8)
-ax.grid(True, linestyle='--', alpha=0.2, color=brand_dark)
-plt.tight_layout()
-plt.show()
-```
-:::
-::::
-
-:::: {.columns .fragment .fade-up style="margin-bottom: -15px;"}
-::: {.column width="45%"}
-🔵 **Too Small**: Flat line. Model is too "timid" to learn.
-:::
-::: {.column width="55%"}
-```{python}
-#| echo: false
-#| fig-align: center
-#| fig-height: 1.6
-import matplotlib.pyplot as plt
-import numpy as np
-epochs = np.arange(1, 51)
-brand_dark = '#1C355E'
-
-low_lr_loss = 0.8 - 0.005 * epochs + 0.02 * np.random.rand(50)
-
-fig, ax = plt.subplots(figsize=(6, 1.8))
-fig.patch.set_alpha(0.0)
-ax.patch.set_alpha(0.0)
-ax.plot(epochs, low_lr_loss, color='#78909C', linewidth=3)
-ax.set_title('TOO LOW: Glacial Progress', fontsize=10, fontweight='bold', color=brand_dark)
-ax.set_ylim(0, 1)
-ax.spines['top'].set_visible(False); ax.spines['right'].set_visible(False)
-ax.spines['bottom'].set_color(brand_dark); ax.spines['left'].set_color(brand_dark)
-ax.tick_params(colors=brand_dark, labelsize=8)
-ax.grid(True, linestyle='--', alpha=0.2, color=brand_dark)
-plt.tight_layout()
-plt.show()
-```
-:::
-::::
-
-:::: {.columns .fragment .fade-up style="margin-bottom: -15px;"}
-::: {.column width="45%"}
-🟢 **Just Right**: Smooth, rapid decay to a low plateau.
-:::
-::: {.column width="55%"}
-```{python}
-#| echo: false
-#| fig-align: center
-#| fig-height: 1.6
-import matplotlib.pyplot as plt
-import numpy as np
-epochs = np.arange(1, 51)
-brand_dark = '#1C355E'
-brand_teal = '#00C9A7'
-
-good_lr_loss = 0.7 * np.exp(-epochs/10) + 0.05 * np.random.rand(50)
-
-fig, ax = plt.subplots(figsize=(6, 1.8))
-fig.patch.set_alpha(0.0)
-ax.patch.set_alpha(0.0)
-ax.plot(epochs, good_lr_loss, color=brand_teal, linewidth=3)
-ax.set_title('JUST RIGHT: Fast & Healthy', fontsize=10, fontweight='bold', color=brand_dark)
-ax.set_ylim(0, 1)
-ax.spines['top'].set_visible(False); ax.spines['right'].set_visible(False)
-ax.spines['bottom'].set_color(brand_dark); ax.spines['left'].set_color(brand_dark)
-ax.tick_params(colors=brand_dark, labelsize=8)
-ax.grid(True, linestyle='--', alpha=0.2, color=brand_dark)
-plt.tight_layout()
-plt.show()
-```
-:::
-::::
-
-
-
-## Hyperparameters: Weight Decay
-
-:::: {.columns}
-
-::: {.column width="55%"}
-```{python}
-#| echo: false
-#| fig-align: center
-import matplotlib.pyplot as plt
-import numpy as np
-
-brand_dark = '#1C355E'
-brand_teal = '#00C9A7'
-
-epochs = np.arange(1, 41)
-np.random.seed(42)
-train_loss = 0.5 * np.exp(-epochs/10) + 0.02 * np.random.rand(40)
-val_no_wd = 0.6 * np.exp(-epochs/8) + 0.02 * np.random.rand(40)
-val_no_wd[15:] = val_no_wd[15:] + 0.012 * np.arange(1, 26)
-val_wd = 0.55 * np.exp(-epochs/10) + 0.02 * np.random.rand(40)
-
-fig, ax = plt.subplots(figsize=(5, 3.5))
-fig.patch.set_alpha(0.0)
-ax.patch.set_alpha(0.0)
-
-ax.plot(epochs, train_loss, color=brand_dark, linewidth=2.5, alpha=0.6, label='Train Loss')
-ax.plot(epochs, val_no_wd, color='#dc3545', linewidth=2.5, linestyle='--', label='Val (no decay) — overfits')
-ax.plot(epochs, val_wd, color=brand_teal, linewidth=2.5, label='Val (with decay) — stable')
-
-ax.set_xlabel('Epochs', fontsize=11, color=brand_dark)
-ax.set_ylabel('Loss', fontsize=11, color=brand_dark)
-ax.set_title('Weight Decay Keeps Val Loss Stable', fontsize=12, fontweight='bold', color=brand_dark)
-ax.legend(frameon=False, fontsize=9)
-ax.spines['top'].set_visible(False)
-ax.spines['right'].set_visible(False)
-ax.spines['bottom'].set_color(brand_dark)
-ax.spines['left'].set_color(brand_dark)
-ax.tick_params(colors=brand_dark, labelsize=9)
-
-plt.tight_layout()
-plt.show()
-```
-:::
-
-::: {.column width="45%"}
-
-| Setting | Effect |
-|:---|:---|
-| Too low | Memorization → 🔴 Overfitting |
-| Too high | Over-constrained → 🟠 Underfitting |
-
-:::
-
-::::
-
-
-
-## Hyperparameters: Early Stopping
-
-:::: {.columns}
-
-::: {.column width="45%"}
-
-- **The Concept:** Stop training if validation metrics haven't improved for $N$ epochs.
-
-**`patience`** (Default: 50)
-
-```python
-from ultralytics import YOLO
-
-model = YOLO("yolo26n.pt")
-# Stop if no improvement for 10 epochs
-model.train(data="data.yaml",
-            epochs=100,
-            patience=10)
-```
-
-:::
-
-::: {.column width="55%"}
-
-```{python}
-#| echo: false
-#| fig-align: center
-import matplotlib.pyplot as plt
-import numpy as np
-
-fig, ax = plt.subplots(figsize=(6, 5))
-fig.patch.set_alpha(0.0)
-ax.patch.set_alpha(0.0)
-
-brand_dark = '#1C355E'
-brand_teal = '#00C9A7'
-brand_orange = '#FF8C00'
-
-epochs = np.arange(1, 101)
-train_loss = 0.5 * np.exp(-epochs/20) + 0.05 * np.random.rand(100)
-val_loss = 0.6 * np.exp(-epochs/15) + 0.05 * np.random.rand(100)
-best_epoch = 25
-patience = 20
-stop_epoch = best_epoch + patience
-
-val_loss[best_epoch:] = val_loss[best_epoch:] + 0.005 * np.arange(100 - best_epoch)
-
-ax.plot(epochs[:stop_epoch], train_loss[:stop_epoch], color=brand_dark, linewidth=3, label='Train Loss')
-ax.plot(epochs[:stop_epoch], val_loss[:stop_epoch], color=brand_teal, linewidth=3, label='Val Loss')
-
-# Highlights
-ax.axvline(x=best_epoch, linestyle='--', color=brand_orange, alpha=0.8, linewidth=2, label='Best Checkpoint')
-ax.axvspan(best_epoch, stop_epoch, alpha=0.15, color=brand_dark, label=f'Patience Window')
-ax.scatter(stop_epoch, val_loss[stop_epoch-1], color='red', marker='x', s=150, linewidth=3, zorder=5, label='Stop Training')
-
-# Styling
-ax.spines['top'].set_visible(False)
-ax.spines['right'].set_visible(False)
-ax.spines['bottom'].set_color(brand_dark)
-ax.spines['left'].set_color(brand_dark)
-ax.tick_params(colors=brand_dark, labelsize=10)
-ax.grid(True, linestyle='--', alpha=0.2, color=brand_dark)
-
-ax.set_xlabel('Epochs', fontsize=12, fontweight='bold', color=brand_dark)
-ax.set_ylabel('Loss', fontsize=12, fontweight='bold', color=brand_dark)
-ax.set_title('Early Stopping in Action', fontsize=14, fontweight='bold', color=brand_dark)
-ax.legend(frameon=False, fontsize=10, loc='upper right')
-
-plt.tight_layout()
-plt.show()
-```
-
-:::
-
-::::
-
-## 💡 Tip for Tiny Objects: SAHI
-
-**Problem:** A 4K image resized to 640px makes tiny objects *invisible* to YOLO.
-
-**Solution — [SAHI](https://docs.ultralytics.com/guides/sahi-tiled-inference/) (Slicing Aided Hyper Inference):**
-
-1. **Slice** the large image into small, overlapping tiles
-2. **Run YOLO** on each tile at full resolution
-3. **Merge** all detections back together automatically
-
-## Demonstration: SAHI Sliced Inference {.center}
-
-{{< video assets/slides/outputs/videos/task-sahi-inference.mp4 width="900" height="500" autoplay="true" loop="true" muted="true" >}}
-
-## Using Config Files (Best Practice)
-
-For reproducibility, put arguments into a `experiment.yaml` file:
-
-```yaml
-# experiment.yaml
-task: detect
-mode: train
-model: yolo26s.pt
-data: data.yaml    
-epochs: 100
-batch: 16
-imgsz: 640
-```
-
-Run with:
-```bash
-yolo cfg=experiment.yaml
-```
-
-## Using Config Files
-
-```python
-# Python Equivalent
-from ultralytics import YOLO
-
-model = YOLO("yolo26s.pt")
-model.train(cfg="experiment.yaml")
-```
-
-## Experiment Tracking
-
-Ultralytics seamlessly integrates with popular MLOps tools to log **metrics** (mAP, loss) and **matrices** (confusion matrix) during training.
-
-::::{.columns}
-
-:::{.column}
-**Supported Integrations:**
-
-- **TensorBoard** (Built-in)
-- **Weights & Biases (W&B)**
-- **Comet**
-- **ClearML**
-- **MLflow**
-:::
-
-:::{.column}
-```bash
-# Enable TensorBoard logging
-yolo settings tensorboard=True
-# In terminal
-tensorboard --logdir runs/train
-# or in colab
-%load_ext tensorboard
-%tensorboard --logdir path/to/runs
-```
-:::
-::::
-
-*Docs Reference: [Integrations](https://docs.ultralytics.com/integrations/)*
-
-
-
-## What Data Augmentation Does
-
-**Concept:** Artificially increase training data variety by applying transformations to existing images.
-
-```{python}
-#| echo: false
-#| fig-align: center
-import matplotlib.pyplot as plt
-import numpy as np
-from PIL import Image
-from scipy.ndimage import gaussian_filter, rotate
-import os
-
-# Load a real image for more meaningful augmentation display
-img_path = 'assets/slides/rainy_car.jpg'
-if not os.path.exists(img_path):
-    img_path = 'slides/assets/slides/rainy_car.jpg'
-
-img = np.array(Image.open(img_path).convert('RGB')) / 255.0
-
-fig, axes = plt.subplots(1, 5, figsize=(15, 3.5))
-fig.patch.set_alpha(0.0)
-
-def setup_ax(ax, title):
-    ax.set_title(title, fontsize=12, fontweight='bold', color='#1C355E')
-    ax.set_xticks([]); ax.set_yticks([])
-    for sp in ax.spines.values(): sp.set_visible(False)
-
-# 1. Original
-axes[0].imshow(img)
-setup_ax(axes[0], 'Original')
-
-# 2. Horizontal Flip
-axes[1].imshow(np.fliplr(img))
-setup_ax(axes[1], 'Flip')
-
-# 3. Brightness
-# Scale pixels and clip to keep within [0, 1]
-bright_img = np.clip(img * 1.6, 0, 1)
-axes[2].imshow(bright_img)
-setup_ax(axes[2], 'Brightness')
-
-# 4. Blur
-# Apply sigma only to spatial dimensions
-blur_img = gaussian_filter(img, sigma=(4, 4, 0))
-axes[3].imshow(blur_img)
-setup_ax(axes[3], 'Blur')
-
-# 5. Rotation
-# rotate image without changing shape
-rot_img = rotate(img, angle=15, reshape=False, mode='nearest')
-axes[4].imshow(rot_img)
-setup_ax(axes[4], 'Rotation')
-
-plt.tight_layout()
-plt.show()
-```
-
-**When it helps:**
-
-- Overfitting (model needs more variety)
-- Small datasets
-- Domain shift (different lighting/angles in production)
-
-
-## Data Augmentation (Python) {.smaller}
-
-YOLO natively supports **Albumentations** to improve model robustness:
-
-```bash
-pip install albumentations ultralytics
-```
-
-```python
-import albumentations as A
-from ultralytics import YOLO
-
-model = YOLO("yolo26n.pt")
-
-# Define custom Albumentations transforms
-custom_transforms = [
-    A.Blur(blur_limit=7, p=0.5),
-    A.RandomCrop(width=256, height=256),
-    A.HorizontalFlip(p=0.5),
-    A.RandomBrightnessContrast(brightness_limit=0.2, contrast_limit=0.2, p=0.5),
-]
-
-# Train the model with custom transforms
-model.train(data="data.yaml", epochs=100, augmentations=custom_transforms)
-```
-
-*Docs Reference: [Albumentations Integration](https://docs.ultralytics.com/integrations/albumentations/)*
-
-
-# 9. Diagnosing Training {.sdaia-dark background-gradient="linear-gradient(135deg, #1C355E, #00C9A7)"}
+# Diagnosing Training {.sdaia-dark background-gradient="linear-gradient(135deg, #1C355E, #00C9A7)"}
 
 Reading the curves to fix what training isn't learning.
 
@@ -764,7 +227,6 @@ Model **never learned** the patterns.
 :::
 
 ::::
-
 
 ## 🔴 Overfitting: The Symptom
 
@@ -827,49 +289,6 @@ plt.show()
 
 ::::
 
-
-## 🔴 Overfitting: The Fixes
-
-:::: {.columns}
-
-::: {.column width="50%"}
-
-**More Data Variety** *(best cure)*
-
-Varied scenes the model can't memorize.
-
-**Augmentation**
-
-Flip, mosaic, color jitter — on by default in YOLO.
-
-**Smaller Model**
-
-Small dataset? Start with `yolo11n` or `yolo11s`.
-
-:::
-
-::: {.column width="50%"}
-
-**Increase `weight_decay`**
-
-```python
-model.train(data="data.yaml", weight_decay=0.001)
-```
-
-**Early Stopping**
-
-```python
-model.train(data="data.yaml", patience=20)
-```
-
-:::
-
-::::
-
-::: {.callout-tip}
-Start with **augmentation + patience**. If overfitting persists, raise `weight_decay`.
-:::
-
 ## 🟠 Underfitting: The Symptom
 
 > The model hasn't learned the patterns — too simple, over-constrained, or undertrained.
@@ -929,99 +348,6 @@ plt.show()
 
 ::::
 
-
-## 🟠 Underfitting: The Fixes
-
-:::: {.columns}
-
-::: {.column width="50%"}
-
-**Bigger Model**
-
-Try `yolo11m` or `yolo11l`.
-
-**Train Longer**
-
-Increase `epochs`.
-
-**Higher Learning Rate**
-
-Try `lr0=0.02` (default `0.01`).
-
-:::
-
-::: {.column width="50%"}
-
-**Less Regularization**
-
-```python
-model.train(data="data.yaml", weight_decay=0.0001)
-```
-
-**Check Your Labels**
-
-Mislabeled data is impossible to learn from — audit before tuning.
-
-:::
-
-::::
-
-
-## 🟢 Healthy Training: "Generalizing"
-
-:::: {.columns}
-
-::: {.column width="45%"}
-<br>
-
-**The Ideal State:**
-
-- Train and val metrics **rise together**
-- Both losses **decrease steadily** and plateau low
-- Model generalizes — performs well on unseen data
-
-:::
-
-::: {.column width="55%"}
-
-```{python}
-#| echo: false
-#| fig-align: center
-import matplotlib.pyplot as plt
-import numpy as np
-
-epochs = np.arange(1, 31)
-# Simulate healthy training: losses converge low
-train_loss = 0.6 * np.exp(-epochs/8) + 0.05 * np.random.rand(30)
-val_loss = 0.65 * np.exp(-epochs/8) + 0.05 * np.random.rand(30)
-
-fig, ax = plt.subplots(figsize=(6, 4))
-fig.patch.set_alpha(0.0)
-ax.patch.set_alpha(0.0)
-
-ax.plot(epochs, train_loss, color='#1C355E', linewidth=3, label='Train Loss')
-ax.plot(epochs, val_loss, color='#00C9A7', linewidth=3, label='Val Loss')
-
-ax.set_xlabel('Epochs', fontsize=12, color='#1C355E')
-ax.set_ylabel('Loss', fontsize=12, color='#1C355E')
-ax.set_title('Healthy: Convergence', fontsize=14, fontweight='bold', color='#1C355E')
-ax.legend(frameon=False)
-ax.set_ylim(0, 1.0)
-ax.set_yticks(np.arange(0, 1.1, 0.1))
-ax.spines['top'].set_visible(False)
-ax.spines['right'].set_visible(False)
-ax.spines['bottom'].set_color('#1C355E')
-ax.spines['left'].set_color('#1C355E')
-ax.tick_params(colors='#1C355E')
-
-plt.tight_layout()
-plt.show()
-```
-:::
-
-::::
-
-
 ## Diagnosing Your Training Run
 
 *Use this as a reference when reading your own loss curves.*
@@ -1036,50 +362,236 @@ plt.show()
 **Always watch both curves.** 99% train accuracy means nothing if val is failing.
 :::
 
+# Practical Data Pipeline {.sdaia-dark background-gradient="linear-gradient(135deg, #1C355E, #00C9A7)"}
 
+Formatting and fixing your data for YOLO.
 
+## What If Your Metrics Reveal a Problem?
 
-## Your Toolkit for Better Training
-
-You can diagnose the problem — now here are the levers to fix it.
+You can now read your validation results — but what do you do when the numbers look bad?
 
 ::: {.fragment .fade-up}
-| Tool | Fixes |
-|:---|:---|
-| **Data Augmentation** | Overfitting, small datasets, domain shift |
-| **Learning Rate** | Unstable or stalled training |
-| **Weight Decay** | Overfitting (model memorizing) |
-| **Early Stopping** | Wasted compute, overfitting |
+The most common culprits are:
+
+- **Class imbalance** — rare classes get ignored during training
+- **Overfitting or underfitting** — the model hasn't generalized
+- **Poor hyperparameters** — learning rate, weight decay, stopping too early or too late
 :::
 
-
-## 🧪 Lab 4B: Technical Performance & Diagnosis
-
-Now that you know how to read the curves, let's fix a model!
-
-1. Open `labs/04b_evaluation_technical.ipynb`
-2. **Compare** different YOLO model sizes (nano vs small).
-3. **Verify** Intersection over Union (IoU) math.
-4. **Identify** signs of overfitting in a training run.
-
-::: {.callout-tip appearance="minimal"}
-**Goal:** Learn to distinguish between a model that "memorizes" and one that "generalizes."
+::: {.fragment .fade-up}
+We'll fix the **data-side** problem here (imbalance). The training-side fixes (augmentation, hyperparameters) come next.
 :::
 
+## Class Imbalance: Fixing the Bias
+
+How do we stop the model from ignoring rare classes during training?
+
+```{python}
+#| echo: false
+#| fig-align: center
+import matplotlib.pyplot as plt
+import numpy as np
+
+fig, axes = plt.subplots(1, 2, figsize=(9, 3.5))
+fig.patch.set_alpha(0.0)
+
+brand_dark = '#1C355E'
+brand_teal = '#00C9A7'
+brand_red  = '#dc3545'
+
+classes = ['Empty Spot', 'Car']
+
+for ax in axes:
+    ax.patch.set_alpha(0.0)
+    ax.spines['top'].set_visible(False)
+    ax.spines['right'].set_visible(False)
+    ax.spines['bottom'].set_color(brand_dark)
+    ax.spines['left'].set_color(brand_dark)
+    ax.tick_params(colors=brand_dark, labelsize=11)
+
+# Before: imbalanced
+counts_before = [9500, 500]
+colors_before = [brand_dark, brand_red]
+axes[0].bar(classes, counts_before, color=colors_before, alpha=0.85, width=0.5)
+axes[0].set_title('Before: Imbalanced', fontsize=13, fontweight='bold', color=brand_dark)
+axes[0].set_ylabel('Training samples', fontsize=11, color=brand_dark)
+for i, v in enumerate(counts_before):
+    axes[0].text(i, v + 100, str(v), ha='center', fontsize=12, fontweight='bold', color=brand_dark)
+axes[0].set_ylim(0, 11000)
+
+# After: balanced via weighted sampling
+counts_after = [9500, 9500]
+colors_after = [brand_teal, brand_teal]
+axes[1].bar(classes, counts_after, color=colors_after, alpha=0.85, width=0.5)
+axes[1].set_title('After: Weighted Sampling', fontsize=13, fontweight='bold', color=brand_dark)
+for i, v in enumerate(counts_after):
+    axes[1].text(i, v + 100, str(v), ha='center', fontsize=12, fontweight='bold', color=brand_dark)
+axes[1].set_ylim(0, 11000)
+
+plt.tight_layout()
+plt.show()
+```
+
+Here we oversample (duplicating images) the minority class (car) to make it learnable.
+
+## Understanding the Data Setup
+
+Different formats for different tasks:
+
+- **Classification**: Relies *entirely* on folder structure (e.g., `train/cat/`, `train/dog/`).
+- **Detection & Segmentation**: Uses standard **YOLO format**, pairing images with `.txt` label files.
+
+```text
+my_dataset/
+├── images/
+│   ├── train/
+│   └── val/
+└── labels/
+    ├── train/
+    └── val/
+```
+
+## Inside the Labels
+
+- **Object Detection** (`.txt` Bounding Box):
+  `<class_index> <x_center> <y_center> <width> <height>`
+
+- **Instance Segmentation** (`.txt` Polygon):
+  `<class_index> <x1> <y1> <x2> <y2> ... <xn> <yn>`
+
+**⚠ Note:** Coordinates must **always be normalized** (0.0 to 1.0) to keep annotations independent of image resolution!
+
+## The `data.yaml` File
+
+Linking indices to names and defining paths.
+
+```yaml
+# data.yaml
+path: ../my_dataset
+train: images/train
+val: images/val
+
+names:
+  0: my_custom_object
+  1: another_object
+```
+
+## Data Leakage: The Silent Killer
+
+**The Problem:** Validation/test data accidentally ends up in the training set.
+
+**The Danger:** Val metrics look "perfect," but the model fails in production.
+
+**How to Avoid:**
+- Use `autosplit()` for automatic, safe partitioning.
+- Avoid manually copying images between split folders.
+- Check for duplicates/hashes before training.
+
+::: {.callout-warning appearance="simple" icon="false"}
+**Suspiciously perfect metrics? Check for leakage!**
+:::
+
+## Labeling Your Own Data
+
+Typing coordinates manually is impossible. Use **Ultralytics HUB**, Roboflow, or CVAT.
+
+1. Upload your images.
+2. Draw bounding boxes or polygons visually.
+3. Export in **YOLO format** for a ready-to-train dataset structure!
+
+*Docs Reference: [Ultralytics HUB](https://docs.ultralytics.com/hub/)*
+
+## AutoLabeling with SAM
+
+Speed up labeling using **SAM** (Segment Anything Model):
+
+1. **Zero-Shot Labeling:** Bypass manual labeling for generic objects.
+2. Run SAM on your raw dataset to generate masks/boxes.
+3. Review and correct the auto-generated labels—drastically faster than drawing manually!
+
+*Docs Reference: [Segment Anything Models (SAM)](https://docs.ultralytics.com/models/sam/)*
+
+# Kickoff Training {.sdaia-dark background-gradient="linear-gradient(135deg, #1C355E, #00C9A7)"}
+
+Hyperparameters and Configs.
+
+## Training
+
+We can start training directly from the command line or Python API:
+
+```bash
+yolo train model=weights/yolo26n.pt data=data.yaml epochs=100 imgsz=640 batch=-1
+```
+
+```python
+# Python Equivalent
+from ultralytics import YOLO
+
+model = YOLO("weights/yolo26n.pt")
+results = model.train(data="data.yaml", epochs=100, imgsz=640, batch=-1)
+```
+
+## Transfer Learning
+
+- **`.pt` (Pretrained weights):** Starts with general features (edges, shapes) from large datasets. Fast training, needs little data. (*Always recommended!*)
+- **`.yaml` (Architecture Definition):** Blank blueprint. Random weights, meaning you train entirely from scratch.
+
+*Use a `.pt` model for all custom dataset training to leverage Transfer Learning.*
+
+## Important Hyperparameters
+
+- `epochs` (Default: 100): Pass through the ENTIRE dataset. More = learns more, but risks overfitting.
+- `batch` (Default: 16): Images processed at once.
+  - Higher = faster, stable, takes more GPU memory.
+  - Smaller = adds noise, longer training.
+  - *Pro-tip*: Use `batch: -1` for **AutoBatch** to maximize your GPU memory!
+- `imgsz` (Default: 640): Target image size. Larger sizes (e.g., 1024) capture more detail but use more RAM.
+
+## Hyperparameters: Tuning the Steps
+
+- **Learning Rate (`lr0`)**: Controls step size—too large and the ball overshoots, too small and training is slow.
+- **Weight Decay**: Penalizes large weights to prevent memorization (🔴 Overfitting).
+- **Patience (`early_stopping`)**: Stop training if validation metrics haven't improved for $N$ epochs.
+
+## 💡 Tip for Tiny Objects: SAHI
+
+**Problem:** A 4K image resized to 640px makes tiny objects *invisible* to YOLO.
+
+**Solution — [SAHI](https://docs.ultralytics.com/guides/sahi-tiled-inference/):**
+1. **Slice** the large image into small, overlapping tiles.
+2. **Run YOLO** on each tile at full resolution.
+3. **Merge** all detections back together automatically.
+
+## Data Augmentation (Albumentations)
+
+YOLO natively supports **Albumentations** to improve model robustness:
+
+```python
+import albumentations as A
+from ultralytics import YOLO
+
+model = YOLO("yolo26n.pt")
+
+# Define custom transforms
+custom_transforms = [
+    A.Blur(blur_limit=7, p=0.5),
+    A.HorizontalFlip(p=0.5),
+    A.RandomBrightnessContrast(p=0.5),
+]
+
+# Train the model with custom transforms
+model.train(data="data.yaml", epochs=100, augmentations=custom_transforms)
+```
 
 # Conclusion {.sdaia-dark background-gradient="linear-gradient(135deg, #1C355E, #00C9A7)"}
 
-Wrapping Up Custom Training
-
 ## Summary
 
-- **Data Setup**: Formatting datasets correctly for YOLO tasks and avoiding data leaks.
-- **Labeling tools**: Using Ultralytics HUB and auto-labeling with SAM.
-- **Training**: Initiating and resuming training runs efficiently.
-- **Loss & Optimization**: How loss functions and gradient descent drive learning.
-- **Hyperparameters**: Tuning `lr0`, `weight_decay`, `patience`, batch, image size.
-- **Augmentation**: Flip, blur, brightness, and Albumentations for robustness.
-- **Diagnosis**: Spotting overfitting vs. underfitting from loss curves and acting on it.
+- **Intuition**: Learning $f(x)$ from data using feedback.
+- **Loss**: The smooth metric that guides optimization (MSE, Box, Class).
+- **Diagnosis**: Reading loss curves to spot Overfitting vs. Underfitting.
+- **Practicality**: YOLO formatting, Class Imbalance, and Auto-labeling with SAM.
+- **Levers**: Tuning Learning Rate, Weight Decay, and Augmentation.
 
 ## Next Steps
 
@@ -1096,5 +608,3 @@ Next up: **Part 5 — Deployment**
 
 Any questions?
 :::
-
-
