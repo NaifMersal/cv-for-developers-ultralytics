@@ -1,0 +1,129 @@
+---
+title: "Ultralytics YOLO Foundations: Part 5"
+subtitle: "Deployment"
+date: today
+format:
+  revealjs:
+    theme: [default, template/assets/sdaia.scss]
+    logo: template/assets/sdaia.svg
+    transition: slide
+    background-transition: fade
+    slide-number: true
+    controls: true
+    progress: true
+    center-title-slide: true
+    title-slide-attributes:
+      data-background-image: "template/assets/anim.svg"
+      data-background-opacity: "0.15"
+resources:
+  - "assets/**"
+---
+
+# 5. Deployment {.sdaia-dark background-gradient="linear-gradient(135deg, #1C355E, #00C9A7)"}
+
+Taking it to production.
+
+## Exporting Models
+
+A PyTorch `.pt` file is great for research, but slow in production.
+Convert to optimized formats using the `export` mode!
+
+::: {.panel-tabset}
+
+### CLI
+```bash
+# Export to ONNX (Great for CPU)
+yolo export model=best.pt format=onnx
+
+# Export to OpenVINO (Intel) or TensorRT (Nvidia GPUs)
+yolo export model=best.pt format=openvino
+```
+
+### Python
+```python
+from ultralytics import YOLO
+
+model = YOLO("best.pt")
+model.export(format="onnx")
+model.export(format="openvino")
+```
+
+:::
+
+*Docs Reference: [Export](https://docs.ultralytics.com/modes/export/)*
+
+## Inference with Exported Models
+
+You don't need complex deployment code to use your exported models. The Ultralytics API loads them just like a standard PyTorch `.pt` file!
+
+::: {.panel-tabset}
+
+### CLI
+```bash
+yolo predict model=best.onnx source="https://ultralytics.com/assets/bus.jpg"
+```
+
+### Python
+```python
+from ultralytics import YOLO
+
+model = YOLO("best.onnx")
+results = model.predict(source="https://ultralytics.com/assets/bus.jpg")
+print(results[0].boxes) 
+```
+
+:::
+
+*Docs Reference: [Predict with Exported Models](https://docs.ultralytics.com/modes/predict/)*
+
+
+# Conclusion {.sdaia-dark background-gradient="linear-gradient(135deg, #1C355E, #00C9A7)"}
+
+Module Wrap-up
+
+## The Ultralytics Ecosystem
+
+```{=html}
+<div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 1rem; margin-top: 1.2rem;">
+  <div style="text-align:center; background:rgba(28,53,94,0.08); padding:1.2rem; border-radius:12px;">
+    <div style="font-size:2rem;">🎯</div>
+    <strong>Tasks</strong><br><small>Detect · Segment · Pose · OBB</small>
+  </div>
+  <div style="text-align:center; background:rgba(28,53,94,0.08); padding:1.2rem; border-radius:12px;">
+    <div style="font-size:2rem;">⚡</div>
+    <strong>Solutions</strong><br><small>Advanced logic, out-of-the-box</small>
+  </div>
+  <div style="text-align:center; background:rgba(28,53,94,0.08); padding:1.2rem; border-radius:12px;">
+    <div style="font-size:2rem;">🗂️</div>
+    <strong>Datasets</strong><br><small>Structure labels for every task</small>
+  </div>
+  <div style="text-align:center; background:rgba(0,201,167,0.12); padding:1.2rem; border-radius:12px;">
+    <div style="font-size:2rem;">🛠️</div>
+    <strong>Tools</strong><br><small>CLI · YAML · Hyperparameters</small>
+  </div>
+  <div style="text-align:center; background:rgba(0,201,167,0.12); padding:1.2rem; border-radius:12px;">
+    <div style="font-size:2rem;">📊</div>
+    <strong>Evaluation</strong><br><small>Metrics · Thresholds · PR curves</small>
+  </div>
+  <div style="text-align:center; background:rgba(0,201,167,0.12); padding:1.2rem; border-radius:12px;">
+    <div style="font-size:2rem;">🚀</div>
+    <strong>Deployment</strong><br><small>Export for production speed</small>
+  </div>
+</div>
+```
+
+## What's Next?
+
+Next up: **Part 6 — HuggingFace for Computer Vision**
+
+- Zero-shot segmentation with **SAM 3**.
+- Visual embeddings for similarity search.
+- Vision LLMs for multimodal reasoning.
+
+## Q&A {.sdaia-dark background-color="#1C355E"}
+
+::: {.r-fit-text}
+**Thank You!**
+
+Any questions?
+:::
