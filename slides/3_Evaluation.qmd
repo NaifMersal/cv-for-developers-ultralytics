@@ -1304,79 +1304,6 @@ print(f"Recall:    {metrics.box.mr}")       # Overall recall
 
 
 
-## What If Your Metrics Reveal a Problem?
-
-You can now read your validation results — but what do you do when the numbers look bad?
-
-::: {.fragment .fade-up}
-The most common culprits are:
-
-- **Class imbalance** — rare classes get ignored during training
-- **Overfitting or underfitting** — the model hasn't generalized
-- **Poor hyperparameters** — learning rate, weight decay, stopping too early or too late
-:::
-
-::: {.fragment .fade-up}
-We'll fix the **data-side** problem here. The training-side problems (over/under-fitting, hyperparameters) come up next in Part 4.
-:::
-
-## Class Imbalance: Fixing the Bias
-
-How do we stop the model from ignoring rare classes during training?
-
-```{python}
-#| echo: false
-#| fig-align: center
-import matplotlib.pyplot as plt
-import numpy as np
-
-fig, axes = plt.subplots(1, 2, figsize=(9, 3.5))
-fig.patch.set_alpha(0.0)
-
-brand_dark = '#1C355E'
-brand_teal = '#00C9A7'
-brand_red  = '#dc3545'
-
-classes = ['Empty Spot', 'Car']
-
-for ax in axes:
-    ax.patch.set_alpha(0.0)
-    ax.spines['top'].set_visible(False)
-    ax.spines['right'].set_visible(False)
-    ax.spines['bottom'].set_color(brand_dark)
-    ax.spines['left'].set_color(brand_dark)
-    ax.tick_params(colors=brand_dark, labelsize=11)
-
-# Before: imbalanced
-counts_before = [9500, 500]
-colors_before = [brand_dark, brand_red]
-axes[0].bar(classes, counts_before, color=colors_before, alpha=0.85, width=0.5)
-axes[0].set_title('Before: Imbalanced', fontsize=13, fontweight='bold', color=brand_dark)
-axes[0].set_ylabel('Training samples', fontsize=11, color=brand_dark)
-for i, v in enumerate(counts_before):
-    axes[0].text(i, v + 100, str(v), ha='center', fontsize=12, fontweight='bold', color=brand_dark)
-axes[0].set_ylim(0, 11000)
-
-# After: balanced via weighted sampling
-counts_after = [9500, 9500]
-colors_after = [brand_teal, brand_teal]
-axes[1].bar(classes, counts_after, color=colors_after, alpha=0.85, width=0.5)
-axes[1].set_title('After: Weighted Sampling', fontsize=13, fontweight='bold', color=brand_dark)
-for i, v in enumerate(counts_after):
-    axes[1].text(i, v + 100, str(v), ha='center', fontsize=12, fontweight='bold', color=brand_dark)
-axes[1].set_ylim(0, 11000)
-
-plt.tight_layout()
-plt.show()
-```
-
-Here we oversample (duplicating images) the minority class (car) to make it learnable.
-
-::: {.fragment}
-*Technical Guide: [Class Balancing with YOLO](https://y-t-g.github.io/tutorials/yolo-class-balancing/)*
-:::
-
-
 
 ## Evaluation: Key Takeaways
 
@@ -1385,21 +1312,21 @@ Here we oversample (duplicating images) the minority class (car) to make it lear
 - **Threshold is a business decision:** ROI curves, not just F1, choose where to set it.
 - **mAP for detection:** Use mAP50 for a quick sanity check, mAP50-95 for a strict production-ready evaluation.
 - **IoU underpins everything:** mAP, mIoU, Dice — all built on the same overlap idea.
-- **When metrics look bad:** Class imbalance is fixable here; overfitting and hyperparameters are tackled in **Part 4 (Deployment)** then **Part 5 (Custom Data & Training)**.
+- **When metrics look bad:** You've identified the *what*, now we need to fix the *why* in **Part 4**.
 :::
 
 ::: {.callout-tip appearance="minimal" .fragment}
-When your model's validation metrics are solid, it's ready for the next step — getting it into production.
+When your model's validation metrics are solid, it's ready for the next step — either more training or moving to production.
 :::
 
 ## Next Steps
 
 Next up: **Part 4 — Custom Data & Training**
 
-- Format your own dataset for YOLO and avoid data leakage.
-- Use Ultralytics HUB and SAM to label data fast.
-- Run training, read loss curves, and tune hyperparameters.
-- Diagnose **overfitting** and **underfitting** — and fix them deliberately.
+- Learn the mathematical "Loss" that drives the model.
+- Format your own dataset and fix **Class Imbalance**.
+- Diagnose and solve **Overfitting** and **Underfitting**.
+- Fine-tune hyperparameters for production performance.
 
 ## Q&A {.sdaia-dark background-color="#1C355E"}
 
