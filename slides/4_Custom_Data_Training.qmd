@@ -1083,11 +1083,11 @@ Wrapping Up Custom Training
 
 ## Next Steps
 
-Next up: **HuggingFace for Computer Vision**
+Next up: **Part 5 — Deployment**
 
-- Zero-shot segmentation with **SAM 3**.
-- Visual embeddings for similarity search.
-- Vision LLMs for multimodal reasoning.
+- Export models to optimized formats like ONNX, OpenVINO, and TensorRT.
+- Run inference with exported models.
+- Take your model to production!
 
 ## Q&A {.sdaia-dark background-color="#1C355E"}
 

@@ -154,16 +154,16 @@ Overcome I/O bottlenecks using Threading and Queues to ensure your inference loo
 :::
 
 ::: {.card}
-### 📊 Part 3: Evaluation & Deployment
+### 📊 Part 3: Model Evaluation
 
-*How good is your model and how to use it?*
+*How good is your model?*
 
 ::: {.card-desc}
-Understanding confusion matrices, IoU, Precision, Recall, mAP metrics, and exporting to optimized formats like ONNX.
+Understanding confusion matrices, IoU, Precision, Recall, and mAP metrics to evaluate model performance professionally.
 :::
 
 ::: {.card-links}
-[**Presentation Slides**](slides/3_Evaluation_Deployment.qmd)
+[**Presentation Slides**](slides/3_Evaluation.qmd)
 
 [**Lab:** ROI-Driven Evaluation](https://colab.research.google.com/github/NaifMersal/cv-for-developers-ultralytics/blob/main/labs/04a_roi_evaluation.ipynb) [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/NaifMersal/cv-for-developers-ultralytics/blob/main/labs/04a_roi_evaluation.ipynb)
 :::
@@ -188,7 +188,21 @@ Data formatting, labeling tools, loss functions, hyperparameter tuning, augmenta
 :::
 
 ::: {.card}
-### 🤗 Part 5: HuggingFace for Computer Vision
+### 🚀 Part 5: Deployment
+
+*Taking your model to production.*
+
+::: {.card-desc}
+Exporting to optimized formats like ONNX, OpenVINO, and TensorRT for high-performance inference on various hardware.
+:::
+
+::: {.card-links}
+[**Presentation Slides**](slides/5_Deployment.qmd)
+:::
+:::
+
+::: {.card}
+### 🤗 Part 6: HuggingFace for Computer Vision
 
 *Expanding your toolkit with the HF Hub.*
 
@@ -197,9 +211,9 @@ Learn to use SAM 3 for zero-shot segmentation, visual embeddings for similarity 
 :::
 
 ::: {.card-links}
-[**Presentation Slides**](slides/5_HuggingFace_CV.qmd)
+[**Presentation Slides**](slides/6_HuggingFace_CV.qmd)
 
-[**Lab 5:** HuggingFace for CV](https://colab.research.google.com/github/NaifMersal/cv-for-developers-ultralytics/blob/main/labs/05_huggingface_cv.ipynb) [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/NaifMersal/cv-for-developers-ultralytics/blob/main/labs/05_huggingface_cv.ipynb)
+[**Lab 6:** HuggingFace for CV](https://colab.research.google.com/github/NaifMersal/cv-for-developers-ultralytics/blob/main/labs/05_huggingface_cv.ipynb) [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/NaifMersal/cv-for-developers-ultralytics/blob/main/labs/05_huggingface_cv.ipynb)
 :::
 :::
 
