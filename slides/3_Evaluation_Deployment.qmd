@@ -1,5 +1,5 @@
 ---
-title: "Ultralytics YOLO Foundations: Part 4"
+title: "Ultralytics YOLO Foundations: Part 3"
 subtitle: "Evaluation & Deployment"
 date: today
 format:
@@ -18,7 +18,7 @@ format:
 resources:
   - "assets/**"
 ---
-# 7. Model Evaluation {.sdaia-dark background-gradient="linear-gradient(135deg, #1C355E, #00C9A7)"}
+# 4. Model Evaluation {.sdaia-dark background-gradient="linear-gradient(135deg, #1C355E, #00C9A7)"}
 
 How good is your model?
 
@@ -492,6 +492,42 @@ Accuracy and F1 are great for engineers, but management speaks one language: **M
 
 ![](assets/pcb_solder_defect_yolo.png){fig-align="center" width="75%"}
 
+```{python}
+#| echo: false
+import numpy as np
+
+# Financial Parameters
+COST_FN = 500
+COST_FP = 25
+TOTAL_DEFECTS = 500
+TOTAL_GOOD = 9500
+
+# Generate synthetic data
+np.random.seed(42)
+scores_defects = np.random.normal(0.55, 0.20, TOTAL_DEFECTS)
+scores_good = np.random.normal(0.10, 0.03, TOTAL_GOOD)
+scores_defects = np.clip(scores_defects, 0.01, 0.99)
+scores_good = np.clip(scores_good, 0.01, 0.99)
+
+def get_roi_stats(t):
+    fn = np.sum(scores_defects < t)
+    fp = np.sum(scores_good >= t)
+    return fn, fp, (fn * COST_FN + fp * COST_FP)
+
+# Pre-calculate thresholds of interest
+t_a = 0.35
+fn_a, fp_a, cost_a = get_roi_stats(t_a)
+
+# Find best threshold (matching plot logic)
+thresholds = np.linspace(0.01, 0.99, 200)
+all_costs = [get_roi_stats(t)[2] for t in thresholds]
+best_idx = np.argmin(all_costs)
+t_best = thresholds[best_idx]
+fn_best, fp_best, cost_best = get_roi_stats(t_best)
+
+savings = cost_a - cost_best
+```
+
 
 ## Cost of Every Prediction
 
@@ -531,7 +567,11 @@ If we test our model on a batch of **10,000 boards** (where 5% actually have def
 ```
 
 ::: {.fragment .fade-up style="text-align: center; margin-top: 1rem;"}
-**Total Financial Loss = $(FN \times \$500) + (FP \times \$25)$**
+```{python}
+#| echo: false
+#| output: asis
+print(f"**Total Financial Loss = $(FN \\times \\${COST_FN}) + (FP \\times \\${COST_FP})$**")
+```
 :::
 
 
@@ -539,27 +579,37 @@ If we test our model on a batch of **10,000 boards** (where 5% actually have def
 
 What if we didn't use AI at all? Let's look at the financial impact of the two simplest "Dummy" strategies:
 
-:::: {.columns}
+```{python}
+#| echo: false
+#| output: asis
 
-::: {.column width="50%" .fragment}
+ship_everything_cost = TOTAL_DEFECTS * COST_FN
+scrap_everything_cost = TOTAL_GOOD * COST_FP
+
+print(f"""
+:::: {{.columns}}
+
+::: {{.column width="50%" .fragment}}
 ### 🚢 "Ship Everything"
 *Assume every board is Good*
 
-- **False Negatives (FN):** 500
-- **Cost:** $500 \times 500$
-- **Total Loss:** [**$250,000**]{style="color:#dc3545; font-size:1.2em;"}
+- **False Negatives (FN):** {TOTAL_DEFECTS}
+- **Cost:** \\${COST_FN}$ \\times {TOTAL_DEFECTS}$
+- **Total Loss:** [**\\${ship_everything_cost:,}**]{{style="color:#dc3545; font-size:1.2em;"}}
 :::
 
-::: {.column width="50%" .fragment}
+::: {{.column width="50%" .fragment}}
 ### ⚙️ "Scrap Everything"
 *Assume every board is Defective*
 
-- **False Positives (FP):** 9,500
-- **Cost:** $9,500 \times 25$
-- **Total Loss:** [**$237,500**]{style="color:#FF8C00; font-size:1.2em;"}
+- **False Positives (FP):** {TOTAL_GOOD}
+- **Cost:** \\${TOTAL_GOOD:,}$ \\times {COST_FP}$
+- **Total Loss:** [**\\${scrap_everything_cost:,}**]{{style="color:#FF8C00; font-size:1.2em;"}}
 :::
 
 ::::
+""")
+```
 
 ::: {.fragment .fade-up style="text-align: center; margin-top: 1.5rem;"}
 ::: {.callout-tip appearance="minimal"}
@@ -570,33 +620,41 @@ What if we didn't use AI at all? Let's look at the financial impact of the two s
 
 ## Optimizing for Profit, Not Just F1
 
-Remember how F1 balances Precision and Recall? When money is involved, the balance changes. A missed defect (FN) is 20x more expensive than a false alarm (FP).
+Remember how F1 balances Precision and Recall? When money is involved, the balance changes.
 
-:::: {.columns}
+```{python}
+#| echo: false
+#| output: asis
 
-::: {.column width="50%" .fragment .fade-up}
+print(f"""
+:::: {{.columns}}
+
+::: {{.column width="50%" .fragment .fade-up}}
 ### Option A: Max F1 Score
-Balanced threshold (conf=0.35)
+Balanced threshold (conf={t_a:.2f})
 
-- **FN (Missed):** 81 boards $\times \$500$ = $\$40,500$
-- **FP (False Alarms):** 0 boards $\times \$25$ = $\$0$
-- **Total Loss:** <span style="color:#dc3545; font-weight:bold;">$40,500</span>
+- **FN (Missed):** {fn_a} boards $\\times \\${COST_FN}$ = $\\${cost_a:,}$
+- **FP (False Alarms):** {fp_a} boards $\\times \\${COST_FP}$ = $\\${fp_a * COST_FP:,}$
+- **Total Loss:** <span style="color:#dc3545; font-weight:bold;">\\${cost_a:,}</span>
 :::
 
-::: {.column width="50%" .fragment .fade-up}
+::: {{.column width="50%" .fragment .fade-up}}
 ### Option B: Max ROI
-Loose threshold (conf=0.20)
+Loose threshold (conf={t_best:.2f})
 
-- **FN (Missed):** 22 boards $\times \$500$ = $\$11,000$
-- **FP (False Alarms):** 2 boards $\times \$25$ = $\$50$
-- **Total Loss:** <span style="color:#00C9A7; font-weight:bold;">$11,050</span>
+- **FN (Missed):** {fn_best} boards $\\times \\${COST_FN}$ = $\\${fn_best * COST_FN:,}$
+- **FP (False Alarms):** {fp_best} boards $\\times \\${COST_FP}$ = $\\${fp_best * COST_FP:,}$
+- **Total Loss:** <span style="color:#00C9A7; font-weight:bold;">\\${cost_best:,}</span>
 :::
 
 ::::
 
-::: {.callout-important appearance="minimal" .fragment .fade-up}
-By lowering our threshold and accepting a few False Positives, we saved the business nearly **$30,000** per batch. We optimized for the **business metric**, not the machine learning metric.
+::: {{.callout-important appearance="minimal" .fragment .fade-up}}
+By lowering our threshold and accepting a few False Positives, we saved the business over **\\${savings:,}** per batch. We optimized for the **business metric**, not the machine learning metric.
 :::
+""")
+```
+
 
 
 ## The Cost Curve
@@ -606,38 +664,12 @@ Just like we plotted the F1 curve, we can plot a **Cost Curve** to find the opti
 ```{python}
 #| echo: false
 #| fig-align: center
-import numpy as np
 import matplotlib.pyplot as plt
 import matplotlib.ticker as ticker
 
-# Generate synthetic data
-np.random.seed(42)  # For reproducible results
-total_defects = 500
-total_good = 9500
-
-# Defects have a clear but overlapping distribution
-scores_defects = np.random.normal(0.55, 0.20, total_defects)
-scores_good = np.random.normal(0.10, 0.03, total_good)
-
-# Clip to valid confidence range
-scores_defects = np.clip(scores_defects, 0.01, 0.99)
-scores_good = np.clip(scores_good, 0.01, 0.99)
-
-# Calculate costs across thresholds
-thresholds = np.linspace(0.01, 0.99, 200)
-total_costs = []
-
-for t in thresholds:
-    fn = np.sum(scores_defects < t)
-    fp = np.sum(scores_good >= t)
-    total_costs.append(fn * 500 + fp * 25)
-
-total_costs = np.array(total_costs)
-
-# Find minimum cost
-best_idx = np.argmin(total_costs)
-best_conf = thresholds[best_idx]
-min_cost = total_costs[best_idx]
+# Calculate costs across thresholds for the line plot
+# (using thresholds and all_costs pre-calculated in the setup block)
+total_costs = np.array(all_costs)
 
 # Plot
 fig, ax = plt.subplots(figsize=(8, 4.5))
@@ -647,11 +679,11 @@ ax.patch.set_alpha(0.0)
 ax.plot(thresholds, total_costs, color='#1C355E', linewidth=3, label='Total Financial Loss ($)')
 
 # Highlight minimum cost
-ax.axvline(best_conf, color='#00C9A7', linewidth=2, linestyle=':')
-ax.scatter([best_conf], [min_cost], color='#00C9A7', zorder=5, s=80)
-ax.annotate(f'Best ROI @ conf={best_conf:.2f}\nCost: ${min_cost:,.0f}',
-            xy=(best_conf, min_cost),
-            xytext=(best_conf + 0.05, min_cost + 20000),
+ax.axvline(t_best, color='#00C9A7', linewidth=2, linestyle=':')
+ax.scatter([t_best], [cost_best], color='#00C9A7', zorder=5, s=80)
+ax.annotate(f'Best ROI @ conf={t_best:.2f}\nCost: ${cost_best:,.0f}',
+            xy=(t_best, cost_best),
+            xytext=(t_best + 0.05, cost_best + 20000),
             fontsize=11, fontweight='bold', color='#00C9A7',
             arrowprops=dict(arrowstyle='->', color='#00C9A7', lw=2))
 
@@ -1285,7 +1317,7 @@ The most common culprits are:
 :::
 
 ::: {.fragment .fade-up}
-Let's go through each one.
+We'll fix the **data-side** problem here. The training-side problems (over/under-fitting, hyperparameters) come up next in Part 4.
 :::
 
 ## Class Imbalance: Fixing the Bias
@@ -1345,702 +1377,22 @@ Here we oversample (duplicating images) the minority class (car) to make it lear
 :::
 
 
-## The Training Spectrum
-
-*Every training run lands somewhere on this spectrum — knowing where is the first step to fixing it.*
-
-:::: {.columns}
-
-::: {.column width="33%"}
-
-::: {.callout-warning}
-### 🔴 Overfitting
-Model **memorizes** training data.
-
-- Train mAP >> Val mAP
-- Val loss starts rising
-
-**Too much capacity for your data**
-:::
-
-:::
-
-::: {.column width="34%"}
-
-::: {.callout-tip}
-### 🟢 Just Right
-Model **generalizes** to new data.
-
-- Train ≈ Val, both high
-- Both losses converge low
-
-**The goal — stay here**
-:::
-
-:::
-
-::: {.column width="33%"}
-
-::: {.callout-note}
-### 🟠 Underfitting
-Model **never learned** the patterns.
-
-- Both Train and Val mAP low
-- Losses barely decrease
-
-**Too little capacity or training**
-:::
-
-:::
-
-::::
-
-
-## 🔴 Overfitting: The Symptom
-
-> The model memorizes training data instead of learning general patterns.
-
-:::: {.columns}
-
-::: {.column width="42%"}
-
-**What you see:**
-
-- Train loss ↓, Val loss ↑
-- Train mAP climbs, Val mAP stalls
-- Growing gap between the two curves
-
-:::
-
-::: {.column width="58%"}
-
-```{python}
-#| echo: false
-#| fig-align: center
-import matplotlib.pyplot as plt
-import numpy as np
-
-np.random.seed(7)
-epochs = np.arange(1, 31)
-train_loss = 0.5 * np.exp(-epochs/10) + 0.02 * np.random.rand(30)
-val_loss = 0.6 * np.exp(-epochs/8) + 0.02 * np.random.rand(30)
-val_loss[12:] = val_loss[12:] + 0.022 * np.arange(1, 19)
-
-fig, ax = plt.subplots(figsize=(6, 4))
-fig.patch.set_alpha(0.0)
-ax.patch.set_alpha(0.0)
-
-ax.plot(epochs, train_loss, color='#1C355E', linewidth=3, label='Train Loss')
-ax.plot(epochs, val_loss, color='#00C9A7', linewidth=3, label='Val Loss')
-ax.axvline(x=13, color='#dc3545', linewidth=1.5, linestyle='--', alpha=0.7)
-ax.annotate('Val loss starts rising', xy=(13, val_loss[12]), xytext=(16, 0.65),
-            fontsize=9, color='#dc3545',
-            arrowprops=dict(arrowstyle='->', color='#dc3545', lw=1.2))
-
-ax.set_xlabel('Epochs', fontsize=12, color='#1C355E')
-ax.set_ylabel('Loss', fontsize=12, color='#1C355E')
-ax.set_title('Overfitting: Diverging Losses', fontsize=14, fontweight='bold', color='#1C355E')
-ax.legend(frameon=False)
-ax.set_ylim(0, 1.0)
-ax.set_yticks(np.arange(0, 1.1, 0.1))
-ax.spines['top'].set_visible(False)
-ax.spines['right'].set_visible(False)
-ax.spines['bottom'].set_color('#1C355E')
-ax.spines['left'].set_color('#1C355E')
-ax.tick_params(colors='#1C355E')
-
-plt.tight_layout()
-plt.show()
-```
-
-:::
-
-::::
-
-
-## 🔴 Overfitting: The Fixes
-
-:::: {.columns}
-
-::: {.column width="50%"}
-
-**More Data Variety** *(best cure)*
-
-Varied scenes the model can't memorize.
-
-**Augmentation**
-
-Flip, mosaic, color jitter — on by default in YOLO.
-
-**Smaller Model**
-
-Small dataset? Start with `yolo11n` or `yolo11s`.
-
-:::
-
-::: {.column width="50%"}
-
-**Increase `weight_decay`**
-
-```python
-model.train(data="data.yaml", weight_decay=0.001)
-```
-
-**Early Stopping**
-
-```python
-model.train(data="data.yaml", patience=20)
-```
-
-:::
-
-::::
-
-::: {.callout-tip}
-Start with **augmentation + patience**. If overfitting persists, raise `weight_decay`.
-:::
-
-## 🟠 Underfitting: The Symptom
-
-> The model hasn't learned the patterns — too simple, over-constrained, or undertrained.
-
-:::: {.columns}
-
-::: {.column width="45%"}
-
-**What you see:**
-
-- Both Train *and* Val mAP **low and flat**
-- Loss barely moves after the first epochs
-- Curves close together — but both stuck high
-
-:::
-
-::: {.column width="55%"}
-
-```{python}
-#| echo: false
-#| fig-align: center
-import matplotlib.pyplot as plt
-import numpy as np
-
-np.random.seed(3)
-epochs = np.arange(1, 31)
-train_loss = 0.4 + 0.2 * np.exp(-epochs/5) + 0.02 * np.random.rand(30)
-val_loss = 0.45 + 0.2 * np.exp(-epochs/5) + 0.02 * np.random.rand(30)
-
-fig, ax = plt.subplots(figsize=(6, 4))
-fig.patch.set_alpha(0.0)
-ax.patch.set_alpha(0.0)
-
-ax.plot(epochs, train_loss, color='#1C355E', linewidth=3, label='Train Loss')
-ax.plot(epochs, val_loss, color='#00C9A7', linewidth=3, label='Val Loss')
-ax.annotate('Both stuck — barely dropping', xy=(20, train_loss[19]),
-            xytext=(12, 0.75), fontsize=9, color='#E07B39',
-            arrowprops=dict(arrowstyle='->', color='#E07B39', lw=1.2))
-
-ax.set_xlabel('Epochs', fontsize=12, color='#1C355E')
-ax.set_ylabel('Loss', fontsize=12, color='#1C355E')
-ax.set_title('Underfitting: High Plateau', fontsize=14, fontweight='bold', color='#1C355E')
-ax.legend(frameon=False)
-ax.set_ylim(0, 1.0)
-ax.set_yticks(np.arange(0, 1.1, 0.1))
-ax.spines['top'].set_visible(False)
-ax.spines['right'].set_visible(False)
-ax.spines['bottom'].set_color('#1C355E')
-ax.spines['left'].set_color('#1C355E')
-ax.tick_params(colors='#1C355E')
-
-plt.tight_layout()
-plt.show()
-```
-
-:::
-
-::::
-
-
-## 🟠 Underfitting: The Fixes
-
-:::: {.columns}
-
-::: {.column width="50%"}
-
-**Bigger Model**
-
-Try `yolo11m` or `yolo11l`.
-
-**Train Longer**
-
-Increase `epochs`.
-
-**Higher Learning Rate**
-
-Try `lr0=0.02` (default `0.01`).
-
-:::
-
-::: {.column width="50%"}
-
-**Less Regularization**
-
-```python
-model.train(data="data.yaml", weight_decay=0.0001)
-```
-
-**Check Your Labels**
-
-Mislabeled data is impossible to learn from — audit before tuning.
-
-:::
-
-::::
-
-
-## 🟢 Healthy Training: "Generalizing"
-
-:::: {.columns}
-
-::: {.column width="45%"}
-<br>
-
-**The Ideal State:**
-
-- Train and val metrics **rise together**
-- Both losses **decrease steadily** and plateau low
-- Model generalizes — performs well on unseen data
-
-:::
-
-::: {.column width="55%"}
-
-```{python}
-#| echo: false
-#| fig-align: center
-import matplotlib.pyplot as plt
-import numpy as np
-
-epochs = np.arange(1, 31)
-# Simulate healthy training: losses converge low
-train_loss = 0.6 * np.exp(-epochs/8) + 0.05 * np.random.rand(30)
-val_loss = 0.65 * np.exp(-epochs/8) + 0.05 * np.random.rand(30)
-
-fig, ax = plt.subplots(figsize=(6, 4))
-fig.patch.set_alpha(0.0)
-ax.patch.set_alpha(0.0)
-
-ax.plot(epochs, train_loss, color='#1C355E', linewidth=3, label='Train Loss')
-ax.plot(epochs, val_loss, color='#00C9A7', linewidth=3, label='Val Loss')
-
-ax.set_xlabel('Epochs', fontsize=12, color='#1C355E')
-ax.set_ylabel('Loss', fontsize=12, color='#1C355E')
-ax.set_title('Healthy: Convergence', fontsize=14, fontweight='bold', color='#1C355E')
-ax.legend(frameon=False)
-ax.set_ylim(0, 1.0)
-ax.set_yticks(np.arange(0, 1.1, 0.1))
-ax.spines['top'].set_visible(False)
-ax.spines['right'].set_visible(False)
-ax.spines['bottom'].set_color('#1C355E')
-ax.spines['left'].set_color('#1C355E')
-ax.tick_params(colors='#1C355E')
-
-plt.tight_layout()
-plt.show()
-```
-:::
-
-::::
-
-
-## Diagnosing Your Training Run
-
-*Use this as a reference when reading your own loss curves.*
-
-| What you see | Problem | Actions |
-|:---|:---:|:---|
-| Train mAP >> Val mAP, Val loss rising | 🔴 **Overfitting** | Add augmentation · increase `weight_decay` · set `patience` |
-| Both mAP low and flat, loss barely moves | 🟠 **Underfitting** | Bigger model · more `epochs` · raise `lr0` · lower `weight_decay` |
-| Both losses converging, mAP climbing | 🟢 **Healthy** | Continue training or deploy |
-
-::: {.callout-tip}
-**Always watch both curves.** 99% train accuracy means nothing if val is failing.
-:::
-
-
-
-
-
-## Your Toolkit for Better Training
-
-You can diagnose the problem — now here are the levers to fix it.
-
-::: {.fragment .fade-up}
-| Tool | Fixes |
-|:---|:---|
-| **Data Augmentation** | Overfitting, small datasets, domain shift |
-| **Learning Rate** | Unstable or stalled training |
-| **Weight Decay** | Overfitting (model memorizing) |
-| **Early Stopping** | Wasted compute, overfitting |
-:::
-
-## What Data Augmentation Does
-
-**Concept:** Artificially increase training data variety by applying transformations to existing images.
-
-```{python}
-#| echo: false
-#| fig-align: center
-import matplotlib.pyplot as plt
-import numpy as np
-from PIL import Image
-from scipy.ndimage import gaussian_filter, rotate
-import os
-
-# Load a real image for more meaningful augmentation display
-img_path = 'assets/slides/rainy_car.jpg'
-if not os.path.exists(img_path):
-    img_path = 'slides/assets/slides/rainy_car.jpg'
-    
-img = np.array(Image.open(img_path).convert('RGB')) / 255.0
-
-fig, axes = plt.subplots(1, 5, figsize=(15, 3.5))
-fig.patch.set_alpha(0.0)
-
-def setup_ax(ax, title):
-    ax.set_title(title, fontsize=12, fontweight='bold', color='#1C355E')
-    ax.set_xticks([]); ax.set_yticks([])
-    for sp in ax.spines.values(): sp.set_visible(False)
-
-# 1. Original
-axes[0].imshow(img)
-setup_ax(axes[0], 'Original')
-
-# 2. Horizontal Flip
-axes[1].imshow(np.fliplr(img))
-setup_ax(axes[1], 'Flip')
-
-# 3. Brightness
-# Scale pixels and clip to keep within [0, 1]
-bright_img = np.clip(img * 1.6, 0, 1)
-axes[2].imshow(bright_img)
-setup_ax(axes[2], 'Brightness')
-
-# 4. Blur
-# Apply sigma only to spatial dimensions
-blur_img = gaussian_filter(img, sigma=(4, 4, 0))
-axes[3].imshow(blur_img)
-setup_ax(axes[3], 'Blur')
-
-# 5. Rotation
-# rotate image without changing shape
-rot_img = rotate(img, angle=15, reshape=False, mode='nearest')
-axes[4].imshow(rot_img)
-setup_ax(axes[4], 'Rotation')
-
-plt.tight_layout()
-plt.show()
-```
-
-**When it helps:**
-
-- Overfitting (model needs more variety)
-- Small datasets
-- Domain shift (different lighting/angles in production)
-
-
-## Data Augmentation (Python) {.smaller}
-
-YOLO natively supports **Albumentations** to improve model robustness:
-
-```bash
-pip install albumentations ultralytics
-```
-
-```python
-import albumentations as A
-from ultralytics import YOLO
-
-model = YOLO("yolo26n.pt")
-
-# Define custom Albumentations transforms
-custom_transforms = [
-    A.Blur(blur_limit=7, p=0.5),
-    A.RandomCrop(width=256, height=256),
-    A.HorizontalFlip(p=0.5),
-    A.RandomBrightnessContrast(brightness_limit=0.2, contrast_limit=0.2, p=0.5),
-]
-
-# Train the model with custom transforms
-model.train(data="data.yaml", epochs=100, augmentations=custom_transforms)
-```
-
-*Docs Reference: [Albumentations Integration](https://docs.ultralytics.com/integrations/albumentations/)*
-
-
-## Hyperparameters: Learning Rate (lr0)
-
-:::: {.columns .fragment .fade-up style="margin-bottom: -15px;"}
-::: {.column width="45%"}
-🔴 **Too High**: Spikes/noise. Model "jumps" over the optimal solution.
-:::
-::: {.column width="55%"}
-```{python}
-#| echo: false
-#| fig-align: center
-#| fig-height: 1.6
-import matplotlib.pyplot as plt
-import numpy as np
-epochs = np.arange(1, 51)
-brand_dark = '#1C355E'
-
-high_lr_loss = 0.5 * np.exp(-epochs/20) + 0.2 * np.random.randn(50)
-high_lr_loss[30:] = high_lr_loss[30:] + 0.1 * np.power(np.arange(20), 1.5)
-
-fig, ax = plt.subplots(figsize=(6, 1.8))
-fig.patch.set_alpha(0.0)
-ax.patch.set_alpha(0.0)
-ax.plot(epochs, high_lr_loss, color='#FF5252', linewidth=3)
-ax.set_title('TOO HIGH: Diverging / Spiking', fontsize=10, fontweight='bold', color=brand_dark)
-ax.set_ylim(0, 5)
-ax.spines['top'].set_visible(False); ax.spines['right'].set_visible(False)
-ax.spines['bottom'].set_color(brand_dark); ax.spines['left'].set_color(brand_dark)
-ax.tick_params(colors=brand_dark, labelsize=8)
-ax.grid(True, linestyle='--', alpha=0.2, color=brand_dark)
-plt.tight_layout()
-plt.show()
-```
-:::
-::::
-
-:::: {.columns .fragment .fade-up style="margin-bottom: -15px;"}
-::: {.column width="45%"}
-🔵 **Too Small**: Flat line. Model is too "timid" to learn.
-:::
-::: {.column width="55%"}
-```{python}
-#| echo: false
-#| fig-align: center
-#| fig-height: 1.6
-import matplotlib.pyplot as plt
-import numpy as np
-epochs = np.arange(1, 51)
-brand_dark = '#1C355E'
-
-low_lr_loss = 0.8 - 0.005 * epochs + 0.02 * np.random.rand(50)
-
-fig, ax = plt.subplots(figsize=(6, 1.8))
-fig.patch.set_alpha(0.0)
-ax.patch.set_alpha(0.0)
-ax.plot(epochs, low_lr_loss, color='#78909C', linewidth=3)
-ax.set_title('TOO LOW: Glacial Progress', fontsize=10, fontweight='bold', color=brand_dark)
-ax.set_ylim(0, 1)
-ax.spines['top'].set_visible(False); ax.spines['right'].set_visible(False)
-ax.spines['bottom'].set_color(brand_dark); ax.spines['left'].set_color(brand_dark)
-ax.tick_params(colors=brand_dark, labelsize=8)
-ax.grid(True, linestyle='--', alpha=0.2, color=brand_dark)
-plt.tight_layout()
-plt.show()
-```
-:::
-::::
-
-:::: {.columns .fragment .fade-up style="margin-bottom: -15px;"}
-::: {.column width="45%"}
-🟢 **Just Right**: Smooth, rapid decay to a low plateau.
-:::
-::: {.column width="55%"}
-```{python}
-#| echo: false
-#| fig-align: center
-#| fig-height: 1.6
-import matplotlib.pyplot as plt
-import numpy as np
-epochs = np.arange(1, 51)
-brand_dark = '#1C355E'
-brand_teal = '#00C9A7'
-
-good_lr_loss = 0.7 * np.exp(-epochs/10) + 0.05 * np.random.rand(50)
-
-fig, ax = plt.subplots(figsize=(6, 1.8))
-fig.patch.set_alpha(0.0)
-ax.patch.set_alpha(0.0)
-ax.plot(epochs, good_lr_loss, color=brand_teal, linewidth=3)
-ax.set_title('JUST RIGHT: Fast & Healthy', fontsize=10, fontweight='bold', color=brand_dark)
-ax.set_ylim(0, 1)
-ax.spines['top'].set_visible(False); ax.spines['right'].set_visible(False)
-ax.spines['bottom'].set_color(brand_dark); ax.spines['left'].set_color(brand_dark)
-ax.tick_params(colors=brand_dark, labelsize=8)
-ax.grid(True, linestyle='--', alpha=0.2, color=brand_dark)
-plt.tight_layout()
-plt.show()
-```
-:::
-::::
-
-
-
-## Hyperparameters: Weight Decay
-
-:::: {.columns}
-
-::: {.column width="55%"}
-```{python}
-#| echo: false
-#| fig-align: center
-import matplotlib.pyplot as plt
-import numpy as np
-
-brand_dark = '#1C355E'
-brand_teal = '#00C9A7'
-
-epochs = np.arange(1, 41)
-np.random.seed(42)
-train_loss = 0.5 * np.exp(-epochs/10) + 0.02 * np.random.rand(40)
-val_no_wd = 0.6 * np.exp(-epochs/8) + 0.02 * np.random.rand(40)
-val_no_wd[15:] = val_no_wd[15:] + 0.012 * np.arange(1, 26)
-val_wd = 0.55 * np.exp(-epochs/10) + 0.02 * np.random.rand(40)
-
-fig, ax = plt.subplots(figsize=(5, 3.5))
-fig.patch.set_alpha(0.0)
-ax.patch.set_alpha(0.0)
-
-ax.plot(epochs, train_loss, color=brand_dark, linewidth=2.5, alpha=0.6, label='Train Loss')
-ax.plot(epochs, val_no_wd, color='#dc3545', linewidth=2.5, linestyle='--', label='Val (no decay) — overfits')
-ax.plot(epochs, val_wd, color=brand_teal, linewidth=2.5, label='Val (with decay) — stable')
-
-ax.set_xlabel('Epochs', fontsize=11, color=brand_dark)
-ax.set_ylabel('Loss', fontsize=11, color=brand_dark)
-ax.set_title('Weight Decay Keeps Val Loss Stable', fontsize=12, fontweight='bold', color=brand_dark)
-ax.legend(frameon=False, fontsize=9)
-ax.spines['top'].set_visible(False)
-ax.spines['right'].set_visible(False)
-ax.spines['bottom'].set_color(brand_dark)
-ax.spines['left'].set_color(brand_dark)
-ax.tick_params(colors=brand_dark, labelsize=9)
-
-plt.tight_layout()
-plt.show()
-```
-:::
-
-::: {.column width="45%"}
-
-| Setting | Effect |
-|:---|:---|
-| Too low | Memorization → 🔴 Overfitting |
-| Too high | Over-constrained → 🟠 Underfitting |
-
-:::
-
-::::
-
-
-
-## Hyperparameters: Early Stopping
-
-:::: {.columns}
-
-::: {.column width="45%"}
-
-- **The Concept:** Stop training if validation metrics haven't improved for $N$ epochs.
-
-**`patience`** (Default: 50)
-
-```python
-from ultralytics import YOLO
-
-model = YOLO("yolo26n.pt")
-# Stop if no improvement for 10 epochs
-model.train(data="data.yaml", 
-            epochs=100, 
-            patience=10)
-```
-
-:::
-
-::: {.column width="55%"}
-
-```{python}
-#| echo: false
-#| fig-align: center
-import matplotlib.pyplot as plt
-import numpy as np
-
-fig, ax = plt.subplots(figsize=(6, 5))
-fig.patch.set_alpha(0.0)
-ax.patch.set_alpha(0.0)
-
-brand_dark = '#1C355E'
-brand_teal = '#00C9A7'
-brand_orange = '#FF8C00'
-
-epochs = np.arange(1, 101)
-train_loss = 0.5 * np.exp(-epochs/20) + 0.05 * np.random.rand(100)
-val_loss = 0.6 * np.exp(-epochs/15) + 0.05 * np.random.rand(100)
-best_epoch = 25
-patience = 20
-stop_epoch = best_epoch + patience
-
-val_loss[best_epoch:] = val_loss[best_epoch:] + 0.005 * np.arange(100 - best_epoch)
-
-ax.plot(epochs[:stop_epoch], train_loss[:stop_epoch], color=brand_dark, linewidth=3, label='Train Loss')
-ax.plot(epochs[:stop_epoch], val_loss[:stop_epoch], color=brand_teal, linewidth=3, label='Val Loss')
-
-# Highlights
-ax.axvline(x=best_epoch, linestyle='--', color=brand_orange, alpha=0.8, linewidth=2, label='Best Checkpoint')
-ax.axvspan(best_epoch, stop_epoch, alpha=0.15, color=brand_dark, label=f'Patience Window')
-ax.scatter(stop_epoch, val_loss[stop_epoch-1], color='red', marker='x', s=150, linewidth=3, zorder=5, label='Stop Training')
-
-# Styling
-ax.spines['top'].set_visible(False)
-ax.spines['right'].set_visible(False)
-ax.spines['bottom'].set_color(brand_dark)
-ax.spines['left'].set_color(brand_dark)
-ax.tick_params(colors=brand_dark, labelsize=10)
-ax.grid(True, linestyle='--', alpha=0.2, color=brand_dark)
-
-ax.set_xlabel('Epochs', fontsize=12, fontweight='bold', color=brand_dark)
-ax.set_ylabel('Loss', fontsize=12, fontweight='bold', color=brand_dark)
-ax.set_title('Early Stopping in Action', fontsize=14, fontweight='bold', color=brand_dark)
-ax.legend(frameon=False, fontsize=10, loc='upper right')
-
-plt.tight_layout()
-plt.show()
-```
-
-:::
-
-::::
-
-
-
 
 ## Evaluation: Key Takeaways
 
 ::: {.incremental}
-- **Metrics:** Use mAP50 for a quick sanity check, mAP50-95 for a strict production-ready evaluation
-- **Diagnose your curves:** overfitting, underfitting, and healthy training each have a clear, distinct signature
-- **Fix deliberately:** augmentation, weight decay, and early stopping cover the majority of training problems
-:::
-
-## 🧪 Lab 4B: Technical Performance & Diagnosis
-
-Now that you know how to read the curves, let's fix a model!
-
-1. Open `labs/04b_evaluation_technical.ipynb`
-2. **Compare** different YOLO model sizes (nano vs small).
-3. **Verify** Intersection over Union (IoU) math.
-4. **Identify** signs of overfitting in a training run.
-
-::: {.callout-tip appearance="minimal"}
-**Goal:** Learn to distinguish between a model that "memorizes" and one that "generalizes."
+- **Confusion matrix first:** Precision, Recall, and F1 each tell a different story — pick the one that matches your cost of mistakes.
+- **Threshold is a business decision:** ROI curves, not just F1, choose where to set it.
+- **mAP for detection:** Use mAP50 for a quick sanity check, mAP50-95 for a strict production-ready evaluation.
+- **IoU underpins everything:** mAP, mIoU, Dice — all built on the same overlap idea.
+- **When metrics look bad:** Class imbalance is fixable here; overfitting and hyperparameters are tackled in **Part 4 (Custom Data & Training)**.
 :::
 
 ::: {.callout-tip appearance="minimal" .fragment}
 When your model's validation metrics are solid, it's ready for the next step — getting it into production.
 :::
 
-# 8. Deployment {.sdaia-dark background-gradient="linear-gradient(135deg, #1C355E, #00C9A7)"}
+# 5. Deployment {.sdaia-dark background-gradient="linear-gradient(135deg, #1C355E, #00C9A7)"}
 
 Taking it to production.
 
@@ -2135,30 +1487,12 @@ Course Wrap-up
 
 ## What's Next?
 
-```{=html}
-<div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 1.2rem; margin-top: 1.4rem;">
-  <div style="background:rgba(28,53,94,0.08); padding:1.2rem; border-radius:12px;">
-    <div style="font-size:2rem; text-align:center;">📷</div>
-    <strong>Smart Security</strong><br>
-    <small>Detect intruders, vehicles, and anomalies in real time.</small>
-  </div>
-  <div style="background:rgba(28,53,94,0.08); padding:1.2rem; border-radius:12px;">
-    <div style="font-size:2rem; text-align:center;">🏥</div>
-    <strong>Medical Imaging</strong><br>
-    <small>Identify tumors, lesions, or instrument counts in scans.</small>
-  </div>
-  <div style="background:rgba(0,201,167,0.10); padding:1.2rem; border-radius:12px;">
-    <div style="font-size:2rem; text-align:center;">🚗</div>
-    <strong>Autonomous Vehicles</strong><br>
-    <small>Detect pedestrians, signs, and road hazards at speed.</small>
-  </div>
-  <div style="background:rgba(0,201,167,0.10); padding:1.2rem; border-radius:12px;">
-    <div style="font-size:2rem; text-align:center;">🛒</div>
-    <strong>Retail Analytics</strong><br>
-    <small>Track foot traffic, shelf stock, and customer behaviour.</small>
-  </div>
-</div>
-```
+Next up: **Part 4 — Custom Data & Training**
+
+- Format your own dataset for YOLO and avoid data leakage.
+- Use Ultralytics HUB and SAM to label data fast.
+- Run training, read loss curves, and tune `lr0`, `weight_decay`, `patience`.
+- Diagnose **overfitting** and **underfitting** — and fix them deliberately.
 
 ## Q&A {.sdaia-dark background-color="#1C355E"}
 
