@@ -17,6 +17,8 @@ format:
       data-background-opacity: "0.15"
 ---
 
+
+
 # How a Model Learns {.sdaia-dark background-gradient="linear-gradient(135deg, #1C355E, #00C9A7)"}
 
 From a single feature to a full classifier — built up step by step.
@@ -498,9 +500,41 @@ Total loss = sum of three components, each catching a different mistake:
 $$\mathcal{L}_{\text{total}} = \lambda_{\text{box}}\mathcal{L}_{\text{box}} + \lambda_{\text{cls}}\mathcal{L}_{\text{cls}} + \lambda_{\text{dfl}}\mathcal{L}_{\text{dfl}}$$
 :::
 
-# Practical Data Pipeline {.sdaia-dark background-gradient="linear-gradient(135deg, #1C355E, #00C9A7)"}
+# 5. Practical Data Pipeline & Labeling {.sdaia-dark background-gradient="linear-gradient(135deg, #1C355E, #00C9A7)"}
 
-Formatting your data for YOLO.
+Formatting your data and preparing labels.
+
+## Train vs. Validation {vertical-align="center"}
+
+::: {.sdaia-v-center}
+To train a robust AI, split your data:
+
+- **Train Set (~80%)**: Data the model actively learns from.
+- **Validation Set (~20%)**: Unseen data evaluated *during* training to measure performance (`mAP`).
+
+**Crucial**: Never train on validation data! This causes **Data Leakage** where the model memorizes answers but fails in the real world.
+
+::: {.callout-tip appearance="minimal"}
+Split your data automatically [using Ultralytics Data Split](https://docs.ultralytics.com/reference/data/split/#ultralytics.data.split.autosplit) or [using the Platform](https://docs.ultralytics.com/platform/data/datasets/).
+:::
+:::
+
+## Data Leakage: The Silent Killer {vertical-align="center"}
+
+::: {.sdaia-v-center}
+**The Problem:** Validation/test data accidentally ends up in the training set.
+
+**The Danger:** Val metrics look "perfect," but the model fails in production.
+
+**How to Avoid:**
+- Use `autosplit()` for automatic, safe partitioning.
+- Avoid manually copying images between split folders.
+- Check for duplicates/hashes before training.
+
+::: {.callout-warning appearance="simple" icon="false"}
+**Suspiciously perfect metrics? Check for leakage!**
+:::
+:::
 
 ## Understanding the Data Setup
 
@@ -544,16 +578,30 @@ names:
   1: another_object
 ```
 
-## Labeling: Manual + Auto
+## Labeling Your Own Data
 
-Typing coordinates by hand is impossible — use visual tools:
+Typing coordinates manually is impossible. Use specialized tools to draw boxes or polygons visually:
 
-- **Manual annotation:** [Ultralytics HUB](https://docs.ultralytics.com/hub/), Roboflow, or CVAT — upload images, draw boxes/polygons, export in YOLO format.
-- **Auto-labeling with [SAM](https://docs.ultralytics.com/models/sam/)** (Segment Anything): run on raw images to generate masks/boxes, then review & correct. Drastically faster than drawing manually.
+1. **Upload your images** to a platform like [Ultralytics HUB](https://docs.ultralytics.com/hub/), Roboflow, or CVAT.
+2. **Draw bounding boxes or polygons** visually on the images.
+3. **Export in YOLO format** to get the standard dataset structure ready for training!
 
-# Kickoff Training {.sdaia-dark background-gradient="linear-gradient(135deg, #1C355E, #00C9A7)"}
+*Docs Reference: [Ultralytics HUB](https://docs.ultralytics.com/hub/)*
 
-Hyperparameters and configs.
+## AutoLabeling with SAM
+
+Speed up the process using foundational models to do the heavy lifting:
+
+1. **Zero-Shot Labeling:** Bypass manual labeling using **SAM** (Segment Anything Model) or **FastSAM**.
+2. Run the model on your raw dataset to automatically generate masks and bounding boxes.
+3. These models understand objects generically without needing custom training!
+4. Simply **review and correct** the auto-generated labels—drastically faster than drawing every box from scratch.
+
+*Docs Reference: [Segment Anything Models (SAM)](https://docs.ultralytics.com/models/sam/)*
+
+# 6. Kickoff Training {.sdaia-dark background-gradient="linear-gradient(135deg, #1C355E, #00C9A7)"}
+
+Hyperparameters and Configs.
 
 ## Training
 
@@ -571,6 +619,26 @@ model = YOLO("weights/yolo26n.pt")
 results = model.train(data="data.yaml", epochs=100, imgsz=640, batch=-1)
 ```
 
+## Resuming Training
+
+If your training is interrupted (e.g., power outage or timeout), you can easily resume it from the last saved weights without losing progress!
+
+```bash
+# Resume training from the last saved checkpoint
+yolo train resume model=path/to/runs/train/exp/weights/last.pt
+```
+
+```python
+# Python Equivalent
+from ultralytics import YOLO
+
+# Load the last checkpoint
+model = YOLO("path/to/runs/train/exp/weights/last.pt")
+
+# Resume training
+results = model.train(resume=True)
+```
+
 ## Transfer Learning
 
 - **`.pt` (Pretrained weights):** Starts with general features (edges, shapes) from large datasets. Fast training, needs little data. (*Always recommended!*)
@@ -586,12 +654,59 @@ results = model.train(data="data.yaml", epochs=100, imgsz=640, batch=-1)
   - Smaller = adds noise, longer training.
   - *Pro-tip*: Use `batch: -1` for **AutoBatch** to maximize your GPU memory!
 - `imgsz` (Default: 640): Target image size. Larger sizes (e.g., 1024) capture more detail but use more RAM.
-
-## Hyperparameters: Tuning the Steps
+- `device` (Default: ''): Specify GPUs (e.g., `device=0,1`) to trigger multi-GPU training!
 
 - **Learning Rate (`lr0`)** (Default: `0.01`): Controls step size—too large and the ball overshoots, too small and training is slow.
 - **Weight Decay** (Default: `0.0005`): Penalizes large weights to prevent memorization (🔴 Overfitting).
 - **Patience (`patience`)** (Default: `100`): Stop training if validation metrics haven't improved for $N$ epochs.
+
+## Using Config Files (Best Practice)
+
+For reproducibility, put arguments into an `experiment.yaml` file:
+
+```yaml
+# experiment.yaml
+task: detect
+mode: train
+model: yolo26s.pt
+data: data.yaml    
+epochs: 100
+batch: 16
+imgsz: 640
+```
+
+Run with:
+```bash
+yolo cfg=experiment.yaml
+# Or in Python
+model.train(cfg="experiment.yaml")
+```
+
+## Experiment Tracking
+
+Ultralytics seamlessly integrates with MLOps tools to log **metrics** (mAP, loss) and **visuals** (confusion matrix) during training.
+
+::::{.columns}
+
+:::{.column width="50%"}
+**Supported Integrations:**
+- **TensorBoard** (Built-in)
+- **Weights & Biases (W&B)**
+- **Comet** / **ClearML** / **MLflow**
+:::
+
+:::{.column width="50%"}
+```bash
+# Enable TensorBoard
+yolo settings tensorboard=True
+
+# View results (in terminal)
+tensorboard --logdir runs/train
+```
+:::
+::::
+
+*Docs Reference: [Integrations](https://docs.ultralytics.com/integrations/)*
 
 # Diagnosing & Fixing Training {.sdaia-dark background-gradient="linear-gradient(135deg, #1C355E, #00C9A7)"}
 
@@ -819,22 +934,8 @@ plt.show()
 
 **Fix:** oversample the minority class so the model sees Cars often enough to learn them.
 
-## Data Leakage: The Silent Killer
-
-The fourth failure mode — the one your curves *won't* warn you about.
-
-**The Problem:** Validation/test data accidentally ends up in the training set.
-
-**The Danger:** Val metrics look "perfect," but the model fails in production.
-
-**How to Avoid:**
-
-- Use `autosplit()` for automatic, safe partitioning.
-- Avoid manually copying images between split folders.
-- Check for duplicates/hashes before training.
-
-::: {.callout-warning appearance="simple" icon="false"}
-**Suspiciously perfect metrics? Check for leakage!**
+::: {.fragment}
+*Technical Guide: [Class Balancing with YOLO](https://y-t-g.github.io/tutorials/yolo-class-balancing/)*
 :::
 
 ## Data Augmentation (Albumentations)
@@ -874,11 +975,11 @@ model.train(data="data.yaml", epochs=100, augmentations=custom_transforms)
 
 ## Summary
 
-- **Intuition**: A model is `f(image) → number`. Training nudges weights until predictions match reality.
-- **Loss**: A smooth measure of "how wrong" — drives gradient descent. YOLO sums three: box, class, distribution.
-- **Data Pipeline**: YOLO folder format, `data.yaml`, manual + auto labeling.
-- **Kickoff**: Transfer learning + `epochs`, `batch`, `imgsz`, `lr0`, `weight_decay`, `patience`.
-- **Diagnose & Fix**: Overfitting, underfitting, class imbalance, data leakage — and the lever for each.
+- **Fundamentals**: Intuitive learning loop, terminology (Epoch, mAP), and avoiding data leakage.
+- **Data Pipeline**: YOLO dataset structure, `data.yaml`, manual labeling, and auto-labeling with SAM.
+- **Training Kickoff**: Transfer learning, resuming interrupted runs, and using config files.
+- **Optimization**: Tuning hyperparameters (`lr0`, `batch`, `imgsz`) and tracking experiments.
+- **Diagnose & Fix**: Identifying and resolving overfitting, underfitting, and class imbalance.
 
 
 ## Next Steps
