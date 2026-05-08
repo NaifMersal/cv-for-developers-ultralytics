@@ -472,6 +472,56 @@ Instead of pixels, we teach the model using **fractions of the image size** (0.0
 You **MUST** provide normalized coordinates (0.0 to 1.0) when *training* the model. However, when you use `model.predict()`, the Ultralytics Python API conveniently un-normalizes them back into standard absolute pixels (like `boxes.xyxy`) for immediate use!
 :::
 
+
+
+## OBB (Oriented Bounding Box) Output Concept
+
+::::: {.columns}
+
+:::: {.column width="55%"}
+```{python}
+#| echo: false
+#| fig-align: center
+import matplotlib.transforms as transforms
+
+fig, ax = plt.subplots(figsize=(4.8, 4.8))
+fig.patch.set_alpha(0.0)
+ax.patch.set_alpha(1.0)
+ax.set_facecolor('white')
+
+draw_base_car(ax)
+
+# Add a rotated Predicted Box
+rect = patches.Rectangle((3.5, 4.0), 8, 7, linewidth=3.5, edgecolor='#00ff00', facecolor='none', zorder=2)
+# Rotate it by 15 degrees around its center (7.5, 7.5) to illustrate OBB
+t = transforms.Affine2D().rotate_deg_around(7.5, 7.5, 15) + ax.transData
+rect.set_transform(t)
+ax.add_patch(rect)
+
+# Add Center dot (Black)
+ax.plot(7.5, 7.5, marker='o', color='black', markersize=9, zorder=3)
+
+plt.tight_layout()
+plt.show()
+```
+::::
+
+:::: {.column width="45%" .incremental}
+
+Model Output (Oriented Box):
+
+- **<code style="color: #000000;">cx, cy</code>**: The center coordinates.
+- **`w`** & **`h`**: The box width and height.
+- **`angle`**: The rotation angle of the box.
+- **`conf`**: The confidence score.
+- **`cls`**: The class ID.
+
+::::
+
+:::::
+
+
+
 ## OBB in Action
 
 Detect objects with oriented bounding boxes (useful for aerial/satellite imagery or rotated objects).
@@ -674,54 +724,6 @@ print(keypoints.xy)                                # Keypoint coordinates
 ## Pose Estimation Output Example
 
 ![](assets/slides/outputs/images/task-pose.png)
-
-
-## OBB (Oriented Bounding Box) Output Concept
-
-::::: {.columns}
-
-:::: {.column width="55%"}
-```{python}
-#| echo: false
-#| fig-align: center
-import matplotlib.transforms as transforms
-
-fig, ax = plt.subplots(figsize=(4.8, 4.8))
-fig.patch.set_alpha(0.0)
-ax.patch.set_alpha(1.0)
-ax.set_facecolor('white')
-
-draw_base_car(ax)
-
-# Add a rotated Predicted Box
-rect = patches.Rectangle((3.5, 4.0), 8, 7, linewidth=3.5, edgecolor='#00ff00', facecolor='none', zorder=2)
-# Rotate it by 15 degrees around its center (7.5, 7.5) to illustrate OBB
-t = transforms.Affine2D().rotate_deg_around(7.5, 7.5, 15) + ax.transData
-rect.set_transform(t)
-ax.add_patch(rect)
-
-# Add Center dot (Black)
-ax.plot(7.5, 7.5, marker='o', color='black', markersize=9, zorder=3)
-
-plt.tight_layout()
-plt.show()
-```
-::::
-
-:::: {.column width="45%" .incremental}
-
-Model Output (Oriented Box):
-
-- **<code style="color: #000000;">cx, cy</code>**: The center coordinates.
-- **`w`** & **`h`**: The box width and height.
-- **`angle`**: The rotation angle of the box.
-- **`conf`**: The confidence score.
-- **`cls`**: The class ID.
-
-::::
-
-:::::
-
 
 
 ## SAHI: Sliced Aided Hyper Inference
