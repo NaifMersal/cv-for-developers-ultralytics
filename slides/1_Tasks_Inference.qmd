@@ -472,6 +472,33 @@ Instead of pixels, we teach the model using **fractions of the image size** (0.0
 You **MUST** provide normalized coordinates (0.0 to 1.0) when *training* the model. However, when you use `model.predict()`, the Ultralytics Python API conveniently un-normalizes them back into standard absolute pixels (like `boxes.xyxy`) for immediate use!
 :::
 
+## OBB in Action
+
+Detect objects with oriented bounding boxes (useful for aerial/satellite imagery or rotated objects).
+
+```bash
+yolo task=obb mode=predict model=yolo26n-obb.pt source="https://ultralytics.com/images/boats.jpg"
+```
+
+```python
+from ultralytics import YOLO
+
+model = YOLO("yolo26n-obb.pt")
+results = model.predict(source="https://ultralytics.com/images/boats.jpg")
+
+# Access Output Shape and Data
+obb = results[0].obb
+print(f"OBB shape: {obb.data.shape}")  # (N, 7) -> N boxes: cx, cy, w, h, angle, conf, cls
+print(obb.xywhr)                       # Center x, y, width, height, rotation angle
+```
+
+*Docs Reference: [OBB](https://docs.ultralytics.com/tasks/obb/)*
+
+
+## OBB Output Example
+
+![](assets/slides/outputs/images/task-obb.png)
+
 
 ## Instance Segmentation Output Concept
 
@@ -696,33 +723,30 @@ Model Output (Oriented Box):
 :::::
 
 
-## OBB in Action
 
-Detect objects with oriented bounding boxes (useful for aerial/satellite imagery or rotated objects).
+## SAHI: Sliced Aided Hyper Inference
 
-```bash
-yolo task=obb mode=predict model=yolo26n-obb.pt source="https://ultralytics.com/images/boats.jpg"
-```
+**Problem:** Tiny objects in high-res images (e.g., 4K) often vanish when resized to 640px.
 
-```python
-from ultralytics import YOLO
+:::: {.columns}
 
-model = YOLO("yolo26n-obb.pt")
-results = model.predict(source="https://ultralytics.com/images/boats.jpg")
+::: {.column width="60%"}
+**Solution — [SAHI](https://docs.ultralytics.com/guides/sahi-tiled-inference/):**
 
-# Access Output Shape and Data
-obb = results[0].obb
-print(f"OBB shape: {obb.data.shape}")  # (N, 7) -> N boxes: cx, cy, w, h, angle, conf, cls
-print(obb.xywhr)                       # Center x, y, width, height, rotation angle
-```
+1. **Slice** the large image into small, overlapping tiles.
+2. **Run YOLO** on each tile at full resolution.
+3. **Merge** all detections back together automatically.
 
-*Docs Reference: [OBB](https://docs.ultralytics.com/tasks/obb/)*
+::: {.callout-note appearance="minimal"}
+SAHI is a **wrapper around inference** — no retraining needed. Use it when objects are small relative to the full frame.
+:::
+:::
 
+::: {.column width="40%"}
+![](https://cdn.jsdelivr.net/gh/ultralytics/assets@main/docs/sahi-sliced-inference-overview.avif)
+:::
 
-## OBB Output Example
-
-![](assets/slides/outputs/images/task-obb.png)
-
+::::
 
 ## Object Tracking in Action {.smaller}
 
@@ -749,7 +773,6 @@ for result in results:
 ```
 
 *Docs Reference: [Tracking](https://docs.ultralytics.com/modes/track/)*
-
 
 ## Demonstration: Object Tracking {.center}
 
@@ -798,7 +821,10 @@ model.predict(source="dir/", stream=True)
 ```
 
 
+
+
 # Conclusion {.sdaia-dark background-gradient="linear-gradient(135deg, #1C355E, #00C9A7)"}
+
 
 Wrapping Up Day 1
 
@@ -807,7 +833,9 @@ Wrapping Up Day 1
 - **YOLO Basics**: We explored how to use the CLI and Python API for various tasks.
 - **Tasks**: Object Detection, Image Classification, Instance Segmentation, Pose Estimation, and OBB.
 - **Coordinates**: The importance of normalized coordinates over absolute pixels.
+- **SAHI**: Using Sliced Aided Hyper Inference for tiny objects.
 - **Inference**: How to predict on single images, videos, and batches efficiently.
+
 
 ## Next Steps
 
