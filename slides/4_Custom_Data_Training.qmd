@@ -493,11 +493,10 @@ Total loss = sum of three components, each catching a different mistake:
 |:---|:---:|:---|
 | **Box Loss** | `box_loss` | Wrong coordinates |
 | **Class Loss** | `cls_loss` | Wrong label |
-| **DFL Loss** | `dfl_loss` | Uncertain box edges |
 :::
 
 ::: {.fragment .fade-up}
-$$\mathcal{L}_{\text{total}} = \lambda_{\text{box}}\mathcal{L}_{\text{box}} + \lambda_{\text{cls}}\mathcal{L}_{\text{cls}} + \lambda_{\text{dfl}}\mathcal{L}_{\text{dfl}}$$
+$$\mathcal{L}_{\text{total}} = \lambda_{\text{box}}\mathcal{L}_{\text{box}} + \lambda_{\text{cls}}\mathcal{L}_{\text{cls}}$$
 :::
 
 # 5. Practical Data Pipeline & Labeling {.sdaia-dark background-gradient="linear-gradient(135deg, #1C355E, #00C9A7)"}
