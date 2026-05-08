@@ -175,6 +175,12 @@ $callout-color-success:     $sdaia-green;
   color: var(--sdaia-navy);
 }
 
+.reveal .sdaia-v-center {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
 // ─── Blockquotes ─────────────────────────────────────────────────────────────
 .reveal blockquote {
   border-left: 4px solid var(--sdaia-teal);
