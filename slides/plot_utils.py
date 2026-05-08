@@ -46,6 +46,9 @@ def draw_base_human(ax):
     # Legs (Dark pants: #2c3e50 -> R=0.17, G=0.24, B=0.31)
     image[10:15, 6:8] = [0.17, 0.24, 0.31]
     image[10:15, 9:11] = [0.17, 0.24, 0.31]
+    # Feet
+    image[15, 5:8] = [0.17, 0.24, 0.31]
+    image[15, 9:12] = [0.17, 0.24, 0.31]
     
     # Display as an image
     ax.imshow(image)
