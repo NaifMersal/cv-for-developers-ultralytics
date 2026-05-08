@@ -1,0 +1,366 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Gradient Descent Demo</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: transparent;
+    font-family: 'Inter', 'Segoe UI', sans-serif;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 0.5rem 1rem 0.75rem;
+  }
+
+  h3 {
+    font-size: 1rem;
+    font-weight: 700;
+    color: #1C355E;
+    letter-spacing: -0.01em;
+  }
+
+  canvas {
+    border-radius: 12px;
+    background: #f8fafc;
+    border: 1.5px solid #e2e8f0;
+    display: block;
+  }
+
+  .controls {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+
+  .slider-group {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.8rem;
+    color: #475569;
+  }
+
+  .slider-group label { font-weight: 600; color: #1C355E; white-space: nowrap; }
+
+  input[type=range] {
+    -webkit-appearance: none;
+    width: 110px;
+    height: 6px;
+    border-radius: 4px;
+    background: #cbd5e1;
+    outline: none;
+    cursor: pointer;
+  }
+  input[type=range]::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    width: 16px; height: 16px;
+    border-radius: 50%;
+    background: #1C355E;
+    cursor: pointer;
+    border: 2px solid #fff;
+    box-shadow: 0 1px 4px rgba(28,53,94,0.3);
+  }
+
+  .btn {
+    padding: 0.4rem 1.1rem;
+    border-radius: 8px;
+    border: none;
+    cursor: pointer;
+    font-size: 0.82rem;
+    font-weight: 600;
+    transition: all 0.15s ease;
+  }
+  .btn-primary {
+    background: #1C355E;
+    color: #fff;
+  }
+  .btn-primary:hover { background: #274d87; }
+  .btn-secondary {
+    background: #e2e8f0;
+    color: #1C355E;
+  }
+  .btn-secondary:hover { background: #cbd5e1; }
+
+  .info-bar {
+    display: flex;
+    gap: 1.5rem;
+    font-size: 0.8rem;
+    color: #64748b;
+  }
+  .info-bar span strong { color: #1C355E; }
+
+  .legend {
+    display: flex;
+    gap: 1rem;
+    font-size: 0.75rem;
+    color: #64748b;
+    align-items: center;
+  }
+  .legend-item { display: flex; align-items: center; gap: 0.3rem; }
+  .dot { width: 10px; height: 10px; border-radius: 50%; }
+</style>
+</head>
+<body>
+
+<canvas id="canvas" width="560" height="240"></canvas>
+
+<div class="controls">
+  <div class="slider-group">
+    <label>Learning Rate (η):</label>
+    <input type="range" id="lr" min="0.01" max="1.05" value="0.40" step="0.01">
+    <span id="lr-val" style="font-weight:700;color:#1C355E;min-width:40px;">0.40</span>
+  </div>
+  <button class="btn btn-primary" id="btn-step">Step ▶</button>
+  <button class="btn btn-primary" id="btn-run">Auto ▶▶</button>
+  <button class="btn btn-secondary" id="btn-reset">↺ Reset</button>
+</div>
+
+<div class="info-bar">
+  <span>Weight <strong id="w-val">—</strong></span>
+  <span>Loss <strong id="l-val">—</strong></span>
+  <span>Step <strong id="step-val">0</strong></span>
+</div>
+
+<div class="legend">
+  <div class="legend-item"><div class="dot" style="background:#1C355E;"></div> Loss curve</div>
+  <div class="legend-item"><div class="dot" style="background:#dc3545; border:2px solid #fff; box-shadow:0 0 0 1.5px #dc3545;"></div> Current weight</div>
+  <div class="legend-item"><div class="dot" style="background:#00C9A7; opacity:0.5;"></div> Path taken</div>
+</div>
+
+<script>
+const canvas = document.getElementById('canvas');
+const ctx = canvas.getContext('2d');
+
+const W = canvas.width, H = canvas.height;
+const PAD = { top: 28, right: 20, bottom: 36, left: 52 };
+const plotW = W - PAD.left - PAD.right;
+const plotH = H - PAD.top - PAD.bottom;
+
+// Loss function: L(w) = (w - 2)^2  →  minimum at w=2
+const wMin = -4, wMax = 8;
+const lossMin = 0, lossMax = 40;
+
+function loss(w) { return (w - 2) ** 2; }
+function gradient(w) { return 2 * (w - 2); }
+
+// Map w → canvas x
+function wx(w) { return PAD.left + ((w - wMin) / (wMax - wMin)) * plotW; }
+// Map l → canvas y
+function ly(l) { return PAD.top + (1 - (l - lossMin) / (lossMax - lossMin)) * plotH; }
+
+let w = -3.5;
+let history = [w];
+let step = 0;
+let running = false;
+let animId = null;
+
+function getLR() {
+  return parseFloat(document.getElementById('lr').value);
+}
+
+function draw() {
+  ctx.clearRect(0, 0, W, H);
+
+  // --- Axes ---
+  ctx.strokeStyle = '#cbd5e1';
+  ctx.lineWidth = 1;
+  ctx.beginPath();
+  ctx.moveTo(PAD.left, PAD.top); ctx.lineTo(PAD.left, PAD.top + plotH);
+  ctx.moveTo(PAD.left, PAD.top + plotH); ctx.lineTo(PAD.left + plotW, PAD.top + plotH);
+  ctx.stroke();
+
+  // Axis labels
+  ctx.fillStyle = '#94a3b8';
+  ctx.font = '11px Inter, sans-serif';
+  ctx.textAlign = 'center';
+  ctx.fillText('Weight (w)', PAD.left + plotW / 2, H - 4);
+  ctx.save();
+  ctx.translate(14, PAD.top + plotH / 2);
+  ctx.rotate(-Math.PI / 2);
+  ctx.fillText('Loss  L(w)', 0, 0);
+  ctx.restore();
+
+  // Y ticks
+  ctx.fillStyle = '#94a3b8';
+  ctx.font = '10px Inter, sans-serif';
+  ctx.textAlign = 'right';
+  [0, 10, 20, 30, 40].forEach(v => {
+    const y = ly(v);
+    ctx.fillText(v, PAD.left - 6, y + 3);
+    ctx.strokeStyle = '#e2e8f0'; ctx.lineWidth = 0.8;
+    ctx.beginPath(); ctx.moveTo(PAD.left, y); ctx.lineTo(PAD.left + plotW, y); ctx.stroke();
+  });
+
+  // Minimum marker
+  const xStar = wx(2), yStar = ly(0);
+  ctx.strokeStyle = '#00C9A7';
+  ctx.setLineDash([4, 4]);
+  ctx.lineWidth = 1.2;
+  ctx.beginPath(); ctx.moveTo(xStar, PAD.top); ctx.lineTo(xStar, PAD.top + plotH); ctx.stroke();
+  ctx.setLineDash([]);
+  ctx.fillStyle = '#00C9A7';
+  ctx.font = 'bold 10px Inter, sans-serif';
+  ctx.textAlign = 'center';
+  ctx.fillText('min', xStar, PAD.top - 6);
+
+  // --- Loss curve ---
+  ctx.beginPath();
+  ctx.strokeStyle = '#1C355E';
+  ctx.lineWidth = 2.5;
+  let first = true;
+  for (let px = 0; px <= plotW; px++) {
+    const wv = wMin + (px / plotW) * (wMax - wMin);
+    const lv = loss(wv);
+    if (lv > lossMax) { first = true; continue; }
+    const cx = PAD.left + px, cy = ly(lv);
+    if (first) { ctx.moveTo(cx, cy); first = false; }
+    else ctx.lineTo(cx, cy);
+  }
+  ctx.stroke();
+
+  // --- History path ---
+  if (history.length > 1) {
+    ctx.strokeStyle = 'rgba(0,201,167,0.45)';
+    ctx.lineWidth = 2;
+    ctx.setLineDash([3, 3]);
+    ctx.beginPath();
+    history.forEach((hw, i) => {
+      const px = wx(hw), py = ly(loss(hw));
+      if (i === 0) ctx.moveTo(px, py); else ctx.lineTo(px, py);
+    });
+    ctx.stroke();
+    ctx.setLineDash([]);
+
+    // Small dots for past positions
+    history.slice(0, -1).forEach(hw => {
+      ctx.beginPath();
+      ctx.arc(wx(hw), ly(loss(hw)), 3.5, 0, 2 * Math.PI);
+      ctx.fillStyle = 'rgba(0,201,167,0.35)';
+      ctx.fill();
+    });
+  }
+
+  // --- Gradient arrow ---
+  const gr = gradient(w);
+  const arrowLen = Math.min(Math.abs(gr) * 3.5, 55);
+  const dir = gr > 0 ? -1 : 1; // opposite to gradient = descent direction
+  const ax1 = wx(w), ay1 = ly(loss(w));
+  const ax2 = ax1 + dir * arrowLen;
+  if (Math.abs(gr) > 0.05) {
+    ctx.strokeStyle = '#E07B39';
+    ctx.lineWidth = 2;
+    ctx.beginPath(); ctx.moveTo(ax1, ay1); ctx.lineTo(ax2, ay1); ctx.stroke();
+    // arrowhead
+    const ahd = dir > 0 ? 1 : -1;
+    ctx.beginPath();
+    ctx.moveTo(ax2, ay1);
+    ctx.lineTo(ax2 - ahd * 8, ay1 - 5);
+    ctx.lineTo(ax2 - ahd * 8, ay1 + 5);
+    ctx.closePath();
+    ctx.fillStyle = '#E07B39';
+    ctx.fill();
+    ctx.font = '9px Inter, sans-serif';
+    ctx.fillStyle = '#E07B39';
+    ctx.textAlign = dir > 0 ? 'right' : 'left';
+    ctx.fillText('descent', ax2 + dir * 3, ay1 - 8);
+  }
+
+  // --- Current ball ---
+  const bx = wx(w), by = ly(loss(w));
+  // Shadow
+  ctx.beginPath();
+  ctx.arc(bx, by + 3, 9, 0, 2 * Math.PI);
+  ctx.fillStyle = 'rgba(220,53,69,0.15)';
+  ctx.fill();
+  // Ball
+  const grad = ctx.createRadialGradient(bx - 2, by - 2, 1, bx, by, 10);
+  grad.addColorStop(0, '#ff6b6b');
+  grad.addColorStop(1, '#dc3545');
+  ctx.beginPath();
+  ctx.arc(bx, by, 9, 0, 2 * Math.PI);
+  ctx.fillStyle = grad;
+  ctx.fill();
+  ctx.strokeStyle = '#fff';
+  ctx.lineWidth = 2;
+  ctx.stroke();
+
+  // Vertical dashed drop line
+  ctx.strokeStyle = 'rgba(220,53,69,0.3)';
+  ctx.lineWidth = 1;
+  ctx.setLineDash([3, 3]);
+  ctx.beginPath(); ctx.moveTo(bx, by + 10); ctx.lineTo(bx, PAD.top + plotH); ctx.stroke();
+  ctx.setLineDash([]);
+
+  // --- Info ---
+  document.getElementById('w-val').textContent = w.toFixed(3);
+  document.getElementById('l-val').textContent = loss(w).toFixed(3);
+  document.getElementById('step-val').textContent = step;
+}
+
+function doStep() {
+  const lr = getLR();
+  const gr = gradient(w);
+  w = w - lr * gr;
+  // Clamp
+  w = Math.max(wMin + 0.1, Math.min(wMax - 0.1, w));
+  history.push(w);
+  step++;
+  draw();
+  // Stop if converged
+  if (Math.abs(gradient(w)) < 0.01) {
+    stopAuto();
+    document.getElementById('btn-run').textContent = '✓ Converged';
+  }
+}
+
+function startAuto() {
+  if (running) return;
+  running = true;
+  document.getElementById('btn-run').textContent = 'Pause ⏸';
+  function tick() {
+    doStep();
+    if (running && Math.abs(gradient(w)) >= 0.01) {
+      animId = setTimeout(tick, 400);
+    } else {
+      running = false;
+    }
+  }
+  tick();
+}
+
+function stopAuto() {
+  running = false;
+  clearTimeout(animId);
+  document.getElementById('btn-run').textContent = 'Auto ▶▶';
+}
+
+function reset() {
+  stopAuto();
+  w = -3.5;
+  history = [w];
+  step = 0;
+  document.getElementById('btn-run').textContent = 'Auto ▶▶';
+  draw();
+}
+
+document.getElementById('btn-step').addEventListener('click', () => { stopAuto(); doStep(); });
+document.getElementById('btn-run').addEventListener('click', () => {
+  if (running) stopAuto(); else startAuto();
+});
+document.getElementById('btn-reset').addEventListener('click', reset);
+
+document.getElementById('lr').addEventListener('input', function () {
+  document.getElementById('lr-val').textContent = parseFloat(this.value).toFixed(2);
+});
+
+draw();
+</script>
+</body>
+</html>

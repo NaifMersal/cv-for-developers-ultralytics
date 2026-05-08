@@ -11,7 +11,7 @@
 <link href="../site_libs/quarto-contrib/videojs/video-js.css" rel="stylesheet"><meta charset="utf-8">
   <meta name="generator" content="quarto-1.8.26">
 
-  <meta name="dcterms.date" content="2026-05-06">
+  <meta name="dcterms.date" content="2026-05-09">
   <title>Ultralytics YOLO Foundations: Part 1</title>
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -97,7 +97,7 @@
     code span.vs { color: #20794d; } /* VerbatimString */
     code span.wa { color: #5e5e5e; font-style: italic; } /* Warning */
   </style>
-  <link rel="stylesheet" href="../site_libs/revealjs/dist/theme/quarto-090e625264d31d7a518ad9f601b8a232.css">
+  <link rel="stylesheet" href="../site_libs/revealjs/dist/theme/quarto-e9716cf42932636f8dac94d70f8e7de5.css">
   <link href="../site_libs/revealjs/plugin/quarto-line-highlight/line-highlight.css" rel="stylesheet">
   <link href="../site_libs/revealjs/plugin/reveal-menu/menu.css" rel="stylesheet">
   <link href="../site_libs/revealjs/plugin/reveal-menu/quarto-menu.css" rel="stylesheet">
@@ -205,7 +205,7 @@
 <div class="quarto-title-authors">
 </div>
 
-  <p class="date">2026-05-06</p>
+  <p class="date">2026-05-09</p>
 </section>
 <section>
 <section id="first-steps-what-can-yolo-do" class="title-slide slide level1 sdaia-dark center" data-background-gradient="linear-gradient(135deg, #1C355E, #00C9A7)">
@@ -442,7 +442,7 @@
 <h2>Image Classification Output Concept</h2>
 <div class="columns">
 <div class="column" style="width:55%;">
-<div id="f30feaba" class="cell" data-execution_count="2">
+<div id="6c9e6a3a" class="cell" data-execution_count="2">
 <div class="cell-output cell-output-display">
 <div class="quarto-figure quarto-figure-center">
 <figure>
@@ -490,7 +490,7 @@
 <h2>From <code>probs</code> to <code>top1</code></h2>
 <div class="columns">
 <div class="column" style="width:55%;">
-<div id="5c43b3c6" class="cell" data-execution_count="3">
+<div id="98bf5f70" class="cell" data-execution_count="3">
 <div class="cell-output cell-output-display">
 <div class="quarto-figure quarto-figure-center">
 <figure>
@@ -542,7 +542,7 @@
 <h2 data-id="quarto-animate-title">Object Detection Output &amp; Confidence</h2>
 <div class="columns" data-id="model-output">
 <div class="column" style="width:55%;">
-<div id="92d96266" class="cell" data-execution_count="4">
+<div id="a1a5730f" class="cell" data-execution_count="4">
 <div class="cell-output cell-output-display">
 <div class="quarto-figure quarto-figure-center">
 <figure>
@@ -590,7 +590,7 @@
 <h2 data-id="quarto-animate-title">Mapping to Bounding Boxes</h2>
 <div class="columns" data-id="model-output">
 <div class="column" style="width:55%;">
-<div id="03af96e5" class="cell" data-execution_count="5">
+<div id="f0c65a32" class="cell" data-execution_count="5">
 <div class="cell-output cell-output-display">
 <div class="quarto-figure quarto-figure-center">
 <figure>
@@ -698,103 +698,15 @@ y_{max} &amp;= cy + \frac{h}{2} = 7.5 + 3.5 = 11.0
 </div>
 </div>
 </section>
-<section id="instance-segmentation-output-concept" class="slide level2">
-<h2>Instance Segmentation Output Concept</h2>
-<div class="columns">
-<div class="column" style="width:55%;">
-<div id="3e27aa21" class="cell" data-execution_count="6">
-<div class="cell-output cell-output-display">
-<div class="quarto-figure quarto-figure-center">
-<figure>
-<p><img data-src="1_Tasks_Inference_files/figure-revealjs/cell-7-output-1.png" class="quarto-figure quarto-figure-center" width="451" height="451"></p>
-</figure>
-</div>
-</div>
-</div>
-</div><div class="column" style="width:45%;">
-<p>Model Output (Mask / Polygon):</p>
-<ul>
-<li class="fragment"><strong>Mask Tensor</strong>: A 2D array (bitmap) of pixels indicating the object’s exact shape (<code>1</code> = object, <code>0</code> = background).</li>
-<li class="fragment"><strong>Coordinates</strong>: Sequence of <span class="math inline">\((x, y)\)</span> polygon coordinates derived from the mask.</li>
-<li class="fragment"><strong><code>conf</code> (0.89)</strong>: Confidence score.</li>
-<li class="fragment"><strong><code>cls</code> (0)</strong>: Class ID.</li>
-</ul>
-</div></div>
-</section>
-<section id="instance-segmentation-in-action" class="slide level2">
-<h2>Instance Segmentation in Action</h2>
-<p>Outline the exact shape (pixels) of each object instance.</p>
-<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb6"><pre class="sourceCode numberSource bash number-lines code-with-copy"><code class="sourceCode bash"><span id="cb6-1"><a></a><span class="co"># Live Example: See the masks!</span></span>
-<span id="cb6-2"><a></a><span class="ex">yolo</span> task=segment mode=predict model=yolo26n-seg.pt source=<span class="st">"https://ultralytics.com/assets/bus.jpg"</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
-<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb7"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb7-1"><a></a><span class="co"># Python Equivalent</span></span>
-<span id="cb7-2"><a></a><span class="im">from</span> ultralytics <span class="im">import</span> YOLO</span>
-<span id="cb7-3"><a></a></span>
-<span id="cb7-4"><a></a>model <span class="op">=</span> YOLO(<span class="st">"yolo26n-seg.pt"</span>)</span>
-<span id="cb7-5"><a></a>results <span class="op">=</span> model.predict(source<span class="op">=</span><span class="st">"https://ultralytics.com/assets/bus.jpg"</span>)</span>
-<span id="cb7-6"><a></a></span>
-<span id="cb7-7"><a></a><span class="co"># Access Output Shape and Data</span></span>
-<span id="cb7-8"><a></a>masks <span class="op">=</span> results[<span class="dv">0</span>].masks</span>
-<span id="cb7-9"><a></a><span class="bu">print</span>(<span class="ss">f"Masks shape: </span><span class="sc">{</span>masks<span class="sc">.</span>data<span class="sc">.</span>shape<span class="sc">}</span><span class="ss">"</span>)  <span class="co"># (N, H, W) -&gt; N masks of HxW size</span></span>
-<span id="cb7-10"><a></a><span class="bu">print</span>(masks.xy)                            <span class="co"># Polygon coordinates</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
-<p><em>Docs Reference: <a href="https://docs.ultralytics.com/tasks/segment/">Segmentation</a></em></p>
-</section>
-<section id="segmentation-output-example" class="slide level2">
-<h2>Segmentation Output Example</h2>
-
-<img data-src="assets/slides/outputs/images/task-segmentation.png" class="r-stretch"></section>
-<section id="pose-estimation-output-concept" class="slide level2">
-<h2>Pose Estimation Output Concept</h2>
-<div class="columns">
-<div class="column" style="width:55%;">
-<div id="e4503476" class="cell" data-execution_count="7">
-<div class="cell-output cell-output-display">
-<div class="quarto-figure quarto-figure-center">
-<figure>
-<p><img data-src="1_Tasks_Inference_files/figure-revealjs/cell-8-output-1.png" class="quarto-figure quarto-figure-center" width="451" height="451"></p>
-</figure>
-</div>
-</div>
-</div>
-</div><div class="column" style="width:45%;">
-<p>Model Output (Keypoints):</p>
-<ul>
-<li class="fragment"><strong><code>x, y</code></strong>: Coordinate pair for each predefined keypoint.</li>
-<li class="fragment"><strong><code>kp_conf</code></strong> (per keypoint): Confidence score for each keypoint’s location.</li>
-<li class="fragment"><strong><code>conf</code> (0.92)</strong>: Overall person detection confidence score.</li>
-<li class="fragment"><strong><code>cls</code> (0)</strong>: Class ID (always 0 = person for pose models).</li>
-</ul>
-</div></div>
-</section>
-<section id="pose-estimation-in-action" class="slide level2">
-<h2>Pose Estimation in Action</h2>
-<p>Estimate human body keypoints (elbows, knees).</p>
-<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb8"><pre class="sourceCode numberSource bash number-lines code-with-copy"><code class="sourceCode bash"><span id="cb8-1"><a></a><span class="co"># Live Example: Track keypoints!</span></span>
-<span id="cb8-2"><a></a><span class="ex">yolo</span> task=pose mode=predict model=yolo26n-pose.pt source=<span class="st">"https://ultralytics.com/assets/bus.jpg"</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
-<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb9"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb9-1"><a></a><span class="co"># Python Equivalent</span></span>
-<span id="cb9-2"><a></a><span class="im">from</span> ultralytics <span class="im">import</span> YOLO</span>
-<span id="cb9-3"><a></a></span>
-<span id="cb9-4"><a></a>model <span class="op">=</span> YOLO(<span class="st">"yolo26n-pose.pt"</span>)</span>
-<span id="cb9-5"><a></a>results <span class="op">=</span> model.predict(source<span class="op">=</span><span class="st">"https://ultralytics.com/assets/bus.jpg"</span>)</span>
-<span id="cb9-6"><a></a></span>
-<span id="cb9-7"><a></a><span class="co"># Access Output Shape and Data</span></span>
-<span id="cb9-8"><a></a>keypoints <span class="op">=</span> results[<span class="dv">0</span>].keypoints</span>
-<span id="cb9-9"><a></a><span class="bu">print</span>(<span class="ss">f"Keypoints shape: </span><span class="sc">{</span>keypoints<span class="sc">.</span>data<span class="sc">.</span>shape<span class="sc">}</span><span class="ss">"</span>)  <span class="co"># (N, 17, 3) -&gt; N persons, 17 keypoints, (x, y, conf)</span></span>
-<span id="cb9-10"><a></a><span class="bu">print</span>(keypoints.xy)                                <span class="co"># Keypoint coordinates</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
-<p><em>Docs Reference: <a href="https://docs.ultralytics.com/tasks/pose/">Pose</a></em></p>
-</section>
-<section id="pose-estimation-output-example" class="slide level2">
-<h2>Pose Estimation Output Example</h2>
-
-<img data-src="assets/slides/outputs/images/task-pose.png" class="r-stretch"></section>
 <section id="obb-oriented-bounding-box-output-concept" class="slide level2">
 <h2>OBB (Oriented Bounding Box) Output Concept</h2>
 <div class="columns">
 <div class="column" style="width:55%;">
-<div id="56e9b9dc" class="cell" data-execution_count="8">
+<div id="afa0bd38" class="cell" data-execution_count="6">
 <div class="cell-output cell-output-display">
 <div class="quarto-figure quarto-figure-center">
 <figure>
-<p><img data-src="1_Tasks_Inference_files/figure-revealjs/cell-9-output-1.png" class="quarto-figure quarto-figure-center" width="451" height="451"></p>
+<p><img data-src="1_Tasks_Inference_files/figure-revealjs/cell-7-output-1.png" class="quarto-figure quarto-figure-center" width="451" height="451"></p>
 </figure>
 </div>
 </div>
@@ -813,22 +725,132 @@ y_{max} &amp;= cy + \frac{h}{2} = 7.5 + 3.5 = 11.0
 <section id="obb-in-action" class="slide level2">
 <h2>OBB in Action</h2>
 <p>Detect objects with oriented bounding boxes (useful for aerial/satellite imagery or rotated objects).</p>
-<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb10"><pre class="sourceCode numberSource bash number-lines code-with-copy"><code class="sourceCode bash"><span id="cb10-1"><a></a><span class="ex">yolo</span> task=obb mode=predict model=yolo26n-obb.pt source=<span class="st">"https://ultralytics.com/images/boats.jpg"</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
-<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb11"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb11-1"><a></a><span class="im">from</span> ultralytics <span class="im">import</span> YOLO</span>
-<span id="cb11-2"><a></a></span>
-<span id="cb11-3"><a></a>model <span class="op">=</span> YOLO(<span class="st">"yolo26n-obb.pt"</span>)</span>
-<span id="cb11-4"><a></a>results <span class="op">=</span> model.predict(source<span class="op">=</span><span class="st">"https://ultralytics.com/images/boats.jpg"</span>)</span>
-<span id="cb11-5"><a></a></span>
-<span id="cb11-6"><a></a><span class="co"># Access Output Shape and Data</span></span>
-<span id="cb11-7"><a></a>obb <span class="op">=</span> results[<span class="dv">0</span>].obb</span>
-<span id="cb11-8"><a></a><span class="bu">print</span>(<span class="ss">f"OBB shape: </span><span class="sc">{</span>obb<span class="sc">.</span>data<span class="sc">.</span>shape<span class="sc">}</span><span class="ss">"</span>)  <span class="co"># (N, 7) -&gt; N boxes: cx, cy, w, h, angle, conf, cls</span></span>
-<span id="cb11-9"><a></a><span class="bu">print</span>(obb.xywhr)                       <span class="co"># Center x, y, width, height, rotation angle</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb6"><pre class="sourceCode numberSource bash number-lines code-with-copy"><code class="sourceCode bash"><span id="cb6-1"><a></a><span class="ex">yolo</span> task=obb mode=predict model=yolo26n-obb.pt source=<span class="st">"https://ultralytics.com/images/boats.jpg"</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb7"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb7-1"><a></a><span class="im">from</span> ultralytics <span class="im">import</span> YOLO</span>
+<span id="cb7-2"><a></a></span>
+<span id="cb7-3"><a></a>model <span class="op">=</span> YOLO(<span class="st">"yolo26n-obb.pt"</span>)</span>
+<span id="cb7-4"><a></a>results <span class="op">=</span> model.predict(source<span class="op">=</span><span class="st">"https://ultralytics.com/images/boats.jpg"</span>)</span>
+<span id="cb7-5"><a></a></span>
+<span id="cb7-6"><a></a><span class="co"># Access Output Shape and Data</span></span>
+<span id="cb7-7"><a></a>obb <span class="op">=</span> results[<span class="dv">0</span>].obb</span>
+<span id="cb7-8"><a></a><span class="bu">print</span>(<span class="ss">f"OBB shape: </span><span class="sc">{</span>obb<span class="sc">.</span>data<span class="sc">.</span>shape<span class="sc">}</span><span class="ss">"</span>)  <span class="co"># (N, 7) -&gt; N boxes: cx, cy, w, h, angle, conf, cls</span></span>
+<span id="cb7-9"><a></a><span class="bu">print</span>(obb.xywhr)                       <span class="co"># Center x, y, width, height, rotation angle</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <p><em>Docs Reference: <a href="https://docs.ultralytics.com/tasks/obb/">OBB</a></em></p>
 </section>
 <section id="obb-output-example" class="slide level2">
 <h2>OBB Output Example</h2>
 
 <img data-src="assets/slides/outputs/images/task-obb.png" class="r-stretch"></section>
+<section id="instance-segmentation-output-concept" class="slide level2">
+<h2>Instance Segmentation Output Concept</h2>
+<div class="columns">
+<div class="column" style="width:55%;">
+<div id="c8d23d8a" class="cell" data-execution_count="7">
+<div class="cell-output cell-output-display">
+<div class="quarto-figure quarto-figure-center">
+<figure>
+<p><img data-src="1_Tasks_Inference_files/figure-revealjs/cell-8-output-1.png" class="quarto-figure quarto-figure-center" width="451" height="451"></p>
+</figure>
+</div>
+</div>
+</div>
+</div><div class="column" style="width:45%;">
+<p>Model Output (Mask / Polygon):</p>
+<ul>
+<li class="fragment"><strong>Mask Tensor</strong>: A 2D array (bitmap) of pixels indicating the object’s exact shape (<code>1</code> = object, <code>0</code> = background).</li>
+<li class="fragment"><strong>Coordinates</strong>: Sequence of <span class="math inline">\((x, y)\)</span> polygon coordinates derived from the mask.</li>
+<li class="fragment"><strong><code>conf</code> (0.89)</strong>: Confidence score.</li>
+<li class="fragment"><strong><code>cls</code> (0)</strong>: Class ID.</li>
+</ul>
+</div></div>
+</section>
+<section id="instance-segmentation-in-action" class="slide level2">
+<h2>Instance Segmentation in Action</h2>
+<p>Outline the exact shape (pixels) of each object instance.</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb8"><pre class="sourceCode numberSource bash number-lines code-with-copy"><code class="sourceCode bash"><span id="cb8-1"><a></a><span class="co"># Live Example: See the masks!</span></span>
+<span id="cb8-2"><a></a><span class="ex">yolo</span> task=segment mode=predict model=yolo26n-seg.pt source=<span class="st">"https://ultralytics.com/assets/bus.jpg"</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb9"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb9-1"><a></a><span class="co"># Python Equivalent</span></span>
+<span id="cb9-2"><a></a><span class="im">from</span> ultralytics <span class="im">import</span> YOLO</span>
+<span id="cb9-3"><a></a></span>
+<span id="cb9-4"><a></a>model <span class="op">=</span> YOLO(<span class="st">"yolo26n-seg.pt"</span>)</span>
+<span id="cb9-5"><a></a>results <span class="op">=</span> model.predict(source<span class="op">=</span><span class="st">"https://ultralytics.com/assets/bus.jpg"</span>)</span>
+<span id="cb9-6"><a></a></span>
+<span id="cb9-7"><a></a><span class="co"># Access Output Shape and Data</span></span>
+<span id="cb9-8"><a></a>masks <span class="op">=</span> results[<span class="dv">0</span>].masks</span>
+<span id="cb9-9"><a></a><span class="bu">print</span>(<span class="ss">f"Masks shape: </span><span class="sc">{</span>masks<span class="sc">.</span>data<span class="sc">.</span>shape<span class="sc">}</span><span class="ss">"</span>)  <span class="co"># (N, H, W) -&gt; N masks of HxW size</span></span>
+<span id="cb9-10"><a></a><span class="bu">print</span>(masks.xy)                            <span class="co"># Polygon coordinates</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p><em>Docs Reference: <a href="https://docs.ultralytics.com/tasks/segment/">Segmentation</a></em></p>
+</section>
+<section id="segmentation-output-example" class="slide level2">
+<h2>Segmentation Output Example</h2>
+
+<img data-src="assets/slides/outputs/images/task-segmentation.png" class="r-stretch"></section>
+<section id="pose-estimation-output-concept" class="slide level2">
+<h2>Pose Estimation Output Concept</h2>
+<div class="columns">
+<div class="column" style="width:55%;">
+<div id="a8a3261a" class="cell" data-execution_count="8">
+<div class="cell-output cell-output-display">
+<div class="quarto-figure quarto-figure-center">
+<figure>
+<p><img data-src="1_Tasks_Inference_files/figure-revealjs/cell-9-output-1.png" class="quarto-figure quarto-figure-center" width="451" height="451"></p>
+</figure>
+</div>
+</div>
+</div>
+</div><div class="column" style="width:45%;">
+<p>Model Output (Keypoints):</p>
+<ul>
+<li class="fragment"><strong><code>x, y</code></strong>: Coordinate pair for each predefined keypoint.</li>
+<li class="fragment"><strong><code>kp_conf</code></strong> (per keypoint): Confidence score for each keypoint’s location.</li>
+<li class="fragment"><strong><code>conf</code> (0.92)</strong>: Overall person detection confidence score.</li>
+<li class="fragment"><strong><code>cls</code> (0)</strong>: Class ID (always 0 = person for pose models).</li>
+</ul>
+</div></div>
+</section>
+<section id="pose-estimation-in-action" class="slide level2">
+<h2>Pose Estimation in Action</h2>
+<p>Estimate human body keypoints (elbows, knees).</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb10"><pre class="sourceCode numberSource bash number-lines code-with-copy"><code class="sourceCode bash"><span id="cb10-1"><a></a><span class="co"># Live Example: Track keypoints!</span></span>
+<span id="cb10-2"><a></a><span class="ex">yolo</span> task=pose mode=predict model=yolo26n-pose.pt source=<span class="st">"https://ultralytics.com/assets/bus.jpg"</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb11"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb11-1"><a></a><span class="co"># Python Equivalent</span></span>
+<span id="cb11-2"><a></a><span class="im">from</span> ultralytics <span class="im">import</span> YOLO</span>
+<span id="cb11-3"><a></a></span>
+<span id="cb11-4"><a></a>model <span class="op">=</span> YOLO(<span class="st">"yolo26n-pose.pt"</span>)</span>
+<span id="cb11-5"><a></a>results <span class="op">=</span> model.predict(source<span class="op">=</span><span class="st">"https://ultralytics.com/assets/bus.jpg"</span>)</span>
+<span id="cb11-6"><a></a></span>
+<span id="cb11-7"><a></a><span class="co"># Access Output Shape and Data</span></span>
+<span id="cb11-8"><a></a>keypoints <span class="op">=</span> results[<span class="dv">0</span>].keypoints</span>
+<span id="cb11-9"><a></a><span class="bu">print</span>(<span class="ss">f"Keypoints shape: </span><span class="sc">{</span>keypoints<span class="sc">.</span>data<span class="sc">.</span>shape<span class="sc">}</span><span class="ss">"</span>)  <span class="co"># (N, 17, 3) -&gt; N persons, 17 keypoints, (x, y, conf)</span></span>
+<span id="cb11-10"><a></a><span class="bu">print</span>(keypoints.xy)                                <span class="co"># Keypoint coordinates</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p><em>Docs Reference: <a href="https://docs.ultralytics.com/tasks/pose/">Pose</a></em></p>
+</section>
+<section id="pose-estimation-output-example" class="slide level2">
+<h2>Pose Estimation Output Example</h2>
+
+<img data-src="assets/slides/outputs/images/task-pose.png" class="r-stretch"></section>
+<section id="sahi-sliced-aided-hyper-inference" class="slide level2">
+<h2>SAHI: Sliced Aided Hyper Inference</h2>
+<p><strong>Problem:</strong> Tiny objects in high-res images (e.g., 4K) often vanish when resized to 640px.</p>
+<div class="columns">
+<div class="column" style="width:60%;">
+<p><strong>Solution — <a href="https://docs.ultralytics.com/guides/sahi-tiled-inference/">SAHI</a>:</strong></p>
+<ol type="1">
+<li><strong>Slice</strong> the large image into small, overlapping tiles.</li>
+<li><strong>Run YOLO</strong> on each tile at full resolution.</li>
+<li><strong>Merge</strong> all detections back together automatically.</li>
+</ol>
+<div class="callout callout-note no-icon callout-style-simple">
+<div class="callout-body">
+<div class="callout-content">
+<p>SAHI is a <strong>wrapper around inference</strong> — no retraining needed. Use it when objects are small relative to the full frame.</p>
+</div>
+</div>
+</div>
+</div><div class="column" style="width:40%;">
+<p><img data-src="https://cdn.jsdelivr.net/gh/ultralytics/assets@main/docs/sahi-sliced-inference-overview.avif"></p>
+</div></div>
+</section>
 <section id="object-tracking-in-action" class="slide level2 smaller">
 <h2>Object Tracking in Action</h2>
 <p>Assign distinct IDs to objects and track them continuously across video frames!</p>
@@ -894,6 +916,7 @@ y_{max} &amp;= cy + \frac{h}{2} = 7.5 + 3.5 = 11.0
 <li><strong>YOLO Basics</strong>: We explored how to use the CLI and Python API for various tasks.</li>
 <li><strong>Tasks</strong>: Object Detection, Image Classification, Instance Segmentation, Pose Estimation, and OBB.</li>
 <li><strong>Coordinates</strong>: The importance of normalized coordinates over absolute pixels.</li>
+<li><strong>SAHI</strong>: Using Sliced Aided Hyper Inference for tiny objects.</li>
 <li><strong>Inference</strong>: How to predict on single images, videos, and batches efficiently.</li>
 </ul>
 </section>

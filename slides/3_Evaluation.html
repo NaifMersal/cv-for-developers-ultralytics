@@ -9,8 +9,8 @@
 <link href="../site_libs/quarto-html/quarto-syntax-highlighting-587c61ba64f3a5504c4d52d930310e48.css" rel="stylesheet" id="quarto-text-highlighting-styles"><meta charset="utf-8">
   <meta name="generator" content="quarto-1.8.26">
 
-  <meta name="dcterms.date" content="2026-05-06">
-  <title>Ultralytics YOLO Foundations: Part 4</title>
+  <meta name="dcterms.date" content="2026-05-09">
+  <title>Ultralytics YOLO Foundations: Part 3</title>
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, minimal-ui">
@@ -95,7 +95,7 @@
     code span.vs { color: #20794d; } /* VerbatimString */
     code span.wa { color: #5e5e5e; font-style: italic; } /* Warning */
   </style>
-  <link rel="stylesheet" href="../site_libs/revealjs/dist/theme/quarto-090e625264d31d7a518ad9f601b8a232.css">
+  <link rel="stylesheet" href="../site_libs/revealjs/dist/theme/quarto-e9716cf42932636f8dac94d70f8e7de5.css">
   <link href="../site_libs/revealjs/plugin/quarto-line-highlight/line-highlight.css" rel="stylesheet">
   <link href="../site_libs/revealjs/plugin/reveal-menu/menu.css" rel="stylesheet">
   <link href="../site_libs/revealjs/plugin/reveal-menu/quarto-menu.css" rel="stylesheet">
@@ -197,17 +197,17 @@
     <div class="slides">
 
 <section id="title-slide" data-background-image="template/assets/anim.svg" data-background-opacity="0.15" data-background-size="cover" class="quarto-title-block center">
-  <h1 class="title">Ultralytics YOLO Foundations: Part 4</h1>
-  <p class="subtitle">Evaluation &amp; Deployment</p>
+  <h1 class="title">Ultralytics YOLO Foundations: Part 3</h1>
+  <p class="subtitle">Model Evaluation</p>
 
 <div class="quarto-title-authors">
 </div>
 
-  <p class="date">2026-05-06</p>
+  <p class="date">2026-05-09</p>
 </section>
 <section>
 <section id="model-evaluation" class="title-slide slide level1 sdaia-dark center" data-background-gradient="linear-gradient(135deg, #1C355E, #00C9A7)">
-<h1>7. Model Evaluation</h1>
+<h1>4. Model Evaluation</h1>
 <p>How good is your model?</p>
 </section>
 <section id="binary-classification-basics" class="slide level2">
@@ -308,11 +308,11 @@
 <p><strong>What if our model catches every car, but is “trigger-happy”?</strong></p>
 <div class="columns">
 <div class="column" style="width:55%;">
-<div id="19c994e7" class="cell" data-execution_count="1">
+<div id="81ec5a78" class="cell" data-execution_count="1">
 <div class="cell-output cell-output-display">
 <div class="quarto-figure quarto-figure-center">
 <figure>
-<p><img data-src="4_Evaluation_Deployment_files/figure-revealjs/cell-2-output-1.png" class="quarto-figure quarto-figure-center" width="457" height="325"></p>
+<p><img data-src="3_Evaluation_files/figure-revealjs/cell-2-output-1.png" class="quarto-figure quarto-figure-center" width="457" height="325"></p>
 </figure>
 </div>
 </div>
@@ -366,11 +366,11 @@
 <section id="model-a-over-sensitive" class="slide level2">
 <h2>Model A: “Over-Sensitive”</h2>
 <p><em>Flags everything — never misses a car</em></p>
-<div id="566efe35" class="cell" data-execution_count="2">
+<div id="761f2c5b" class="cell" data-execution_count="2">
 <div class="cell-output cell-output-display">
 <div class="quarto-figure quarto-figure-center">
 <figure>
-<p><img data-src="4_Evaluation_Deployment_files/figure-revealjs/cell-3-output-1.png" class="quarto-figure quarto-figure-center" width="663" height="373"></p>
+<p><img data-src="3_Evaluation_files/figure-revealjs/cell-3-output-1.png" class="quarto-figure quarto-figure-center" width="663" height="373"></p>
 </figure>
 </div>
 </div>
@@ -385,11 +385,11 @@
 <section id="model-b-cautious" class="slide level2">
 <h2>Model B: “Cautious”</h2>
 <p><em>Only flags when very confident</em></p>
-<div id="0841a604" class="cell" data-execution_count="3">
+<div id="9d79242c" class="cell" data-execution_count="3">
 <div class="cell-output cell-output-display">
 <div class="quarto-figure quarto-figure-center">
 <figure>
-<p><img data-src="4_Evaluation_Deployment_files/figure-revealjs/cell-4-output-1.png" class="quarto-figure quarto-figure-center" width="663" height="373"></p>
+<p><img data-src="3_Evaluation_files/figure-revealjs/cell-4-output-1.png" class="quarto-figure quarto-figure-center" width="663" height="373"></p>
 </figure>
 </div>
 </div>
@@ -469,11 +469,11 @@
 </section>
 <section id="f1-score-model-comparison" class="slide level2">
 <h2>F1 Score: Model Comparison</h2>
-<div id="d1d68187" class="cell" data-execution_count="4">
+<div id="7107cdd8" class="cell" data-execution_count="4">
 <div class="cell-output cell-output-display">
 <div class="quarto-figure quarto-figure-center">
 <figure>
-<p><img data-src="4_Evaluation_Deployment_files/figure-revealjs/cell-5-output-1.png" class="quarto-figure quarto-figure-center" width="951" height="467"></p>
+<p><img data-src="3_Evaluation_files/figure-revealjs/cell-5-output-1.png" class="quarto-figure quarto-figure-center" width="951" height="467"></p>
 </figure>
 </div>
 </div>
@@ -488,11 +488,11 @@
 </section>
 <section id="choosing-the-right-threshold" class="slide level2">
 <h2>Choosing the Right Threshold</h2>
-<div id="17aa5414" class="cell" data-execution_count="5">
+<div id="de6668b5" class="cell" data-execution_count="5">
 <div class="cell-output cell-output-display">
 <div class="quarto-figure quarto-figure-center">
 <figure>
-<p><img data-src="4_Evaluation_Deployment_files/figure-revealjs/cell-6-output-1.png" class="quarto-figure quarto-figure-center" width="663" height="423"></p>
+<p><img data-src="3_Evaluation_files/figure-revealjs/cell-6-output-1.png" class="quarto-figure quarto-figure-center" width="663" height="423"></p>
 </figure>
 </div>
 </div>
@@ -569,15 +569,15 @@
 <p><em>Assume every board is Good</em></p>
 <ul>
 <li><strong>False Negatives (FN):</strong> 500</li>
-<li><strong>Cost:</strong> <span class="math inline">\(500 \times 500\)</span></li>
+<li><strong>Cost:</strong> $500$ $</li>
 <li><strong>Total Loss:</strong> <span style="color:#dc3545; font-size:1.2em;"><strong>$250,000</strong></span></li>
 </ul>
 </div><div class="column fragment" style="width:50%;">
 <h3 id="scrap-everything">⚙️ “Scrap Everything”</h3>
 <p><em>Assume every board is Defective</em></p>
 <ul>
-<li><strong>False Positives (FP):</strong> 9,500</li>
-<li><strong>Cost:</strong> <span class="math inline">\(9,500 \times 25\)</span></li>
+<li><strong>False Positives (FP):</strong> 9500</li>
+<li><strong>Cost:</strong> $9,500$ $</li>
 <li><strong>Total Loss:</strong> <span style="color:#FF8C00; font-size:1.2em;"><strong>$237,500</strong></span></li>
 </ul>
 </div></div>
@@ -593,30 +593,30 @@
 </section>
 <section id="optimizing-for-profit-not-just-f1" class="slide level2">
 <h2>Optimizing for Profit, Not Just F1</h2>
-<p>Remember how F1 balances Precision and Recall? When money is involved, the balance changes. A missed defect (FN) is 20x more expensive than a false alarm (FP).</p>
+<p>Remember how F1 balances Precision and Recall? When money is involved, the balance changes.</p>
 <div class="columns">
 <div class="column fragment fade-up" style="width:50%;">
 <h3 id="option-a-max-f1-score">Option A: Max F1 Score</h3>
 <p>Balanced threshold (conf=0.35)</p>
 <ul>
-<li><strong>FN (Missed):</strong> 81 boards <span class="math inline">\(\times \$500\)</span> = <span class="math inline">\(\$40,500\)</span></li>
+<li><strong>FN (Missed):</strong> 76 boards <span class="math inline">\(\times \$500\)</span> = <span class="math inline">\(\$38,000\)</span></li>
 <li><strong>FP (False Alarms):</strong> 0 boards <span class="math inline">\(\times \$25\)</span> = <span class="math inline">\(\$0\)</span></li>
-<li><strong>Total Loss:</strong> <span style="color:#dc3545; font-weight:bold;">$40,500</span></li>
+<li><strong>Total Loss:</strong> <span style="color:#dc3545; font-weight:bold;">$38,000</span></li>
 </ul>
 </div><div class="column fragment fade-up" style="width:50%;">
 <h3 id="option-b-max-roi">Option B: Max ROI</h3>
 <p>Loose threshold (conf=0.20)</p>
 <ul>
-<li><strong>FN (Missed):</strong> 22 boards <span class="math inline">\(\times \$500\)</span> = <span class="math inline">\(\$11,000\)</span></li>
-<li><strong>FP (False Alarms):</strong> 2 boards <span class="math inline">\(\times \$25\)</span> = <span class="math inline">\(\$50\)</span></li>
-<li><strong>Total Loss:</strong> <span style="color:#00C9A7; font-weight:bold;">$11,050</span></li>
+<li><strong>FN (Missed):</strong> 13 boards <span class="math inline">\(\times \$500\)</span> = <span class="math inline">\(\$6,500\)</span></li>
+<li><strong>FP (False Alarms):</strong> 4 boards <span class="math inline">\(\times \$25\)</span> = <span class="math inline">\(\$100\)</span></li>
+<li><strong>Total Loss:</strong> <span style="color:#00C9A7; font-weight:bold;">$6,600</span></li>
 </ul>
 </div></div>
 <div class="fragment fade-up">
 <div class="callout callout-important no-icon callout-style-simple">
 <div class="callout-body">
 <div class="callout-content">
-<p>By lowering our threshold and accepting a few False Positives, we saved the business nearly <strong>$30,000</strong> per batch. We optimized for the <strong>business metric</strong>, not the machine learning metric.</p>
+<p>By lowering our threshold and accepting a few False Positives, we saved the business over <strong>$31,400</strong> per batch. We optimized for the <strong>business metric</strong>, not the machine learning metric.</p>
 </div>
 </div>
 </div>
@@ -625,11 +625,11 @@
 <section id="the-cost-curve" class="slide level2">
 <h2>The Cost Curve</h2>
 <p>Just like we plotted the F1 curve, we can plot a <strong>Cost Curve</strong> to find the optimal threshold for deployment.</p>
-<div id="5ed0666b" class="cell" data-execution_count="6">
+<div id="16df3cb4" class="cell" data-execution_count="10">
 <div class="cell-output cell-output-display">
 <div class="quarto-figure quarto-figure-center">
 <figure>
-<p><img data-src="4_Evaluation_Deployment_files/figure-revealjs/cell-7-output-1.png" class="quarto-figure quarto-figure-center" width="759" height="423"></p>
+<p><img data-src="3_Evaluation_files/figure-revealjs/cell-11-output-1.png" class="quarto-figure quarto-figure-center" width="759" height="423"></p>
 </figure>
 </div>
 </div>
@@ -695,11 +695,11 @@
 </div>
 <p><br></p>
 </div><div class="column" style="width:50%;">
-<div id="6570db6d" class="cell" data-execution_count="7">
+<div id="9c9f49a9" class="cell" data-execution_count="11">
 <div class="cell-output cell-output-display">
 <div class="quarto-figure quarto-figure-center">
 <figure>
-<p><img data-src="4_Evaluation_Deployment_files/figure-revealjs/cell-8-output-1.png" class="quarto-figure quarto-figure-center" width="566" height="470"></p>
+<p><img data-src="3_Evaluation_files/figure-revealjs/cell-12-output-1.png" class="quarto-figure quarto-figure-center" width="566" height="470"></p>
 </figure>
 </div>
 </div>
@@ -824,11 +824,11 @@
 <section id="intersection-over-union-iou" class="slide level2">
 <h2>Intersection over Union (IoU)</h2>
 <p>How perfectly does the predicted bounding box overlap the <em>ground truth</em> box?</p>
-<div id="39872fda" class="cell" data-execution_count="8">
+<div id="f37073c2" class="cell" data-execution_count="12">
 <div class="cell-output cell-output-display">
 <div class="quarto-figure quarto-figure-center">
 <figure>
-<p><img data-src="4_Evaluation_Deployment_files/figure-revealjs/cell-9-output-1.png" class="quarto-figure quarto-figure-center" width="771" height="373"></p>
+<p><img data-src="3_Evaluation_files/figure-revealjs/cell-13-output-1.png" class="quarto-figure quarto-figure-center" width="771" height="373"></p>
 </figure>
 </div>
 </div>
@@ -840,11 +840,11 @@
 <p>A prediction must be <strong>accurate in location</strong> (<span class="math inline">\(IoU \ge 0.5\)</span>) to count as a <strong>True Positive (TP)</strong>.</p>
 <div class="columns">
 <div class="column" style="width:55%;">
-<div id="e5c558b6" class="cell" data-execution_count="9">
+<div id="9b749e4c" class="cell" data-execution_count="13">
 <div class="cell-output cell-output-display">
 <div class="quarto-figure quarto-figure-center">
 <figure>
-<p><img data-src="4_Evaluation_Deployment_files/figure-revealjs/cell-10-output-1.png" class="quarto-figure quarto-figure-center" width="315" height="373"></p>
+<p><img data-src="3_Evaluation_files/figure-revealjs/cell-14-output-1.png" class="quarto-figure quarto-figure-center" width="315" height="373"></p>
 </figure>
 </div>
 </div>
@@ -870,11 +870,11 @@
 <p>A common question is: <em>“What if the model predicts multiple boxes for the exact same object?”</em></p>
 <div class="columns">
 <div class="column" style="width:50%;">
-<div id="6ab7cee4" class="cell" data-execution_count="10">
+<div id="66bc9755" class="cell" data-execution_count="14">
 <div class="cell-output cell-output-display">
 <div class="quarto-figure quarto-figure-center">
 <figure>
-<p><img data-src="4_Evaluation_Deployment_files/figure-revealjs/cell-11-output-1.png" class="quarto-figure quarto-figure-center" width="373" height="338"></p>
+<p><img data-src="3_Evaluation_files/figure-revealjs/cell-15-output-1.png" class="quarto-figure quarto-figure-center" width="373" height="338"></p>
 </figure>
 </div>
 </div>
@@ -899,11 +899,11 @@
 <p>For segmentation, we evaluate how well the <strong>pixels</strong> overlap, not just bounding boxes.</p>
 <div class="columns">
 <div class="column" style="width:50%;">
-<div id="190b54de" class="cell" data-execution_count="11">
+<div id="aa07aa4f" class="cell" data-execution_count="15">
 <div class="cell-output cell-output-display">
 <div class="quarto-figure quarto-figure-center">
 <figure>
-<p><img data-src="4_Evaluation_Deployment_files/figure-revealjs/cell-12-output-1.png" class="quarto-figure quarto-figure-center" width="315" height="323"></p>
+<p><img data-src="3_Evaluation_files/figure-revealjs/cell-16-output-1.png" class="quarto-figure quarto-figure-center" width="315" height="323"></p>
 </figure>
 </div>
 </div>
@@ -930,11 +930,11 @@
 <p>The most common metric in <strong>Medical AI</strong>. It is mathematically identical to the <strong>F1-score</strong> at the pixel level.</p>
 <div class="columns">
 <div class="column" style="width:50%;">
-<div id="69757627" class="cell" data-execution_count="12">
+<div id="4ec59526" class="cell" data-execution_count="16">
 <div class="cell-output cell-output-display">
 <div class="quarto-figure quarto-figure-center">
 <figure>
-<p><img data-src="4_Evaluation_Deployment_files/figure-revealjs/cell-13-output-1.png" class="quarto-figure quarto-figure-center" width="315" height="338"></p>
+<p><img data-src="3_Evaluation_files/figure-revealjs/cell-17-output-1.png" class="quarto-figure quarto-figure-center" width="315" height="338"></p>
 </figure>
 </div>
 </div>
@@ -989,588 +989,34 @@
 <span id="cb3-10"><a></a><span class="bu">print</span>(<span class="ss">f"Recall:    </span><span class="sc">{</span>metrics<span class="sc">.</span>box<span class="sc">.</span>mr<span class="sc">}</span><span class="ss">"</span>)       <span class="co"># Overall recall</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <p><em>Docs Reference: <a href="https://docs.ultralytics.com/modes/val/">Validation Results</a></em></p>
 </section>
-<section id="what-if-your-metrics-reveal-a-problem" class="slide level2">
-<h2>What If Your Metrics Reveal a Problem?</h2>
-<p>You can now read your validation results — but what do you do when the numbers look bad?</p>
-<div class="fragment fade-up">
-<p>The most common culprits are:</p>
-<ul>
-<li><strong>Class imbalance</strong> — rare classes get ignored during training</li>
-<li><strong>Overfitting or underfitting</strong> — the model hasn’t generalized</li>
-<li><strong>Poor hyperparameters</strong> — learning rate, weight decay, stopping too early or too late</li>
-</ul>
-</div>
-<div class="fragment fade-up">
-<p>Let’s go through each one.</p>
-</div>
-</section>
-<section id="class-imbalance-fixing-the-bias" class="slide level2">
-<h2>Class Imbalance: Fixing the Bias</h2>
-<p>How do we stop the model from ignoring rare classes during training?</p>
-<div id="0b58556b" class="cell" data-execution_count="13">
-<div class="cell-output cell-output-display">
-<div class="quarto-figure quarto-figure-center">
-<figure>
-<p><img data-src="4_Evaluation_Deployment_files/figure-revealjs/cell-14-output-1.png" class="quarto-figure quarto-figure-center" width="853" height="325"></p>
-</figure>
-</div>
-</div>
-</div>
-<p>Here we oversample (duplicating images) the minority class (car) to make it learnable.</p>
-<div class="fragment">
-<p><em>Technical Guide: <a href="https://y-t-g.github.io/tutorials/yolo-class-balancing/">Class Balancing with YOLO</a></em></p>
-</div>
-</section>
-<section id="the-training-spectrum" class="slide level2">
-<h2>The Training Spectrum</h2>
-<p><em>Every training run lands somewhere on this spectrum — knowing where is the first step to fixing it.</em></p>
-<div class="columns">
-<div class="column" style="width:33%;">
-<div class="callout callout-warning callout-titled callout-style-default">
-<div class="callout-body">
-<div class="callout-title">
-<div class="callout-icon-container">
-<i class="callout-icon"></i>
-</div>
-<p><strong>🔴 Overfitting</strong></p>
-</div>
-<div class="callout-content">
-<p>Model <strong>memorizes</strong> training data.</p>
-<ul>
-<li>Train mAP &gt;&gt; Val mAP</li>
-<li>Val loss starts rising</li>
-</ul>
-<p><strong>Too much capacity for your data</strong></p>
-</div>
-</div>
-</div>
-</div><div class="column" style="width:34%;">
-<div class="callout callout-tip callout-titled callout-style-default">
-<div class="callout-body">
-<div class="callout-title">
-<div class="callout-icon-container">
-<i class="callout-icon"></i>
-</div>
-<p><strong>🟢 Just Right</strong></p>
-</div>
-<div class="callout-content">
-<p>Model <strong>generalizes</strong> to new data.</p>
-<ul>
-<li>Train ≈ Val, both high</li>
-<li>Both losses converge low</li>
-</ul>
-<p><strong>The goal — stay here</strong></p>
-</div>
-</div>
-</div>
-</div><div class="column" style="width:33%;">
-<div class="callout callout-note callout-titled callout-style-default">
-<div class="callout-body">
-<div class="callout-title">
-<div class="callout-icon-container">
-<i class="callout-icon"></i>
-</div>
-<p><strong>🟠 Underfitting</strong></p>
-</div>
-<div class="callout-content">
-<p>Model <strong>never learned</strong> the patterns.</p>
-<ul>
-<li>Both Train and Val mAP low</li>
-<li>Losses barely decrease</li>
-</ul>
-<p><strong>Too little capacity or training</strong></p>
-</div>
-</div>
-</div>
-</div></div>
-</section>
-<section id="overfitting-the-symptom" class="slide level2">
-<h2>🔴 Overfitting: The Symptom</h2>
-<blockquote>
-<p>The model memorizes training data instead of learning general patterns.</p>
-</blockquote>
-<div class="columns">
-<div class="column" style="width:42%;">
-<p><strong>What you see:</strong></p>
-<ul>
-<li>Train loss ↓, Val loss ↑</li>
-<li>Train mAP climbs, Val mAP stalls</li>
-<li>Growing gap between the two curves</li>
-</ul>
-</div><div class="column" style="width:58%;">
-<div id="6594e7b6" class="cell" data-execution_count="14">
-<div class="cell-output cell-output-display">
-<div class="quarto-figure quarto-figure-center">
-<figure>
-<p><img data-src="4_Evaluation_Deployment_files/figure-revealjs/cell-15-output-1.png" class="quarto-figure quarto-figure-center" width="567" height="374"></p>
-</figure>
-</div>
-</div>
-</div>
-</div></div>
-</section>
-<section id="overfitting-the-fixes" class="slide level2">
-<h2>🔴 Overfitting: The Fixes</h2>
-<div class="columns">
-<div class="column" style="width:50%;">
-<p><strong>More Data Variety</strong> <em>(best cure)</em></p>
-<p>Varied scenes the model can’t memorize.</p>
-<p><strong>Augmentation</strong></p>
-<p>Flip, mosaic, color jitter — on by default in YOLO.</p>
-<p><strong>Smaller Model</strong></p>
-<p>Small dataset? Start with <code>yolo11n</code> or <code>yolo11s</code>.</p>
-</div><div class="column" style="width:50%;">
-<p><strong>Increase <code>weight_decay</code></strong></p>
-<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb4"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb4-1"><a></a>model.train(data<span class="op">=</span><span class="st">"data.yaml"</span>, weight_decay<span class="op">=</span><span class="fl">0.001</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
-<p><strong>Early Stopping</strong></p>
-<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb5"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb5-1"><a></a>model.train(data<span class="op">=</span><span class="st">"data.yaml"</span>, patience<span class="op">=</span><span class="dv">20</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
-</div></div>
-<div class="callout callout-tip callout-titled callout-style-default">
-<div class="callout-body">
-<div class="callout-title">
-<div class="callout-icon-container">
-<i class="callout-icon"></i>
-</div>
-<p><strong>Tip</strong></p>
-</div>
-<div class="callout-content">
-<p>Start with <strong>augmentation + patience</strong>. If overfitting persists, raise <code>weight_decay</code>.</p>
-</div>
-</div>
-</div>
-</section>
-<section id="underfitting-the-symptom" class="slide level2">
-<h2>🟠 Underfitting: The Symptom</h2>
-<blockquote>
-<p>The model hasn’t learned the patterns — too simple, over-constrained, or undertrained.</p>
-</blockquote>
-<div class="columns">
-<div class="column" style="width:45%;">
-<p><strong>What you see:</strong></p>
-<ul>
-<li>Both Train <em>and</em> Val mAP <strong>low and flat</strong></li>
-<li>Loss barely moves after the first epochs</li>
-<li>Curves close together — but both stuck high</li>
-</ul>
-</div><div class="column" style="width:55%;">
-<div id="bd30f69c" class="cell" data-execution_count="15">
-<div class="cell-output cell-output-display">
-<div class="quarto-figure quarto-figure-center">
-<figure>
-<p><img data-src="4_Evaluation_Deployment_files/figure-revealjs/cell-16-output-1.png" class="quarto-figure quarto-figure-center" width="567" height="374"></p>
-</figure>
-</div>
-</div>
-</div>
-</div></div>
-</section>
-<section id="underfitting-the-fixes" class="slide level2">
-<h2>🟠 Underfitting: The Fixes</h2>
-<div class="columns">
-<div class="column" style="width:50%;">
-<p><strong>Bigger Model</strong></p>
-<p>Try <code>yolo11m</code> or <code>yolo11l</code>.</p>
-<p><strong>Train Longer</strong></p>
-<p>Increase <code>epochs</code>.</p>
-<p><strong>Higher Learning Rate</strong></p>
-<p>Try <code>lr0=0.02</code> (default <code>0.01</code>).</p>
-</div><div class="column" style="width:50%;">
-<p><strong>Less Regularization</strong></p>
-<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb6"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb6-1"><a></a>model.train(data<span class="op">=</span><span class="st">"data.yaml"</span>, weight_decay<span class="op">=</span><span class="fl">0.0001</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
-<p><strong>Check Your Labels</strong></p>
-<p>Mislabeled data is impossible to learn from — audit before tuning.</p>
-</div></div>
-</section>
-<section id="healthy-training-generalizing" class="slide level2">
-<h2>🟢 Healthy Training: “Generalizing”</h2>
-<div class="columns">
-<div class="column" style="width:45%;">
-<p><br></p>
-<p><strong>The Ideal State:</strong></p>
-<ul>
-<li>Train and val metrics <strong>rise together</strong></li>
-<li>Both losses <strong>decrease steadily</strong> and plateau low</li>
-<li>Model generalizes — performs well on unseen data</li>
-</ul>
-</div><div class="column" style="width:55%;">
-<div id="e1bafbfb" class="cell" data-execution_count="16">
-<div class="cell-output cell-output-display">
-<div class="quarto-figure quarto-figure-center">
-<figure>
-<p><img data-src="4_Evaluation_Deployment_files/figure-revealjs/cell-17-output-1.png" class="quarto-figure quarto-figure-center" width="567" height="374"></p>
-</figure>
-</div>
-</div>
-</div>
-</div></div>
-</section>
-<section id="diagnosing-your-training-run" class="slide level2">
-<h2>Diagnosing Your Training Run</h2>
-<p><em>Use this as a reference when reading your own loss curves.</em></p>
-<table class="caption-top">
-<colgroup>
-<col style="width: 30%">
-<col style="width: 38%">
-<col style="width: 30%">
-</colgroup>
-<thead>
-<tr class="header">
-<th style="text-align: left;">What you see</th>
-<th style="text-align: center;">Problem</th>
-<th style="text-align: left;">Actions</th>
-</tr>
-</thead>
-<tbody>
-<tr class="odd">
-<td style="text-align: left;">Train mAP &gt;&gt; Val mAP, Val loss rising</td>
-<td style="text-align: center;">🔴 <strong>Overfitting</strong></td>
-<td style="text-align: left;">Add augmentation · increase <code>weight_decay</code> · set <code>patience</code></td>
-</tr>
-<tr class="even">
-<td style="text-align: left;">Both mAP low and flat, loss barely moves</td>
-<td style="text-align: center;">🟠 <strong>Underfitting</strong></td>
-<td style="text-align: left;">Bigger model · more <code>epochs</code> · raise <code>lr0</code> · lower <code>weight_decay</code></td>
-</tr>
-<tr class="odd">
-<td style="text-align: left;">Both losses converging, mAP climbing</td>
-<td style="text-align: center;">🟢 <strong>Healthy</strong></td>
-<td style="text-align: left;">Continue training or deploy</td>
-</tr>
-</tbody>
-</table>
-<div class="callout callout-tip callout-titled callout-style-default">
-<div class="callout-body">
-<div class="callout-title">
-<div class="callout-icon-container">
-<i class="callout-icon"></i>
-</div>
-<p><strong>Tip</strong></p>
-</div>
-<div class="callout-content">
-<p><strong>Always watch both curves.</strong> 99% train accuracy means nothing if val is failing.</p>
-</div>
-</div>
-</div>
-</section>
-<section id="your-toolkit-for-better-training" class="slide level2">
-<h2>Your Toolkit for Better Training</h2>
-<p>You can diagnose the problem — now here are the levers to fix it.</p>
-<div class="fragment fade-up">
-<table class="caption-top">
-<thead>
-<tr class="header">
-<th style="text-align: left;">Tool</th>
-<th style="text-align: left;">Fixes</th>
-</tr>
-</thead>
-<tbody>
-<tr class="odd">
-<td style="text-align: left;"><strong>Data Augmentation</strong></td>
-<td style="text-align: left;">Overfitting, small datasets, domain shift</td>
-</tr>
-<tr class="even">
-<td style="text-align: left;"><strong>Learning Rate</strong></td>
-<td style="text-align: left;">Unstable or stalled training</td>
-</tr>
-<tr class="odd">
-<td style="text-align: left;"><strong>Weight Decay</strong></td>
-<td style="text-align: left;">Overfitting (model memorizing)</td>
-</tr>
-<tr class="even">
-<td style="text-align: left;"><strong>Early Stopping</strong></td>
-<td style="text-align: left;">Wasted compute, overfitting</td>
-</tr>
-</tbody>
-</table>
-</div>
-</section>
-<section id="what-data-augmentation-does" class="slide level2">
-<h2>What Data Augmentation Does</h2>
-<p><strong>Concept:</strong> Artificially increase training data variety by applying transformations to existing images.</p>
-<div id="c7f9b47c" class="cell" data-execution_count="17">
-<div class="cell-output cell-output-display">
-<div class="quarto-figure quarto-figure-center">
-<figure>
-<p><img data-src="4_Evaluation_Deployment_files/figure-revealjs/cell-18-output-1.png" class="quarto-figure quarto-figure-center" width="1430" height="191"></p>
-</figure>
-</div>
-</div>
-</div>
-<p><strong>When it helps:</strong></p>
-<ul>
-<li>Overfitting (model needs more variety)</li>
-<li>Small datasets</li>
-<li>Domain shift (different lighting/angles in production)</li>
-</ul>
-</section>
-<section id="data-augmentation-python" class="slide level2 smaller">
-<h2>Data Augmentation (Python)</h2>
-<p>YOLO natively supports <strong>Albumentations</strong> to improve model robustness:</p>
-<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb7"><pre class="sourceCode numberSource bash number-lines code-with-copy"><code class="sourceCode bash"><span id="cb7-1"><a></a><span class="ex">pip</span> install albumentations ultralytics</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
-<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb8"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb8-1"><a></a><span class="im">import</span> albumentations <span class="im">as</span> A</span>
-<span id="cb8-2"><a></a><span class="im">from</span> ultralytics <span class="im">import</span> YOLO</span>
-<span id="cb8-3"><a></a></span>
-<span id="cb8-4"><a></a>model <span class="op">=</span> YOLO(<span class="st">"yolo26n.pt"</span>)</span>
-<span id="cb8-5"><a></a></span>
-<span id="cb8-6"><a></a><span class="co"># Define custom Albumentations transforms</span></span>
-<span id="cb8-7"><a></a>custom_transforms <span class="op">=</span> [</span>
-<span id="cb8-8"><a></a>    A.Blur(blur_limit<span class="op">=</span><span class="dv">7</span>, p<span class="op">=</span><span class="fl">0.5</span>),</span>
-<span id="cb8-9"><a></a>    A.RandomCrop(width<span class="op">=</span><span class="dv">256</span>, height<span class="op">=</span><span class="dv">256</span>),</span>
-<span id="cb8-10"><a></a>    A.HorizontalFlip(p<span class="op">=</span><span class="fl">0.5</span>),</span>
-<span id="cb8-11"><a></a>    A.RandomBrightnessContrast(brightness_limit<span class="op">=</span><span class="fl">0.2</span>, contrast_limit<span class="op">=</span><span class="fl">0.2</span>, p<span class="op">=</span><span class="fl">0.5</span>),</span>
-<span id="cb8-12"><a></a>]</span>
-<span id="cb8-13"><a></a></span>
-<span id="cb8-14"><a></a><span class="co"># Train the model with custom transforms</span></span>
-<span id="cb8-15"><a></a>model.train(data<span class="op">=</span><span class="st">"data.yaml"</span>, epochs<span class="op">=</span><span class="dv">100</span>, augmentations<span class="op">=</span>custom_transforms)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
-<p><em>Docs Reference: <a href="https://docs.ultralytics.com/integrations/albumentations/">Albumentations Integration</a></em></p>
-</section>
-<section id="hyperparameters-learning-rate-lr0" class="slide level2">
-<h2>Hyperparameters: Learning Rate (lr0)</h2>
-<div class="columns fragment fade-up" style="margin-bottom: -15px;">
-<div class="column" style="width:45%;">
-<p>🔴 <strong>Too High</strong>: Spikes/noise. Model “jumps” over the optimal solution.</p>
-</div><div class="column" style="width:55%;">
-<div id="6799db59" class="cell" data-fig-height="1.6" data-execution_count="18">
-<div class="cell-output cell-output-display">
-<div class="quarto-figure quarto-figure-center">
-<figure>
-<p><img data-src="4_Evaluation_Deployment_files/figure-revealjs/cell-19-output-1.png" class="quarto-figure quarto-figure-center" width="566" height="163"></p>
-</figure>
-</div>
-</div>
-</div>
-</div></div>
-<div class="columns fragment fade-up" style="margin-bottom: -15px;">
-<div class="column" style="width:45%;">
-<p>🔵 <strong>Too Small</strong>: Flat line. Model is too “timid” to learn.</p>
-</div><div class="column" style="width:55%;">
-<div id="58a70768" class="cell" data-fig-height="1.6" data-execution_count="19">
-<div class="cell-output cell-output-display">
-<div class="quarto-figure quarto-figure-center">
-<figure>
-<p><img data-src="4_Evaluation_Deployment_files/figure-revealjs/cell-20-output-1.png" class="quarto-figure quarto-figure-center" width="573" height="163"></p>
-</figure>
-</div>
-</div>
-</div>
-</div></div>
-<div class="columns fragment fade-up" style="margin-bottom: -15px;">
-<div class="column" style="width:45%;">
-<p>🟢 <strong>Just Right</strong>: Smooth, rapid decay to a low plateau.</p>
-</div><div class="column" style="width:55%;">
-<div id="af675c88" class="cell" data-fig-height="1.6" data-execution_count="20">
-<div class="cell-output cell-output-display">
-<div class="quarto-figure quarto-figure-center">
-<figure>
-<p><img data-src="4_Evaluation_Deployment_files/figure-revealjs/cell-21-output-1.png" class="quarto-figure quarto-figure-center" width="573" height="163"></p>
-</figure>
-</div>
-</div>
-</div>
-</div></div>
-</section>
-<section id="hyperparameters-weight-decay" class="slide level2">
-<h2>Hyperparameters: Weight Decay</h2>
-<div class="columns">
-<div class="column" style="width:55%;">
-<div id="1e2efe07" class="cell" data-execution_count="21">
-<div class="cell-output cell-output-display">
-<div class="quarto-figure quarto-figure-center">
-<figure>
-<p><img data-src="4_Evaluation_Deployment_files/figure-revealjs/cell-22-output-1.png" class="quarto-figure quarto-figure-center" width="470" height="324"></p>
-</figure>
-</div>
-</div>
-</div>
-</div><div class="column" style="width:45%;">
-<table class="caption-top">
-<thead>
-<tr class="header">
-<th style="text-align: left;">Setting</th>
-<th style="text-align: left;">Effect</th>
-</tr>
-</thead>
-<tbody>
-<tr class="odd">
-<td style="text-align: left;">Too low</td>
-<td style="text-align: left;">Memorization → 🔴 Overfitting</td>
-</tr>
-<tr class="even">
-<td style="text-align: left;">Too high</td>
-<td style="text-align: left;">Over-constrained → 🟠 Underfitting</td>
-</tr>
-</tbody>
-</table>
-</div></div>
-</section>
-<section id="hyperparameters-early-stopping" class="slide level2">
-<h2>Hyperparameters: Early Stopping</h2>
-<div class="columns">
-<div class="column" style="width:45%;">
-<ul>
-<li><strong>The Concept:</strong> Stop training if validation metrics haven’t improved for <span class="math inline">\(N\)</span> epochs.</li>
-</ul>
-<p><strong><code>patience</code></strong> (Default: 50)</p>
-<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb9"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb9-1"><a></a><span class="im">from</span> ultralytics <span class="im">import</span> YOLO</span>
-<span id="cb9-2"><a></a></span>
-<span id="cb9-3"><a></a>model <span class="op">=</span> YOLO(<span class="st">"yolo26n.pt"</span>)</span>
-<span id="cb9-4"><a></a><span class="co"># Stop if no improvement for 10 epochs</span></span>
-<span id="cb9-5"><a></a>model.train(data<span class="op">=</span><span class="st">"data.yaml"</span>, </span>
-<span id="cb9-6"><a></a>            epochs<span class="op">=</span><span class="dv">100</span>, </span>
-<span id="cb9-7"><a></a>            patience<span class="op">=</span><span class="dv">10</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
-</div><div class="column" style="width:55%;">
-<div id="5286bdb9" class="cell" data-execution_count="22">
-<div class="cell-output cell-output-display">
-<div class="quarto-figure quarto-figure-center">
-<figure>
-<p><img data-src="4_Evaluation_Deployment_files/figure-revealjs/cell-23-output-1.png" class="quarto-figure quarto-figure-center" width="567" height="470"></p>
-</figure>
-</div>
-</div>
-</div>
-</div></div>
-</section>
 <section id="evaluation-key-takeaways" class="slide level2">
 <h2>Evaluation: Key Takeaways</h2>
 <ul>
-<li class="fragment"><strong>Metrics:</strong> Use mAP50 for a quick sanity check, mAP50-95 for a strict production-ready evaluation</li>
-<li class="fragment"><strong>Diagnose your curves:</strong> overfitting, underfitting, and healthy training each have a clear, distinct signature</li>
-<li class="fragment"><strong>Fix deliberately:</strong> augmentation, weight decay, and early stopping cover the majority of training problems</li>
+<li class="fragment"><strong>Confusion matrix first:</strong> Precision, Recall, and F1 each tell a different story — pick the one that matches your cost of mistakes.</li>
+<li class="fragment"><strong>Threshold is a business decision:</strong> ROI curves, not just F1, choose where to set it.</li>
+<li class="fragment"><strong>mAP for detection:</strong> Use mAP50 for a quick sanity check, mAP50-95 for a strict production-ready evaluation.</li>
+<li class="fragment"><strong>IoU underpins everything:</strong> mAP, mIoU, Dice — all built on the same overlap idea.</li>
+<li class="fragment"><strong>When metrics look bad:</strong> You’ve identified the <em>what</em>, now we need to fix the <em>why</em> in <strong>Part 4</strong>.</li>
 </ul>
-</section>
-<section id="lab-4b-technical-performance-diagnosis" class="slide level2">
-<h2>🧪 Lab 4B: Technical Performance &amp; Diagnosis</h2>
-<p>Now that you know how to read the curves, let’s fix a model!</p>
-<ol type="1">
-<li>Open <code>labs/04b_evaluation_technical.ipynb</code></li>
-<li><strong>Compare</strong> different YOLO model sizes (nano vs small).</li>
-<li><strong>Verify</strong> Intersection over Union (IoU) math.</li>
-<li><strong>Identify</strong> signs of overfitting in a training run.</li>
-</ol>
-<div class="callout callout-tip no-icon callout-style-simple">
-<div class="callout-body">
-<div class="callout-content">
-<p><strong>Goal:</strong> Learn to distinguish between a model that “memorizes” and one that “generalizes.”</p>
-</div>
-</div>
-</div>
 <div class="fragment">
 <div class="callout callout-tip no-icon callout-style-simple">
 <div class="callout-body">
 <div class="callout-content">
-<p>When your model’s validation metrics are solid, it’s ready for the next step — getting it into production.</p>
+<p>When your model’s validation metrics are solid, it’s ready for the next step — either more training or moving to production.</p>
 </div>
 </div>
 </div>
-</div>
-</section></section>
-<section>
-<section id="deployment" class="title-slide slide level1 sdaia-dark center" data-background-gradient="linear-gradient(135deg, #1C355E, #00C9A7)">
-<h1>8. Deployment</h1>
-<p>Taking it to production.</p>
-</section>
-<section id="exporting-models" class="slide level2">
-<h2>Exporting Models</h2>
-<p>A PyTorch <code>.pt</code> file is great for research, but slow in production. Convert to optimized formats using the <code>export</code> mode!</p>
-<div class="panel-tabset">
-<ul id="tabset-2" class="panel-tabset-tabby"><li><a data-tabby-default="" href="#tabset-2-1">CLI</a></li><li><a href="#tabset-2-2">Python</a></li></ul>
-<div class="tab-content">
-<div id="tabset-2-1">
-<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb10"><pre class="sourceCode numberSource bash number-lines code-with-copy"><code class="sourceCode bash"><span id="cb10-1"><a></a><span class="co"># Export to ONNX (Great for CPU)</span></span>
-<span id="cb10-2"><a></a><span class="ex">yolo</span> export model=best.pt format=onnx</span>
-<span id="cb10-3"><a></a></span>
-<span id="cb10-4"><a></a><span class="co"># Export to OpenVINO (Intel) or TensorRT (Nvidia GPUs)</span></span>
-<span id="cb10-5"><a></a><span class="ex">yolo</span> export model=best.pt format=openvino</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
-</div>
-<div id="tabset-2-2">
-<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb11"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb11-1"><a></a><span class="im">from</span> ultralytics <span class="im">import</span> YOLO</span>
-<span id="cb11-2"><a></a></span>
-<span id="cb11-3"><a></a>model <span class="op">=</span> YOLO(<span class="st">"best.pt"</span>)</span>
-<span id="cb11-4"><a></a>model.export(<span class="bu">format</span><span class="op">=</span><span class="st">"onnx"</span>)</span>
-<span id="cb11-5"><a></a>model.export(<span class="bu">format</span><span class="op">=</span><span class="st">"openvino"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
-</div>
-</div>
-</div>
-<p><em>Docs Reference: <a href="https://docs.ultralytics.com/modes/export/">Export</a></em></p>
-</section>
-<section id="inference-with-exported-models" class="slide level2">
-<h2>Inference with Exported Models</h2>
-<p>You don’t need complex deployment code to use your exported models. The Ultralytics API loads them just like a standard PyTorch <code>.pt</code> file!</p>
-<div class="panel-tabset">
-<ul id="tabset-3" class="panel-tabset-tabby"><li><a data-tabby-default="" href="#tabset-3-1">CLI</a></li><li><a href="#tabset-3-2">Python</a></li></ul>
-<div class="tab-content">
-<div id="tabset-3-1">
-<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb12"><pre class="sourceCode numberSource bash number-lines code-with-copy"><code class="sourceCode bash"><span id="cb12-1"><a></a><span class="ex">yolo</span> predict model=best.onnx source=<span class="st">"https://ultralytics.com/assets/bus.jpg"</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
-</div>
-<div id="tabset-3-2">
-<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb13"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb13-1"><a></a><span class="im">from</span> ultralytics <span class="im">import</span> YOLO</span>
-<span id="cb13-2"><a></a></span>
-<span id="cb13-3"><a></a>model <span class="op">=</span> YOLO(<span class="st">"best.onnx"</span>)</span>
-<span id="cb13-4"><a></a>results <span class="op">=</span> model.predict(source<span class="op">=</span><span class="st">"https://ultralytics.com/assets/bus.jpg"</span>)</span>
-<span id="cb13-5"><a></a><span class="bu">print</span>(results[<span class="dv">0</span>].boxes) </span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
-</div>
-</div>
-</div>
-<p><em>Docs Reference: <a href="https://docs.ultralytics.com/modes/predict/">Predict with Exported Models</a></em></p>
-</section></section>
-<section>
-<section id="conclusion" class="title-slide slide level1 sdaia-dark center" data-background-gradient="linear-gradient(135deg, #1C355E, #00C9A7)">
-<h1>Conclusion</h1>
-<p>Course Wrap-up</p>
-</section>
-<section id="the-ultralytics-ecosystem" class="slide level2">
-<h2>The Ultralytics Ecosystem</h2>
-<div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 1rem; margin-top: 1.2rem;">
-  <div style="text-align:center; background:rgba(28,53,94,0.08); padding:1.2rem; border-radius:12px;">
-    <div style="font-size:2rem;">🎯</div>
-    <strong>Tasks</strong><br><small>Detect · Segment · Pose · OBB</small>
-  </div>
-  <div style="text-align:center; background:rgba(28,53,94,0.08); padding:1.2rem; border-radius:12px;">
-    <div style="font-size:2rem;">⚡</div>
-    <strong>Solutions</strong><br><small>Advanced logic, out-of-the-box</small>
-  </div>
-  <div style="text-align:center; background:rgba(28,53,94,0.08); padding:1.2rem; border-radius:12px;">
-    <div style="font-size:2rem;">🗂️</div>
-    <strong>Datasets</strong><br><small>Structure labels for every task</small>
-  </div>
-  <div style="text-align:center; background:rgba(0,201,167,0.12); padding:1.2rem; border-radius:12px;">
-    <div style="font-size:2rem;">🛠️</div>
-    <strong>Tools</strong><br><small>CLI · YAML · Hyperparameters</small>
-  </div>
-  <div style="text-align:center; background:rgba(0,201,167,0.12); padding:1.2rem; border-radius:12px;">
-    <div style="font-size:2rem;">📊</div>
-    <strong>Evaluation</strong><br><small>Metrics · Thresholds · PR curves</small>
-  </div>
-  <div style="text-align:center; background:rgba(0,201,167,0.12); padding:1.2rem; border-radius:12px;">
-    <div style="font-size:2rem;">🚀</div>
-    <strong>Deployment</strong><br><small>Export for production speed</small>
-  </div>
 </div>
 </section>
-<section id="whats-next" class="slide level2">
-<h2>What’s Next?</h2>
-<div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 1.2rem; margin-top: 1.4rem;">
-  <div style="background:rgba(28,53,94,0.08); padding:1.2rem; border-radius:12px;">
-    <div style="font-size:2rem; text-align:center;">📷</div>
-    <strong>Smart Security</strong><br>
-    <small>Detect intruders, vehicles, and anomalies in real time.</small>
-  </div>
-  <div style="background:rgba(28,53,94,0.08); padding:1.2rem; border-radius:12px;">
-    <div style="font-size:2rem; text-align:center;">🏥</div>
-    <strong>Medical Imaging</strong><br>
-    <small>Identify tumors, lesions, or instrument counts in scans.</small>
-  </div>
-  <div style="background:rgba(0,201,167,0.10); padding:1.2rem; border-radius:12px;">
-    <div style="font-size:2rem; text-align:center;">🚗</div>
-    <strong>Autonomous Vehicles</strong><br>
-    <small>Detect pedestrians, signs, and road hazards at speed.</small>
-  </div>
-  <div style="background:rgba(0,201,167,0.10); padding:1.2rem; border-radius:12px;">
-    <div style="font-size:2rem; text-align:center;">🛒</div>
-    <strong>Retail Analytics</strong><br>
-    <small>Track foot traffic, shelf stock, and customer behaviour.</small>
-  </div>
-</div>
+<section id="next-steps" class="slide level2">
+<h2>Next Steps</h2>
+<p>Next up: <strong>Part 4 — Custom Data &amp; Training</strong></p>
+<ul>
+<li>Learn the mathematical “Loss” that drives the model.</li>
+<li>Format your own dataset and fix <strong>Class Imbalance</strong>.</li>
+<li>Diagnose and solve <strong>Overfitting</strong> and <strong>Underfitting</strong>.</li>
+<li>Fine-tune hyperparameters for production performance.</li>
+</ul>
 </section>
 <section id="qa" class="slide level2 sdaia-dark" data-background-color="#1C355E">
 <h2>Q&amp;A</h2>

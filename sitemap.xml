@@ -1,35 +1,39 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url>
-    <loc>https://NaifMersal.github.io/cv-for-developers-ultralytics/slides/5_HuggingFace_CV.html</loc>
-    <lastmod>2026-05-05T17:06:45.784Z</lastmod>
+    <loc>https://NaifMersal.github.io/cv-for-developers-ultralytics/slides/6_HuggingFace_CV.html</loc>
+    <lastmod>2026-05-08T23:01:45.734Z</lastmod>
   </url>
   <url>
-    <loc>https://NaifMersal.github.io/cv-for-developers-ultralytics/slides/3_Custom_Data_Training.html</loc>
-    <lastmod>2026-05-05T17:06:45.782Z</lastmod>
-  </url>
-  <url>
-    <loc>https://NaifMersal.github.io/cv-for-developers-ultralytics/slides/2B_Real_World_Video_Engineering.html</loc>
-    <lastmod>2026-05-05T17:17:03.380Z</lastmod>
-  </url>
-  <url>
-    <loc>https://NaifMersal.github.io/cv-for-developers-ultralytics/slides/0_Image_Foundations.html</loc>
-    <lastmod>2026-05-05T17:06:45.779Z</lastmod>
-  </url>
-  <url>
-    <loc>https://NaifMersal.github.io/cv-for-developers-ultralytics/index.html</loc>
-    <lastmod>2026-05-05T18:34:00.988Z</lastmod>
-  </url>
-  <url>
-    <loc>https://NaifMersal.github.io/cv-for-developers-ultralytics/slides/1_Tasks_Inference.html</loc>
-    <lastmod>2026-05-05T17:06:45.779Z</lastmod>
+    <loc>https://NaifMersal.github.io/cv-for-developers-ultralytics/slides/4_Custom_Data_Training.html</loc>
+    <lastmod>2026-05-08T23:04:06.195Z</lastmod>
   </url>
   <url>
     <loc>https://NaifMersal.github.io/cv-for-developers-ultralytics/slides/2_Real_World_Use_Cases.html</loc>
     <lastmod>2026-05-05T17:06:45.779Z</lastmod>
   </url>
   <url>
-    <loc>https://NaifMersal.github.io/cv-for-developers-ultralytics/slides/4_Evaluation_Deployment.html</loc>
-    <lastmod>2026-05-05T23:07:27.019Z</lastmod>
+    <loc>https://NaifMersal.github.io/cv-for-developers-ultralytics/slides/1_Tasks_Inference.html</loc>
+    <lastmod>2026-05-08T23:01:45.732Z</lastmod>
+  </url>
+  <url>
+    <loc>https://NaifMersal.github.io/cv-for-developers-ultralytics/index.html</loc>
+    <lastmod>2026-05-08T23:01:45.730Z</lastmod>
+  </url>
+  <url>
+    <loc>https://NaifMersal.github.io/cv-for-developers-ultralytics/slides/0_Image_Foundations.html</loc>
+    <lastmod>2026-05-05T17:06:45.779Z</lastmod>
+  </url>
+  <url>
+    <loc>https://NaifMersal.github.io/cv-for-developers-ultralytics/slides/2B_Real_World_Video_Engineering.html</loc>
+    <lastmod>2026-05-05T17:17:03.380Z</lastmod>
+  </url>
+  <url>
+    <loc>https://NaifMersal.github.io/cv-for-developers-ultralytics/slides/3_Evaluation.html</loc>
+    <lastmod>2026-05-08T23:01:45.733Z</lastmod>
+  </url>
+  <url>
+    <loc>https://NaifMersal.github.io/cv-for-developers-ultralytics/slides/5_Deployment.html</loc>
+    <lastmod>2026-05-08T23:01:45.734Z</lastmod>
   </url>
 </urlset>

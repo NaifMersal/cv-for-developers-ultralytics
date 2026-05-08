@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Sigmoid Demo</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: transparent;
+    font-family: 'Inter', 'Segoe UI', sans-serif;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.6rem;
+    padding: 0.4rem 1rem 0.6rem;
+  }
+
+  canvas {
+    border-radius: 12px;
+    background: #f8fafc;
+    border: 1.5px solid #e2e8f0;
+    display: block;
+  }
+
+  .controls {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+
+  .slider-group {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+    font-size: 0.9rem;
+    color: #475569;
+  }
+
+  .slider-group label {
+    font-weight: 700;
+    color: #1C355E;
+    white-space: nowrap;
+    font-size: 1rem;
+  }
+
+  input[type=range] {
+    -webkit-appearance: none;
+    width: 240px;
+    height: 6px;
+    border-radius: 4px;
+    background: #cbd5e1;
+    outline: none;
+    cursor: pointer;
+  }
+  input[type=range]::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    width: 20px; height: 20px;
+    border-radius: 50%;
+    background: #1C355E;
+    cursor: pointer;
+    border: 2px solid #fff;
+    box-shadow: 0 1px 4px rgba(28,53,94,0.3);
+  }
+
+  .info-bar {
+    display: flex;
+    gap: 1.5rem;
+    font-size: 0.95rem;
+    color: #64748b;
+  }
+  .info-bar span strong {
+    color: #1C355E;
+    font-weight: 700;
+  }
+  .info-bar .sig-val {
+    color: #00C9A7;
+    font-size: 1.15em;
+  }
+</style>
+</head>
+<body>
+
+<canvas id="canvas" width="560" height="240"></canvas>
+
+<div class="controls">
+  <div class="slider-group">
+    <label>z</label>
+    <input type="range" id="z-slider" min="-80" max="80" value="0" step="1">
+    <span id="z-val" style="font-weight:700; color:#1C355E; min-width:48px;">0.0</span>
+  </div>
+</div>
+
+<div class="info-bar">
+  <span>&sigma;(z) = <strong class="sig-val" id="sig-val">0.500</strong></span>
+</div>
+
+<script>
+const canvas = document.getElementById('canvas');
+const ctx = canvas.getContext('2d');
+const W = canvas.width, H = canvas.height;
+const PAD = { top: 18, right: 22, bottom: 30, left: 50 };
+const plotW = W - PAD.left - PAD.right;
+const plotH = H - PAD.top - PAD.bottom;
+
+const zMin = -8, zMax = 8;
+const yMin = -0.05, yMax = 1.1;
+
+function sigmoid(z) { return 1 / (1 + Math.exp(-z)); }
+function zx(z) { return PAD.left + ((z - zMin) / (zMax - zMin)) * plotW; }
+function yy(y) { return PAD.top + (1 - (y - yMin) / (yMax - yMin)) * plotH; }
+
+let z = 0;
+
+function draw() {
+  ctx.clearRect(0, 0, W, H);
+
+  // Y gridlines + labels
+  ctx.font = '11px Inter, sans-serif';
+  ctx.textAlign = 'right';
+  [0, 0.5, 1].forEach(v => {
+    const y = yy(v);
+    ctx.fillStyle = '#94a3b8';
+    ctx.fillText(v.toFixed(1), PAD.left - 6, y + 4);
+    ctx.strokeStyle = '#e2e8f0';
+    ctx.lineWidth = 0.8;
+    ctx.setLineDash([3, 3]);
+    ctx.beginPath();
+    ctx.moveTo(PAD.left, y);
+    ctx.lineTo(PAD.left + plotW, y);
+    ctx.stroke();
+    ctx.setLineDash([]);
+  });
+
+  // X axis (at y = 0)
+  ctx.strokeStyle = '#cbd5e1';
+  ctx.lineWidth = 1;
+  ctx.beginPath();
+  ctx.moveTo(PAD.left, yy(0));
+  ctx.lineTo(PAD.left + plotW, yy(0));
+  ctx.stroke();
+
+  // X tick labels
+  ctx.textAlign = 'center';
+  ctx.fillStyle = '#94a3b8';
+  [-8, -4, 0, 4, 8].forEach(v => {
+    const x = zx(v);
+    ctx.fillText(v, x, yy(0) + 16);
+  });
+
+  // Axis titles
+  ctx.font = 'italic 12px Inter, sans-serif';
+  ctx.fillStyle = '#64748b';
+  ctx.fillText('z', PAD.left + plotW - 6, yy(0) - 6);
+  ctx.save();
+  ctx.translate(14, PAD.top + 12);
+  ctx.fillText('σ(z)', 0, 0);
+  ctx.restore();
+
+  // Sigmoid curve
+  ctx.strokeStyle = '#00C9A7';
+  ctx.lineWidth = 3.5;
+  ctx.beginPath();
+  for (let px = 0; px <= plotW; px++) {
+    const zv = zMin + (px / plotW) * (zMax - zMin);
+    const yv = sigmoid(zv);
+    const cx = PAD.left + px, cy = yy(yv);
+    if (px === 0) ctx.moveTo(cx, cy);
+    else ctx.lineTo(cx, cy);
+  }
+  ctx.stroke();
+
+  // Drop lines from the moving dot
+  const sx = zx(z), sy = yy(sigmoid(z));
+  ctx.strokeStyle = 'rgba(28,53,94,0.35)';
+  ctx.lineWidth = 1;
+  ctx.setLineDash([4, 4]);
+  ctx.beginPath();
+  ctx.moveTo(sx, sy); ctx.lineTo(sx, yy(0));
+  ctx.moveTo(sx, sy); ctx.lineTo(PAD.left, sy);
+  ctx.stroke();
+  ctx.setLineDash([]);
+
+  // σ(z) value at the y-axis
+  ctx.fillStyle = '#1C355E';
+  ctx.font = 'bold 11px Inter, sans-serif';
+  ctx.textAlign = 'right';
+  ctx.fillText(sigmoid(z).toFixed(2), PAD.left - 6, sy + 4);
+
+  // Current dot
+  ctx.beginPath();
+  ctx.arc(sx, sy, 9, 0, 2 * Math.PI);
+  ctx.fillStyle = '#1C355E';
+  ctx.fill();
+  ctx.strokeStyle = '#fff';
+  ctx.lineWidth = 2.5;
+  ctx.stroke();
+
+  // Update labels
+  document.getElementById('z-val').textContent = z.toFixed(1);
+  document.getElementById('sig-val').textContent = sigmoid(z).toFixed(3);
+}
+
+document.getElementById('z-slider').addEventListener('input', function() {
+  z = parseFloat(this.value) / 10;
+  draw();
+});
+
+draw();
+</script>
+</body>
+</html>

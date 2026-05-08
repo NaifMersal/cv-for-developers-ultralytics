@@ -1,743 +1,449 @@
 [
   {
-    "objectID": "slides/5_HuggingFace_CV.html#agenda",
-    "href": "slides/5_HuggingFace_CV.html#agenda",
+    "objectID": "slides/6_HuggingFace_CV.html#agenda",
+    "href": "slides/6_HuggingFace_CV.html#agenda",
     "title": "HuggingFace for Computer Vision",
     "section": "Agenda",
-    "text": "Agenda\n\n  \n    ✂️\n    SAM3\n    Segment any object with text, boxes, or image exemplars\n  \n  \n    🔍\n    Vision Embeddings\n    Search and classify images by meaning with CLIP & DINOv3\n  \n  \n    🧠\n    Vision LLMs\n    Ask any question about an image — Qwen3.5 & Gemma4\n  \n  \n    📄\n    OCR & Documents\n    Read text, extract fields — all with one VLM\n  \n  \n    ⚙️\n    Fine-tuning & Trainer API\n    The standard way to train and adapt any HuggingFace model to your data\n  \n\n\n\n\nPrerequisites: Parts 1–4 complete. You know YOLO detect / segment / train / export."
+    "text": "Agenda\n\n  \n    ✂️\n    SAM3\n    Segment any object with text, boxes, or image exemplars\n  \n  \n    🔍\n    Vision Embeddings\n    Search and classify images by meaning with CLIP & DINOv3\n  \n  \n    🧠\n    Vision LLMs\n    Ask any question about an image — Qwen3.5 & Gemma4\n  \n  \n    📄\n    OCR & Documents\n    Read text, extract fields — all with one VLM\n  \n  \n    ⚙️\n    Fine-tuning & Trainer API\n    The standard way to train and adapt any HuggingFace model to your data\n  \n\n\n\n\nPrerequisites: Parts 1–5 complete. You know YOLO detect / segment / train / export."
   },
   {
-    "objectID": "slides/5_HuggingFace_CV.html#from-yolo-to-huggingface",
-    "href": "slides/5_HuggingFace_CV.html#from-yolo-to-huggingface",
+    "objectID": "slides/6_HuggingFace_CV.html#from-yolo-to-huggingface",
+    "href": "slides/6_HuggingFace_CV.html#from-yolo-to-huggingface",
     "title": "HuggingFace for Computer Vision",
     "section": "From YOLO to HuggingFace",
     "text": "From YOLO to HuggingFace\n\n\nWhat YOLO gives you\n\n\nDetect, segment, classify, track — fast\n\n\n\n\nPre-trained on COCO (80 classes)\n\n\n\n\nFine-tune on your own data\n\n\n\n\nExport to ONNX / TensorRT for production\n\n\n\nWhat HuggingFace adds\n\n\n500k+ models across all AI tasks\n\n\n\n\nRead text, understand documents\n\n\n\n\nSegment anything without training data\n\n\n\n\nAnswer natural language questions about images\n\n\n\n\n\n\n\nHuggingFace is not a competitor to YOLO — it’s the rest of the toolkit."
   },
   {
-    "objectID": "slides/5_HuggingFace_CV.html#what-is-huggingface",
-    "href": "slides/5_HuggingFace_CV.html#what-is-huggingface",
+    "objectID": "slides/6_HuggingFace_CV.html#what-is-huggingface",
+    "href": "slides/6_HuggingFace_CV.html#what-is-huggingface",
     "title": "HuggingFace for Computer Vision",
     "section": "What Is HuggingFace?",
     "text": "What Is HuggingFace?\n\n  \n    🗂️\n    Hub\n    500k+ models, 100k+ datasets — download any model in one line of Python\n  \n  \n    ⚡\n    transformers\n    One unified Python library for inference, fine-tuning, and deployment of any model\n  \n  \n    🚀\n    Spaces\n    Deploy interactive Gradio apps in minutes — share your model with the world"
   },
   {
-    "objectID": "slides/5_HuggingFace_CV.html#the-pipeline-api",
-    "href": "slides/5_HuggingFace_CV.html#the-pipeline-api",
+    "objectID": "slides/6_HuggingFace_CV.html#the-pipeline-api",
+    "href": "slides/6_HuggingFace_CV.html#the-pipeline-api",
     "title": "HuggingFace for Computer Vision",
     "section": "The pipeline() API",
     "text": "The pipeline() API\n\n\nStandardized interface for 40+ tasks\n\n  \n    from transformers import pipeline\n    pipe = pipeline(\n      \"image-classification\",\n      model=\"google/vit-base\"\n    )\n    res  = pipe(\"cat.jpg\")\n  \n\n\n\n\nOne function to rule them all. No need to learn new code for every new model.\n\n\n\n\n\n\n\nFeature\nYOLO\nHuggingFace\n\n\n\n\nLoad\nYOLO(pt)\npipeline(task)\n\n\nRun\n.predict()\npipe()\n\n\nStorage\nLocal .pt\n~/.cache/hf\n\n\nScope\nCore CV\nEverything AI\n\n\n\n\n\n  HF is the \"App Store\" for AI models."
   },
   {
-    "objectID": "slides/5_HuggingFace_CV.html#the-automodel-pattern",
-    "href": "slides/5_HuggingFace_CV.html#the-automodel-pattern",
+    "objectID": "slides/6_HuggingFace_CV.html#the-automodel-pattern",
+    "href": "slides/6_HuggingFace_CV.html#the-automodel-pattern",
     "title": "HuggingFace for Computer Vision",
     "section": "The AutoModel Pattern",
     "text": "The AutoModel Pattern\n\nQuick — pipeline()Full Control — AutoModel\n\n\nfrom transformers import pipeline\n\n# Download + load + run in 3 lines\npipe = pipeline(\"image-to-text\", model=\"Qwen/Qwen3.5-27B\")\nresult = pipe(\"invoice.png\", text=\"What text is in this image?\")\nprint(result)\n\n\nfrom transformers import AutoProcessor, AutoModelForCausalLM\nfrom PIL import Image\nimport torch\n\n# Load separately for fine-tuning, batching, or custom logic\nprocessor = AutoProcessor.from_pretrained(\"Qwen/Qwen3.5-27B\")\nmodel     = AutoModelForCausalLM.from_pretrained(\n                \"Qwen/Qwen3.5-27B\", device_map=\"auto\"\n            )\n\nimage   = Image.open(\"invoice.png\").convert(\"RGB\")\ninputs  = processor(images=image, text=\"What text is in this image?\",\n                    return_tensors=\"pt\").to(model.device)\noutputs = model.generate(**inputs, max_new_tokens=256)\nprint(processor.decode(outputs[0], skip_special_tokens=True))\n\n\n\n\n\n\nUse pipeline() for exploration. Use AutoModel when you need batching, fine-tuning, or integration into a training loop."
   },
   {
-    "objectID": "slides/5_HuggingFace_CV.html#the-trainer-api-how-to-fine-tune",
-    "href": "slides/5_HuggingFace_CV.html#the-trainer-api-how-to-fine-tune",
+    "objectID": "slides/6_HuggingFace_CV.html#the-trainer-api-how-to-fine-tune",
+    "href": "slides/6_HuggingFace_CV.html#the-trainer-api-how-to-fine-tune",
     "title": "HuggingFace for Computer Vision",
     "section": "The Trainer API: How to Fine-tune",
     "text": "The Trainer API: How to Fine-tune\n\n\nThe standard way to adapt any model\n\nHandles training loops, evaluation, and logging automatically.\nCheckpointing and model saving built-in.\nMulti-GPU support via accelerate.\n\n\n\n\nOne script to train almost any model on the Hub.\n\n\n\n\nfrom transformers import TrainingArguments, Trainer\n\n# 1. Configure the training setup\nargs = TrainingArguments(\n    output_dir=\"my_model\",\n    per_device_train_batch_size=8,\n    num_train_epochs=3,\n    evaluation_strategy=\"epoch\",\n    logging_steps=10\n)\n\n# 2. Initialize and run\ntrainer = Trainer(\n    model=model, \n    args=args, \n    train_dataset=train_data,\n    eval_dataset=val_data\n)\n\ntrainer.train()"
   },
   {
-    "objectID": "slides/5_HuggingFace_CV.html#youve-already-met-sam",
-    "href": "slides/5_HuggingFace_CV.html#youve-already-met-sam",
+    "objectID": "slides/6_HuggingFace_CV.html#youve-already-met-sam",
+    "href": "slides/6_HuggingFace_CV.html#youve-already-met-sam",
     "title": "HuggingFace for Computer Vision",
     "section": "You’ve Already Met SAM",
     "text": "You’ve Already Met SAM\n\n\nPart 3: Labeling\nSAM as a data assistant\n\nInput: Concept or Example\nOutput: Training Labels\nGoal: Faster YOLO Datasets\n\nToday: Inference\nSAM3 as a standalone engine\n\nZero-Shot: No training needed\nPCS: Promptable segmentation\nGoal: Direct production use"
   },
   {
-    "objectID": "slides/5_HuggingFace_CV.html#the-prompting-idea",
-    "href": "slides/5_HuggingFace_CV.html#the-prompting-idea",
+    "objectID": "slides/6_HuggingFace_CV.html#the-prompting-idea",
+    "href": "slides/6_HuggingFace_CV.html#the-prompting-idea",
     "title": "HuggingFace for Computer Vision",
     "section": "The Prompting Idea",
     "text": "The Prompting Idea\n\n\n\n\n\n\n\n\n\n\n\n\nSAM does not need manual class labels. Give it a description (text) or a visual template (box/image) — it figures out the boundary."
   },
   {
-    "objectID": "slides/5_HuggingFace_CV.html#sam3-text-only-prompt",
-    "href": "slides/5_HuggingFace_CV.html#sam3-text-only-prompt",
+    "objectID": "slides/6_HuggingFace_CV.html#sam3-text-only-prompt",
+    "href": "slides/6_HuggingFace_CV.html#sam3-text-only-prompt",
     "title": "HuggingFace for Computer Vision",
     "section": "SAM3: Text-Only Prompt",
     "text": "SAM3: Text-Only Prompt\n\n\n\nNew in SAM 3: Promptable Concept Segmentation. You can now segment by name!\nHugging Face Docs | Ultralytics Docs\n\n\n\n\n\n\nGated Model: SAM 3 requires users to accept the license on Hugging Face before downloading. Ensure you are logged in using huggingface-cli login.\n\n\n\nfrom transformers import Sam3Model, Sam3Processor\nfrom PIL import Image\nimport torch\n\nmodel     = Sam3Model.from_pretrained(\"facebook/sam3\")\nprocessor = Sam3Processor.from_pretrained(\"facebook/sam3\")\n\nimage = Image.open(\"highway.jpg\").convert(\"RGB\")\n\n# Segment by concept name\ninputs = processor(images=image, text=\"yellow school bus\", return_tensors=\"pt\")\n\nwith torch.no_grad():\n    outputs = model(**inputs)\n\n# Post-process to get binary masks and confidence scores\nresults = processor.post_process_instance_segmentation(\n    outputs, \n    threshold=0.5,\n    target_sizes=inputs.get(\"original_sizes\").tolist()\n)[0]\n\nprint(f\"Detected {len(results['masks'])} buses\")"
   },
   {
-    "objectID": "slides/5_HuggingFace_CV.html#sam3-negative-box-refinement",
-    "href": "slides/5_HuggingFace_CV.html#sam3-negative-box-refinement",
+    "objectID": "slides/6_HuggingFace_CV.html#sam3-negative-box-refinement",
+    "href": "slides/6_HuggingFace_CV.html#sam3-negative-box-refinement",
     "title": "HuggingFace for Computer Vision",
     "section": "SAM3: Negative Box Refinement",
     "text": "SAM3: Negative Box Refinement\n\n\n\nSAM3 uses Concepts (text or templates). If a text prompt is too broad, use negative boxes to exclude specific areas.\n\n\n\n# Segment \"handle\" but exclude the oven handle using a negative box\ntext = \"handle\"\n# Box in [x1, y1, x2, y2] format\noven_handle_box = [40, 183, 318, 204]\n\ninputs = processor(\n    images=image, \n    text=text, \n    input_boxes=[[oven_handle_box]], \n    input_boxes_labels=[[0]], # 0 = negative (exclude this region)\n    return_tensors=\"pt\"\n).to(device)\n\nwith torch.no_grad():\n    outputs = model(**inputs)\n\nresults = processor.post_process_instance_segmentation(\n    outputs, threshold=0.5, target_sizes=inputs.get(\"original_sizes\").tolist()\n)[0]\n\n\n\nLabel conventions: 1 = Positive (include), 0 = Negative (exclude)."
   },
   {
-    "objectID": "slides/5_HuggingFace_CV.html#sam3-use-cases",
-    "href": "slides/5_HuggingFace_CV.html#sam3-use-cases",
+    "objectID": "slides/6_HuggingFace_CV.html#sam3-use-cases",
+    "href": "slides/6_HuggingFace_CV.html#sam3-use-cases",
     "title": "HuggingFace for Computer Vision",
     "section": "SAM3 Use Cases",
     "text": "SAM3 Use Cases\n\n  \n    🏗️\n    Construction Monitoring\n    Segment excavation zones, equipment, and safety areas from drone or aerial imagery\n  \n  \n    🌴\n    Crop & Land Analysis\n    Segment individual date palm trees from satellite imagery for yield estimation\n  \n  \n    🏥\n    Medical Imaging\n    Segment organs or lesions in MRI/CT scans — zero labeled training images required\n  \n  \n    🛒\n    Retail Product Cutouts\n    Isolate products from shelf images for catalog photography without manual editing"
   },
   {
-    "objectID": "slides/5_HuggingFace_CV.html#what-is-an-embedding",
-    "href": "slides/5_HuggingFace_CV.html#what-is-an-embedding",
+    "objectID": "slides/6_HuggingFace_CV.html#what-is-an-embedding",
+    "href": "slides/6_HuggingFace_CV.html#what-is-an-embedding",
     "title": "HuggingFace for Computer Vision",
     "section": "What Is an Embedding?",
     "text": "What Is an Embedding?\n\n\nPixels tell you what color is at x, y. Embeddings tell you what the image means.\n\nDense vector (e.g., 768 numbers)\nClose together = similar concepts\nFar apart = different meanings\n\n\n\n\nIt’s a “mental map” for AI. It doesn’t see lines; it sees identity."
   },
   {
-    "objectID": "slides/5_HuggingFace_CV.html#clip-logic-over-pixels",
-    "href": "slides/5_HuggingFace_CV.html#clip-logic-over-pixels",
+    "objectID": "slides/6_HuggingFace_CV.html#clip-logic-over-pixels",
+    "href": "slides/6_HuggingFace_CV.html#clip-logic-over-pixels",
     "title": "HuggingFace for Computer Vision",
     "section": "CLIP: Logic Over Pixels",
     "text": "CLIP: Logic Over Pixels\n\n\nCLIP (OpenAI) connects words to images by watching 400M pairs.\n\nContrastive Learning: Makes images and text describe each other.\nShared “Meaning Space”.\n\n\n\n\nWith CLIP, you don’t “label” a model. You “describe” what you want to find."
   },
   {
-    "objectID": "slides/5_HuggingFace_CV.html#clip-zero-shot-classification",
-    "href": "slides/5_HuggingFace_CV.html#clip-zero-shot-classification",
+    "objectID": "slides/6_HuggingFace_CV.html#clip-zero-shot-classification",
+    "href": "slides/6_HuggingFace_CV.html#clip-zero-shot-classification",
     "title": "HuggingFace for Computer Vision",
     "section": "CLIP: Zero-Shot Classification",
     "text": "CLIP: Zero-Shot Classification\nClassify anything you can describe\nCLIP scores labels against images without needing labeled training data.\n\nAny Class: “overexposed”, “foggy”, “night-time”\nRare Objects: Concepts YOLO wasn’t trained on\nDomain Specific: Complex terminology (medical, satellite)\n\n\n\n\nHugging Face CLIP Documentation\n\n\n\n\n\n\nThink of it as “Visual Entailment” — how well does this text describe this image?"
   },
   {
-    "objectID": "slides/5_HuggingFace_CV.html#clip-zero-shot-implementation",
-    "href": "slides/5_HuggingFace_CV.html#clip-zero-shot-implementation",
+    "objectID": "slides/6_HuggingFace_CV.html#clip-zero-shot-implementation",
+    "href": "slides/6_HuggingFace_CV.html#clip-zero-shot-implementation",
     "title": "HuggingFace for Computer Vision",
     "section": "CLIP: Zero-Shot Implementation",
     "text": "CLIP: Zero-Shot Implementation\nmodel     = CLIPModel.from_pretrained(\"openai/clip-vit-base-patch32\")\nprocessor = CLIPProcessor.from_pretrained(\"openai/clip-vit-base-patch32\")\n\nimage  = Image.open(\"scene.jpg\")\nlabels = [\"construction site\", \"street market\", \"desert\", \"office\"]\n\ninputs = processor(text=labels, images=image, return_tensors=\"pt\", padding=True)\noutput = model(**inputs)\nprobs  = output.logits_per_image.softmax(dim=1)\n\nfor label, prob in zip(labels, probs[0]):\n    print(f\"{label}: {prob.item():.3f}\")"
   },
   {
-    "objectID": "slides/5_HuggingFace_CV.html#clip-image-similarity-search",
-    "href": "slides/5_HuggingFace_CV.html#clip-image-similarity-search",
+    "objectID": "slides/6_HuggingFace_CV.html#clip-image-similarity-search",
+    "href": "slides/6_HuggingFace_CV.html#clip-image-similarity-search",
     "title": "HuggingFace for Computer Vision",
     "section": "CLIP: Image Similarity Search",
     "text": "CLIP: Image Similarity Search\nSearch by Visual “Meaning”\nFind images that look like the query image without manual keywords.\n\nEmbed: Pre-convert your image library into vectors.\nQuery: Convert the user’s target image to a vector.\nMatch: Use cosine similarity to find the nearest neighbors.\n\n\n\n\nFor millions of images, use a vector DB like FAISS or Qdrant for sub-millisecond search.\n\n\n\nCommon Use Cases:\n\nE-commerce recommendations (“Shop the Look”)\nQuality control (finding matching defects)\nDataset deduplication"
   },
   {
-    "objectID": "slides/5_HuggingFace_CV.html#clip-similarity-implementation",
-    "href": "slides/5_HuggingFace_CV.html#clip-similarity-implementation",
+    "objectID": "slides/6_HuggingFace_CV.html#clip-similarity-implementation",
+    "href": "slides/6_HuggingFace_CV.html#clip-similarity-implementation",
     "title": "HuggingFace for Computer Vision",
     "section": "CLIP: Similarity Implementation",
     "text": "CLIP: Similarity Implementation\ndef embed(path):\n    img    = Image.open(path).convert(\"RGB\")\n    inputs = processor(images=img, return_tensors=\"pt\")\n    with torch.no_grad():\n        feat = model.get_image_features(**inputs)\n    return F.normalize(feat, dim=-1)\n\n# 1. Build index\nimage_paths = [\"img1.jpg\", \"img2.jpg\", ...]\nindex = torch.cat([embed(p) for p in image_paths])\n\n# 2. Query\nquery  = embed(\"query.jpg\")\nscores = (query @ index.T).squeeze()\ntop5   = scores.topk(5).indices"
   },
   {
-    "objectID": "slides/5_HuggingFace_CV.html#dinov3-the-vision-backbone",
-    "href": "slides/5_HuggingFace_CV.html#dinov3-the-vision-backbone",
+    "objectID": "slides/6_HuggingFace_CV.html#dinov3-the-vision-backbone",
+    "href": "slides/6_HuggingFace_CV.html#dinov3-the-vision-backbone",
     "title": "HuggingFace for Computer Vision",
     "section": "DINOv3: The Vision Backbone",
     "text": "DINOv3: The Vision Backbone\nSelf-Supervised Excellence\nDINO (Self-Distillation with No Labels) learns from images alone.\n\nUniversal: Works for any domain (X-ray, Satellite, Microscopic).\nSpatial Precision: Excellent for segmentation and depth tasks.\nRobustness: Deep understanding of object geometry.\n\n\n\n\nHugging Face DINOv3 Documentation\n\n\n\n\n\n\nGated Model: Like SAM 3, DINOv3 requires you to request access on the Hugging Face model page before it can be downloaded.\n\n\n\n\n\n\nCLIP is for text-to-image. DINO is for pure vision (pixel detail)."
   },
   {
-    "objectID": "slides/5_HuggingFace_CV.html#dinov3-feature-extraction",
-    "href": "slides/5_HuggingFace_CV.html#dinov3-feature-extraction",
+    "objectID": "slides/6_HuggingFace_CV.html#dinov3-feature-extraction",
+    "href": "slides/6_HuggingFace_CV.html#dinov3-feature-extraction",
     "title": "HuggingFace for Computer Vision",
     "section": "DINOv3: Feature Extraction",
     "text": "DINOv3: Feature Extraction\nMODEL = \"facebook/dinov3-vitb16-pretrain-lvd1689m\"\nmodel = AutoModel.from_pretrained(MODEL, device_map=\"auto\")\nproc  = AutoImageProcessor.from_pretrained(MODEL)\n\nimage  = load_image(\"satellite_crop.jpg\")\ninputs = proc(images=image, return_tensors=\"pt\").to(model.device)\n\nwith torch.inference_mode():\n    out = model(**inputs)\n\n# Global embedding (image-level)\nglobal_feat = out.pooler_output\n\n# Patch-level features (pixel-level detail)\npatch_feats = out.last_hidden_state"
   },
   {
-    "objectID": "slides/5_HuggingFace_CV.html#clip-vs-dinov3",
-    "href": "slides/5_HuggingFace_CV.html#clip-vs-dinov3",
+    "objectID": "slides/6_HuggingFace_CV.html#clip-vs-dinov3",
+    "href": "slides/6_HuggingFace_CV.html#clip-vs-dinov3",
     "title": "HuggingFace for Computer Vision",
     "section": "CLIP vs DINOv3",
     "text": "CLIP vs DINOv3\n\n\n\n\nCLIP\nDINOv3\n\n\nTraining data\nImage + text pairs\nImages only (self-supervised)\n\n\nZero-shot via text\n✅ Yes\n❌ Image-only search\n\n\nSpatial detail\nModerate (global)\nExcellent (patch-level)\n\n\nBest for\nText-guided search, zero-shot classify\nImage-only retrieval, fine-grained tasks\n\n\n\n\n\n\nRule of thumb: if you can describe what you’re looking for in words, use CLIP. If you have an example image, DINOv3 gives richer features."
   },
   {
-    "objectID": "slides/5_HuggingFace_CV.html#embedding-use-cases",
-    "href": "slides/5_HuggingFace_CV.html#embedding-use-cases",
+    "objectID": "slides/6_HuggingFace_CV.html#embedding-use-cases",
+    "href": "slides/6_HuggingFace_CV.html#embedding-use-cases",
     "title": "HuggingFace for Computer Vision",
     "section": "Embedding Use Cases",
     "text": "Embedding Use Cases\n\n  \n    🛒\n    E-Commerce Search\n    Customers upload a photo → find visually matching products in your catalog\n  \n  \n    🏥\n    Medical Retrieval\n    Find historical scans similar to a patient's current imaging — no labels needed\n  \n  \n    🛰️\n    Satellite & Geospatial\n    Query large-scale image archives by visual similarity — land cover, change detection\n  \n  \n    🔬\n    Dataset Curation\n    Find near-duplicate images or cluster unlabeled data before training"
   },
   {
-    "objectID": "slides/5_HuggingFace_CV.html#the-vision-intelligence-ladder",
-    "href": "slides/5_HuggingFace_CV.html#the-vision-intelligence-ladder",
+    "objectID": "slides/6_HuggingFace_CV.html#the-vision-intelligence-ladder",
+    "href": "slides/6_HuggingFace_CV.html#the-vision-intelligence-ladder",
     "title": "HuggingFace for Computer Vision",
     "section": "The Vision Intelligence Ladder",
     "text": "The Vision Intelligence Ladder\n\n\n\n\n\n\n\n\n\n\n\n\nYou’ve now learned every level of this ladder across Parts 1–6."
   },
   {
-    "objectID": "slides/5_HuggingFace_CV.html#what-is-a-vision-llm",
-    "href": "slides/5_HuggingFace_CV.html#what-is-a-vision-llm",
+    "objectID": "slides/6_HuggingFace_CV.html#what-is-a-vision-llm",
+    "href": "slides/6_HuggingFace_CV.html#what-is-a-vision-llm",
     "title": "HuggingFace for Computer Vision",
     "section": "What Is a Vision LLM?",
     "text": "What Is a Vision LLM?\n\n  🖼  Image\n   + \n  💬 \"How many people are wearing helmets?\"\n   → \n  Model\n   → \n  \"3 out of 5 workers are wearing helmets.\"\n\n\n\nThree things the model does:\n\nSees the image — encodes it into visual tokens (similar to how CLIP or DINOv3 works)\nReads your question — processes it as text tokens\nGenerates an answer — attends to both image and text together\n\n\n\n\n\n\nNo class list. No bounding boxes. Just ask your question in plain language."
   },
   {
-    "objectID": "slides/5_HuggingFace_CV.html#qwen3.5-multilingual-visual-reasoning",
-    "href": "slides/5_HuggingFace_CV.html#qwen3.5-multilingual-visual-reasoning",
+    "objectID": "slides/6_HuggingFace_CV.html#qwen3.5-multilingual-visual-reasoning",
+    "href": "slides/6_HuggingFace_CV.html#qwen3.5-multilingual-visual-reasoning",
     "title": "HuggingFace for Computer Vision",
     "section": "Qwen3.5: Multilingual Visual Reasoning",
     "text": "Qwen3.5: Multilingual Visual Reasoning\nQwen 3.5 collection Qwen/Qwen3.5-27B\n\nVision + video + text — unified multimodal\n262K token context window\nStrong Arabic and multilingual support\nApache 2.0 license\nThinking mode by default (generates reasoning before answering)"
   },
   {
-    "objectID": "slides/5_HuggingFace_CV.html#gemma4-lightweight-on-device-vision",
-    "href": "slides/5_HuggingFace_CV.html#gemma4-lightweight-on-device-vision",
+    "objectID": "slides/6_HuggingFace_CV.html#gemma4-lightweight-on-device-vision",
+    "href": "slides/6_HuggingFace_CV.html#gemma4-lightweight-on-device-vision",
     "title": "HuggingFace for Computer Vision",
     "section": "Gemma4: Lightweight On-Device Vision",
     "text": "Gemma4: Lightweight On-Device Vision\ngoogle/gemma-4-E2B-it\n\n2.3B effective parameters — fast and practical\nTrue multimodal: image + text + audio inputs\n\n\n\n\nHugging Face Gemma 4 Documentation\n\n\n\n\nOpen weights, Apache 2.0 license\nRuns on a single consumer GPU"
   },
   {
-    "objectID": "slides/5_HuggingFace_CV.html#ocr-as-a-vlm-use-case",
-    "href": "slides/5_HuggingFace_CV.html#ocr-as-a-vlm-use-case",
+    "objectID": "slides/6_HuggingFace_CV.html#ocr-as-a-vlm-use-case",
+    "href": "slides/6_HuggingFace_CV.html#ocr-as-a-vlm-use-case",
     "title": "HuggingFace for Computer Vision",
     "section": "OCR as a VLM Use Case",
     "text": "OCR as a VLM Use Case\nWhy use a VLM for OCR?\n\nHandles Arabic, handwriting, curved text, and mixed scripts without special models\nUnderstands context — not just characters, but what the text means\nWorks on full documents, not just single-line crops\nOne model for everything\n\n\n\n\n\nNo TrOCR. No LayoutLM. No separate OCR pipeline — just ask the model."
   },
   {
-    "objectID": "slides/5_HuggingFace_CV.html#a-moving-target-benchmarks",
-    "href": "slides/5_HuggingFace_CV.html#a-moving-target-benchmarks",
+    "objectID": "slides/6_HuggingFace_CV.html#a-moving-target-benchmarks",
+    "href": "slides/6_HuggingFace_CV.html#a-moving-target-benchmarks",
     "title": "HuggingFace for Computer Vision",
     "section": "A Moving Target: Benchmarks",
     "text": "A Moving Target: Benchmarks\n\n\n\nThe field moves fast. New models are released weekly — always check if a better tool has emerged for your use case.\n\n\n\nHow to find the best model for your task:\n\nArtificial Analysis — Comparison of performance, speed, and cost.\nBalsam Leaderboard — Specialized benchmarks for Arabic AI by KSAA.\nArabic LLM Leaderboard — Silma.ai’s ranking of Arabic language models.\nOpen Arabic LLM Leaderboard (OALL) — The community hub for Arabic model evaluation.\n\n\n\n\nPro-tip: Don’t just look at global scores. Look at benchmarks that match your specific domain (e.g., Arabic, medical, or drone imagery)."
   },
   {
-    "objectID": "slides/5_HuggingFace_CV.html#when-to-use-what",
-    "href": "slides/5_HuggingFace_CV.html#when-to-use-what",
+    "objectID": "slides/6_HuggingFace_CV.html#when-to-use-what",
+    "href": "slides/6_HuggingFace_CV.html#when-to-use-what",
     "title": "HuggingFace for Computer Vision",
     "section": "When to Use What",
     "text": "When to Use What"
   },
   {
-    "objectID": "slides/5_HuggingFace_CV.html#your-complete-toolkit",
-    "href": "slides/5_HuggingFace_CV.html#your-complete-toolkit",
+    "objectID": "slides/6_HuggingFace_CV.html#your-complete-toolkit",
+    "href": "slides/6_HuggingFace_CV.html#your-complete-toolkit",
     "title": "HuggingFace for Computer Vision",
     "section": "Your Complete Toolkit",
     "text": "Your Complete Toolkit\n\n  \n    🎯\n    YOLO (Ultralytics)\n    Detect · Segment · Pose · Track — fast, production-ready, exportable\n  \n  \n    ✂️\n    SAM3\n    Zero-shot segmentation — any object, any domain, point or box prompt\n  \n  \n    🔍\n    CLIP + DINOv3\n    Semantic image search — by text description or visual similarity\n  \n  \n    🧠\n    Qwen3.5 + Gemma4\n    Visual reasoning, OCR, document understanding — ask anything in any language"
   },
   {
-    "objectID": "slides/5_HuggingFace_CV.html#qa",
-    "href": "slides/5_HuggingFace_CV.html#qa",
+    "objectID": "slides/6_HuggingFace_CV.html#qa",
+    "href": "slides/6_HuggingFace_CV.html#qa",
     "title": "HuggingFace for Computer Vision",
     "section": "Q&A",
     "text": "Q&A\n\nThank You!\nAny questions?"
   },
   {
-    "objectID": "slides/3_Custom_Data_Training.html#key-training-concepts",
-    "href": "slides/3_Custom_Data_Training.html#key-training-concepts",
-    "title": "Ultralytics YOLO Foundations: Part 3",
-    "section": "Key Training Concepts",
-    "text": "Key Training Concepts\nBefore we dive in, let’s lock down the terminology:\n\nModel: The mathematical structure with learned weights (e.g., weights/yolo26n.pt).\nEpoch: One complete pass through your entire training dataset.\nmAP (Mean Average Precision): The ultimate grading score (0-100%). It grades how well the model finds the object AND correctly identifies it!"
+    "objectID": "slides/4_Custom_Data_Training.html#from-part-1-fimage-output",
+    "href": "slides/4_Custom_Data_Training.html#from-part-1-fimage-output",
+    "title": "Ultralytics YOLO Foundations: Part 4",
+    "section": "From Part 1: f(image) → output",
+    "text": "From Part 1: f(image) → output\n\nIn Part 1: a model is f, learned from data, mapping image → output.\n\nThat’s what it does — not how it learns.\n\n\nThis section: how f goes from random guesses to useful predictions.\n\n\n\n\n\nWe’ll build it up from a toy color classifier, then scale to YOLO."
   },
   {
-    "objectID": "slides/3_Custom_Data_Training.html#train-vs.-validation",
-    "href": "slides/3_Custom_Data_Training.html#train-vs.-validation",
-    "title": "Ultralytics YOLO Foundations: Part 3",
+    "objectID": "slides/4_Custom_Data_Training.html#the-learning-loop",
+    "href": "slides/4_Custom_Data_Training.html#the-learning-loop",
+    "title": "Ultralytics YOLO Foundations: Part 4",
+    "section": "The Learning Loop",
+    "text": "The Learning Loop\n\nTraining isn’t magic; it’s a repetitive cycle of refinement.\n\n\nDefine a Function: Create a mapping from data to predictions (\\(f\\)).\n\n\n\n\nEvaluate Performance: Measure exactly how “wrong” the current function is (Loss).\n\n\n\n\nOptimize & Repeat: Update the function’s parameters to reduce that error (Optimization).\n\n\n\n\n\n\nWe start with a guess and “tune” the knobs until we’re happy with the results."
+  },
+  {
+    "objectID": "slides/4_Custom_Data_Training.html#a-naive-classifier-from-color",
+    "href": "slides/4_Custom_Data_Training.html#a-naive-classifier-from-color",
+    "title": "Ultralytics YOLO Foundations: Part 4",
+    "section": "A Naive Classifier from Color",
+    "text": "A Naive Classifier from Color\nTask: Is this a red car? — output should eventually be a probability.\n\nSimplest feature: average red pixel value (0-255).\n\\[f(\\text{image}) \\approx x_{\\text{red}}(\\text{image})\\]"
+  },
+  {
+    "objectID": "slides/4_Custom_Data_Training.html#from-a-number-to-a-probability",
+    "href": "slides/4_Custom_Data_Training.html#from-a-number-to-a-probability",
+    "title": "Ultralytics YOLO Foundations: Part 4",
+    "section": "From a Number to a Probability",
+    "text": "From a Number to a Probability\n\nThe average red value lands in [0, 255] — but it’s just a raw number. To learn, we need parameters.\n\nAdd weights to calculate a score (\\(z\\)):\n\\[z = w \\cdot x_{\\text{red}} + b\\]\n\n\n\n\\(w\\) (Weight): How much does “redness” matter?\n\\(b\\) (Bias): Baseline assumption (are red cars common?)\n\n\n\nNow \\(z\\) depends on \\(w\\) and \\(b\\) — but it’s unbounded: it can go negative or exceed 1.\n\n\n\n\n\nProblem: We need a function that maps any real number → [0, 1] for a probability."
+  },
+  {
+    "objectID": "slides/4_Custom_Data_Training.html#the-sigmoid",
+    "href": "slides/4_Custom_Data_Training.html#the-sigmoid",
+    "title": "Ultralytics YOLO Foundations: Part 4",
+    "section": "The Sigmoid",
+    "text": "The Sigmoid\n\n\nThe Squashing Function\n\\[\\sigma(z) = \\frac{1}{1 + e^{-z}}\\]\n\n\nLarge +z → near 1.0\nLarge −z → near 0.0\nz = 0 → 0.5\n\n\n\n\n\n\n\n\n\n\n\n\n\n\nPrediction: \\[f(\\text{image}) = \\sigma(\\underbrace{w \\cdot x_{\\text{red}} + b}_{\\text{score } z})\\]"
+  },
+  {
+    "objectID": "slides/4_Custom_Data_Training.html#why-metrics-arent-enough-for-learning",
+    "href": "slides/4_Custom_Data_Training.html#why-metrics-arent-enough-for-learning",
+    "title": "Ultralytics YOLO Foundations: Part 4",
+    "section": "Why Metrics Aren’t Enough for Learning",
+    "text": "Why Metrics Aren’t Enough for Learning\nWe have predictions. From Part 3, we know how to grade them — mAP, Precision, Recall. So why not just train against those?\n\n\n\n\n\nDiscrete (Problem)\n\n\nmAP, Precision, Recall\nSmall weight changes → zero change in the metric.\n\n\n\n\n\n\n\n\n\nSmooth (Solution)\n\n\nTraining Loss\nEvery tiny adjustment is mathematically measurable.\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\nSo we need a smooth substitute. Enter the loss.\n\n\n\n\n\n\nWe skip deeper technical details to keep the intuition front and center."
+  },
+  {
+    "objectID": "slides/4_Custom_Data_Training.html#measuring-wrongness-the-idea",
+    "href": "slides/4_Custom_Data_Training.html#measuring-wrongness-the-idea",
+    "title": "Ultralytics YOLO Foundations: Part 4",
+    "section": "Measuring Wrongness — The Idea",
+    "text": "Measuring Wrongness — The Idea\n\nTo evaluate our model, we need a mathematical definition of “wrongness.”\n\n\n\n\n\n\n🤔 Instinct\n\n\nMeasure the raw difference between target and prediction.\n\n\\(\\text{err} = y - f(x)\\)\n\n\n\n\n\n\n\n\n\n\n\n\n🚨 The Flaw\n\n\nTarget = \\(0\\), Prediction = \\(1\\)\n\n\\(0 - 1 = \\mathbf{-1}\\)\n\nThe model seeks the lowest number. It thinks \\(-1\\) is better than \\(0\\) (perfect)!\n\n\n\n\n\n\n\n\n\n\n\n💡 The Fix\n\n\nA mistake of \\(-1\\) is just as bad as \\(+1\\).\nSquare the difference:\n\n\\(\\text{err}^2 = (y - f(x))^2\\)"
+  },
+  {
+    "objectID": "slides/4_Custom_Data_Training.html#measuring-wrongness-example",
+    "href": "slides/4_Custom_Data_Training.html#measuring-wrongness-example",
+    "title": "Ultralytics YOLO Foundations: Part 4",
+    "section": "Measuring Wrongness — Example",
+    "text": "Measuring Wrongness — Example\nLet’s start with a random guess: w = 0.06, b = -14.0\n\n\n\nImage A — Red Car\n\n\\(x_{\\text{red}} \\approx 247\\)\n\n\n\n\n\n\nImage B — Not a Red Car\n\n\\(x_{\\text{red}} \\approx 212\\)\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\nScore: \\(z = 0.06(247) - 14.0 = 0.82\\)\nPrediction: \\(f(x) = \\sigma(0.82) \\approx 0.69\\)\n\\(\\text{err} = (1 - 0.69)^2 = \\mathbf{0.10}\\)\n\n\n\n\n\n\n\n\n\n\n\nScore: \\(z = 0.06(212) - 14.0 = -1.28\\)\nPrediction: \\(f(x) = \\sigma(-1.28) \\approx 0.22\\)\n\\(\\text{err} = (0 - 0.22)^2 = \\mathbf{0.05}\\)"
+  },
+  {
+    "objectID": "slides/4_Custom_Data_Training.html#formalizing-the-loss-mse",
+    "href": "slides/4_Custom_Data_Training.html#formalizing-the-loss-mse",
+    "title": "Ultralytics YOLO Foundations: Part 4",
+    "section": "Formalizing the Loss (MSE)",
+    "text": "Formalizing the Loss (MSE)\n\nTo get a single metric for the whole dataset, we average these squared errors.\n\nFor our two images: Loss = \\(\\frac{0.10 + 0.05}{2}\\) = 0.075\n\n\nThis is called Mean Squared Error (MSE): \\[\\mathcal{L}_{\\text{MSE}} = \\frac{1}{n}\\sum_{i=1}^{n}\\bigl(y_i - f(x_i)\\bigr)^2\\]\n\n\n\n\n\nNote: We use MSE here for simplicity to build intuition. In practice, modern classifiers use Cross-Entropy Loss, which mathematically penalizes highly-confident wrong guesses much more harshly."
+  },
+  {
+    "objectID": "slides/4_Custom_Data_Training.html#following-the-gradient",
+    "href": "slides/4_Custom_Data_Training.html#following-the-gradient",
+    "title": "Ultralytics YOLO Foundations: Part 4",
+    "section": "Following the Gradient",
+    "text": "Following the Gradient\nTwo knobs (w, b). The gradient points where loss drops fastest. Step a little that way. Repeat. → gradient descent.\n\n\n\n\n\n\nLearning Rate: The size of the step. Too large = overshoot; too small = takes forever.\nEpochs: Repeating this process for the entire dataset."
+  },
+  {
+    "objectID": "slides/4_Custom_Data_Training.html#scaling-up-from-color-to-yolo",
+    "href": "slides/4_Custom_Data_Training.html#scaling-up-from-color-to-yolo",
+    "title": "Ultralytics YOLO Foundations: Part 4",
+    "section": "Scaling Up: From Color to YOLO",
+    "text": "Scaling Up: From Color to YOLO\nOur toy: 2 weights, 1 feature (avg red).\n\nYOLO — same idea, scaled:\n\nMillions of weights, learns its own features via Convolutions (filters that automatically detect edges/textures/shapes).\nAnswers many questions per object: where (box), what (class), how sharp (boundary).\n\n\n\nOne loss isn’t enough → YOLO sums several, one per question."
+  },
+  {
+    "objectID": "slides/4_Custom_Data_Training.html#yolos-loss-three-signals",
+    "href": "slides/4_Custom_Data_Training.html#yolos-loss-three-signals",
+    "title": "Ultralytics YOLO Foundations: Part 4",
+    "section": "YOLO’s Loss: Three Signals",
+    "text": "YOLO’s Loss: Three Signals\nTotal loss = sum of three components, each catching a different mistake:\n\n\n\n\nComponent\nAlso called\nWhat it penalizes\n\n\n\n\nBox Loss\nbox_loss\nWrong coordinates\n\n\nClass Loss\ncls_loss\nWrong label\n\n\n\n\n\n\\[\\mathcal{L}_{\\text{total}} = \\lambda_{\\text{box}}\\mathcal{L}_{\\text{box}} + \\lambda_{\\text{cls}}\\mathcal{L}_{\\text{cls}}\\]"
+  },
+  {
+    "objectID": "slides/4_Custom_Data_Training.html#train-vs.-validation",
+    "href": "slides/4_Custom_Data_Training.html#train-vs.-validation",
+    "title": "Ultralytics YOLO Foundations: Part 4",
     "section": "Train vs. Validation",
-    "text": "Train vs. Validation\nTo train a robust AI, split your data:\n\nTrain Set (~80%): Data the model actively learns from.\nValidation Set (~20%): Unseen data evaluated during training to measure performance (mAP).\n\nCrucial: Never train on validation data! This causes Data Leakage where the model memorizes answers but fails in the real world.\nSplit your data into train and validation sets using Ultralytics Data Split or using thier Platform"
+    "text": "Train vs. Validation\n\nTo train a robust AI, split your data:\n\nTrain Set (~80%): Data the model actively learns from.\nValidation Set (~20%): Unseen data evaluated during training to measure performance (mAP).\n\nCrucial: Never train on validation data! This causes Data Leakage where the model memorizes answers but fails in the real world.\n\n\n\nSplit your data automatically using Ultralytics Data Split or using the Platform."
   },
   {
-    "objectID": "slides/3_Custom_Data_Training.html#data-leakage-the-silent-killer",
-    "href": "slides/3_Custom_Data_Training.html#data-leakage-the-silent-killer",
-    "title": "Ultralytics YOLO Foundations: Part 3",
+    "objectID": "slides/4_Custom_Data_Training.html#data-leakage-the-silent-killer",
+    "href": "slides/4_Custom_Data_Training.html#data-leakage-the-silent-killer",
+    "title": "Ultralytics YOLO Foundations: Part 4",
     "section": "Data Leakage: The Silent Killer",
-    "text": "Data Leakage: The Silent Killer\nThe Problem: Validation/test data accidentally ends up in the training set.\nCommon Causes: Duplicate images, wrong temporal splits, or preprocessing before splitting.\nThe Danger: Val metrics look “perfect,” but the model fails in production.\nHow to Avoid:\n\nUse autosplit() for automatic, safe partitioning.\nAvoid manually copying images between split folders.\nCheck for duplicates/hashes before training.\n\n\n\n\nSuspiciously perfect metrics? Check for leakage!"
+    "text": "Data Leakage: The Silent Killer\n\nThe Problem: Validation/test data accidentally ends up in the training set.\nThe Danger: Val metrics look “perfect,” but the model fails in production.\nHow to Avoid: - Use autosplit() for automatic, safe partitioning. - Avoid manually copying images between split folders. - Check for duplicates/hashes before training.\n\n\n\nSuspiciously perfect metrics? Check for leakage!"
   },
   {
-    "objectID": "slides/3_Custom_Data_Training.html#transfer-learning",
-    "href": "slides/3_Custom_Data_Training.html#transfer-learning",
-    "title": "Ultralytics YOLO Foundations: Part 3",
-    "section": "Transfer Learning",
-    "text": "Transfer Learning\n\n.pt (Pretrained weights): Starts with general features (edges, shapes) from large datasets. Fast training, needs little data. (Always recommended!)\n.yaml (Architecture Definition): Blank blueprint. Random weights, meaning you train entirely from scratch.\n\nUse a .pt model for all custom dataset training to leverage Transfer Learning."
-  },
-  {
-    "objectID": "slides/3_Custom_Data_Training.html#understanding-the-data-setup",
-    "href": "slides/3_Custom_Data_Training.html#understanding-the-data-setup",
-    "title": "Ultralytics YOLO Foundations: Part 3",
+    "objectID": "slides/4_Custom_Data_Training.html#understanding-the-data-setup",
+    "href": "slides/4_Custom_Data_Training.html#understanding-the-data-setup",
+    "title": "Ultralytics YOLO Foundations: Part 4",
     "section": "Understanding the Data Setup",
-    "text": "Understanding the Data Setup\nDifferent formats for different tasks:\n\nClassification: Relies entirely on folder structure (e.g., train/cat/, train/dog/). No label files needed!\nDetection & Segmentation: Uses standard YOLO format, pairing images with .txt label files.\n\nmy_dataset/\n├── images/\n│   ├── train/\n│   └── val/\n└── labels/\n    ├── train/\n    └── val/"
+    "text": "Understanding the Data Setup\nDifferent formats for different tasks:\n\nClassification: Relies entirely on folder structure (e.g., train/cat/, train/dog/).\nDetection & Segmentation: Uses standard YOLO format, pairing images with .txt label files.\n\nmy_dataset/\n├── images/\n│   ├── train/\n│   └── val/\n└── labels/\n    ├── train/\n    └── val/"
   },
   {
-    "objectID": "slides/3_Custom_Data_Training.html#inside-the-labels",
-    "href": "slides/3_Custom_Data_Training.html#inside-the-labels",
-    "title": "Ultralytics YOLO Foundations: Part 3",
+    "objectID": "slides/4_Custom_Data_Training.html#inside-the-labels",
+    "href": "slides/4_Custom_Data_Training.html#inside-the-labels",
+    "title": "Ultralytics YOLO Foundations: Part 4",
     "section": "Inside the Labels",
-    "text": "Inside the Labels\n\nObject Detection (.txt Bounding Box): &lt;class_index&gt; &lt;x_center&gt; &lt;y_center&gt; &lt;width&gt; &lt;height&gt;\nInstance Segmentation (.txt Polygon): &lt;class_index&gt; &lt;x1&gt; &lt;y1&gt; &lt;x2&gt; &lt;y2&gt; ... &lt;xn&gt; &lt;yn&gt;\nPose Estimation (.txt Keypoints): &lt;class_index&gt; &lt;x_center&gt; &lt;y_center&gt; &lt;width&gt; &lt;height&gt; &lt;px1&gt; &lt;py1&gt; &lt;p1_vis&gt; ...\n\n⚠ Note: Coordinates must always be normalized (0.0 to 1.0) to keep annotations independent of image resolution!"
+    "text": "Inside the Labels\n\nObject Detection (.txt Bounding Box): &lt;class_index&gt; &lt;x_center&gt; &lt;y_center&gt; &lt;width&gt; &lt;height&gt;\nInstance Segmentation (.txt Polygon): &lt;class_index&gt; &lt;x1&gt; &lt;y1&gt; &lt;x2&gt; &lt;y2&gt; ... &lt;xn&gt; &lt;yn&gt;\n\n⚠ Note: Coordinates must always be normalized (0.0 to 1.0) to keep annotations independent of image resolution!"
   },
   {
-    "objectID": "slides/3_Custom_Data_Training.html#the-data.yaml-file",
-    "href": "slides/3_Custom_Data_Training.html#the-data.yaml-file",
-    "title": "Ultralytics YOLO Foundations: Part 3",
+    "objectID": "slides/4_Custom_Data_Training.html#the-data.yaml-file",
+    "href": "slides/4_Custom_Data_Training.html#the-data.yaml-file",
+    "title": "Ultralytics YOLO Foundations: Part 4",
     "section": "The data.yaml File",
-    "text": "The data.yaml File\nLinking indices to names.\n# data.yaml\npath: ../my_dataset\ntrain: images/train\nval: images/val\n\nnames:\n  0: my_custom_object\n  1: another_object"
+    "text": "The data.yaml File\nLinking indices to names and defining paths.\n# data.yaml\npath: ../my_dataset\ntrain: images/train\nval: images/val\n\nnames:\n  0: my_custom_object\n  1: another_object"
   },
   {
-    "objectID": "slides/3_Custom_Data_Training.html#labeling-your-own-data",
-    "href": "slides/3_Custom_Data_Training.html#labeling-your-own-data",
-    "title": "Ultralytics YOLO Foundations: Part 3",
+    "objectID": "slides/4_Custom_Data_Training.html#labeling-your-own-data",
+    "href": "slides/4_Custom_Data_Training.html#labeling-your-own-data",
+    "title": "Ultralytics YOLO Foundations: Part 4",
     "section": "Labeling Your Own Data",
-    "text": "Labeling Your Own Data\nTyping coordinates manually is impossible. Use Ultralytics HUB, Roboflow, or CVAT.\n\nUpload your images.\nDraw bounding boxes or polygons visually.\nExport in YOLO format for a ready-to-train dataset structure!\n\nDocs Reference: Ultralytics HUB"
+    "text": "Labeling Your Own Data\nTyping coordinates manually is impossible. Use specialized tools to draw boxes or polygons visually:\n\nUpload your images to a platform like Ultralytics HUB, Roboflow, or CVAT.\nDraw bounding boxes or polygons visually on the images.\nExport in YOLO format to get the standard dataset structure ready for training!\n\nDocs Reference: Ultralytics HUB"
   },
   {
-    "objectID": "slides/3_Custom_Data_Training.html#autolabeling-with-sam",
-    "href": "slides/3_Custom_Data_Training.html#autolabeling-with-sam",
-    "title": "Ultralytics YOLO Foundations: Part 3",
+    "objectID": "slides/4_Custom_Data_Training.html#autolabeling-with-sam",
+    "href": "slides/4_Custom_Data_Training.html#autolabeling-with-sam",
+    "title": "Ultralytics YOLO Foundations: Part 4",
     "section": "AutoLabeling with SAM",
-    "text": "AutoLabeling with SAM\nSpeed up the labeling process using foundational models:\n\nZero-Shot Labeling: Bypass manual labeling using SAM (Segment Anything Model) or FastSAM.\nRun the model on your raw dataset to automatically generate masks and bounding boxes.\nThese models understand objects generically without needing custom training!\nSimply review and correct the auto-generated labels—drastically faster than drawing every box or polygon manually!\n\nDocs Reference: Segment Anything Models (SAM)"
+    "text": "AutoLabeling with SAM\nSpeed up the process using foundational models to do the heavy lifting:\n\nZero-Shot Labeling: Bypass manual labeling using SAM (Segment Anything Model) or FastSAM.\nRun the model on your raw dataset to automatically generate masks and bounding boxes.\nThese models understand objects generically without needing custom training!\nSimply review and correct the auto-generated labels—drastically faster than drawing every box from scratch.\n\nDocs Reference: Segment Anything Models (SAM)"
   },
   {
-    "objectID": "slides/3_Custom_Data_Training.html#training",
-    "href": "slides/3_Custom_Data_Training.html#training",
-    "title": "Ultralytics YOLO Foundations: Part 3",
+    "objectID": "slides/4_Custom_Data_Training.html#training",
+    "href": "slides/4_Custom_Data_Training.html#training",
+    "title": "Ultralytics YOLO Foundations: Part 4",
     "section": "Training",
     "text": "Training\nWe can start training directly from the command line or Python API:\nyolo train model=weights/yolo26n.pt data=data.yaml epochs=100 imgsz=640 batch=-1\n# Python Equivalent\nfrom ultralytics import YOLO\n\nmodel = YOLO(\"weights/yolo26n.pt\")\nresults = model.train(data=\"data.yaml\", epochs=100, imgsz=640, batch=-1)"
   },
   {
-    "objectID": "slides/3_Custom_Data_Training.html#resuming-training",
-    "href": "slides/3_Custom_Data_Training.html#resuming-training",
-    "title": "Ultralytics YOLO Foundations: Part 3",
+    "objectID": "slides/4_Custom_Data_Training.html#resuming-training",
+    "href": "slides/4_Custom_Data_Training.html#resuming-training",
+    "title": "Ultralytics YOLO Foundations: Part 4",
     "section": "Resuming Training",
-    "text": "Resuming Training\nIf your training is interrupted (e.g., power outage or Colab timeout), you can easily resume it from the last saved weights without losing progress!\n# Resume training from the last saved checkpoint\nyolo train resume model=path/to/runs/train/exp/weights/last.pt\n# Python Equivalent\nfrom ultralytics import YOLO\n\n# Load the last checkpoint\nmodel = YOLO(\"path/to/runs/train/exp/weights/last.pt\")\n\n# Resume training\nresults = model.train(resume=True)"
+    "text": "Resuming Training\nIf your training is interrupted (e.g., power outage or timeout), you can easily resume it from the last saved weights without losing progress!\n# Resume training from the last saved checkpoint\nyolo train resume model=path/to/runs/train/exp/weights/last.pt\n# Python Equivalent\nfrom ultralytics import YOLO\n\n# Load the last checkpoint\nmodel = YOLO(\"path/to/runs/train/exp/weights/last.pt\")\n\n# Resume training\nresults = model.train(resume=True)"
   },
   {
-    "objectID": "slides/3_Custom_Data_Training.html#important-hyperparameters",
-    "href": "slides/3_Custom_Data_Training.html#important-hyperparameters",
-    "title": "Ultralytics YOLO Foundations: Part 3",
+    "objectID": "slides/4_Custom_Data_Training.html#transfer-learning",
+    "href": "slides/4_Custom_Data_Training.html#transfer-learning",
+    "title": "Ultralytics YOLO Foundations: Part 4",
+    "section": "Transfer Learning",
+    "text": "Transfer Learning\n\n.pt (Pretrained weights): Starts with general features (edges, shapes) from large datasets. Fast training, needs little data. (Always recommended!)\n.yaml (Architecture Definition): Blank blueprint. Random weights, meaning you train entirely from scratch.\n\nUse a .pt model for all custom dataset training to leverage Transfer Learning."
+  },
+  {
+    "objectID": "slides/4_Custom_Data_Training.html#important-hyperparameters",
+    "href": "slides/4_Custom_Data_Training.html#important-hyperparameters",
+    "title": "Ultralytics YOLO Foundations: Part 4",
     "section": "Important Hyperparameters",
-    "text": "Important Hyperparameters\n\nepochs (Default: 100): Pass through the ENTIRE dataset. More = learns more, but risks overfitting.\nbatch (Default: 16): Images processed at once.\n\nHigher = faster, stable, takes more GPU memory.\nSmaller = adds noise, longer training.\nPro-tip: Use batch: -1 for AutoBatch to maximize your GPU memory without crashing!"
+    "text": "Important Hyperparameters\n\nepochs (Default: 100): Pass through the ENTIRE dataset. More = learns more, but risks overfitting.\nbatch (Default: 16): Images processed at once.\n\nHigher = faster, stable, takes more GPU memory.\nSmaller = adds noise, longer training.\nPro-tip: Use batch: -1 for AutoBatch to maximize your GPU memory!\n\nimgsz (Default: 640): Target image size. Larger sizes (e.g., 1024) capture more detail but use more RAM.\ndevice (Default: ’’): Specify GPUs (e.g., device=0,1) to trigger multi-GPU training!\nLearning Rate (lr0) (Default: 0.01): Controls step size—too large and the ball overshoots, too small and training is slow.\nWeight Decay (Default: 0.0005): Penalizes large weights to prevent memorization (🔴 Overfitting).\nPatience (patience) (Default: 100): Stop training if validation metrics haven’t improved for \\(N\\) epochs."
   },
   {
-    "objectID": "slides/3_Custom_Data_Training.html#hyperparameters-image-size-and-hardware",
-    "href": "slides/3_Custom_Data_Training.html#hyperparameters-image-size-and-hardware",
-    "title": "Ultralytics YOLO Foundations: Part 3",
-    "section": "Hyperparameters: Image Size and Hardware",
-    "text": "Hyperparameters: Image Size and Hardware\n\nimgsz (Default: 640): Target image size. Larger sizes (e.g., 1024) capture more detail (great for tiny objects!) but use more RAM and are slower.\ndevice (Default: ’’): Specify GPUs (e.g., device=0,1) to trigger multi-GPU training!"
-  },
-  {
-    "objectID": "slides/3_Custom_Data_Training.html#tip-for-tiny-objects-sahi",
-    "href": "slides/3_Custom_Data_Training.html#tip-for-tiny-objects-sahi",
-    "title": "Ultralytics YOLO Foundations: Part 3",
-    "section": "💡 Tip for Tiny Objects: SAHI",
-    "text": "💡 Tip for Tiny Objects: SAHI\nProblem: A 4K image resized to 640px makes tiny objects invisible to YOLO.\nSolution — SAHI (Slicing Aided Hyper Inference):\n\nSlice the large image into small, overlapping tiles\nRun YOLO on each tile at full resolution\nMerge all detections back together automatically"
-  },
-  {
-    "objectID": "slides/3_Custom_Data_Training.html#demonstration-sahi-sliced-inference",
-    "href": "slides/3_Custom_Data_Training.html#demonstration-sahi-sliced-inference",
-    "title": "Ultralytics YOLO Foundations: Part 3",
-    "section": "Demonstration: SAHI Sliced Inference",
-    "text": "Demonstration: SAHI Sliced Inference"
-  },
-  {
-    "objectID": "slides/3_Custom_Data_Training.html#using-config-files-best-practice",
-    "href": "slides/3_Custom_Data_Training.html#using-config-files-best-practice",
-    "title": "Ultralytics YOLO Foundations: Part 3",
+    "objectID": "slides/4_Custom_Data_Training.html#using-config-files-best-practice",
+    "href": "slides/4_Custom_Data_Training.html#using-config-files-best-practice",
+    "title": "Ultralytics YOLO Foundations: Part 4",
     "section": "Using Config Files (Best Practice)",
-    "text": "Using Config Files (Best Practice)\nFor reproducibility, put arguments into a experiment.yaml file:\n# experiment.yaml\ntask: detect\nmode: train\nmodel: yolo26s.pt\ndata: data.yaml    \nepochs: 100\nbatch: 16\nimgsz: 640\nRun with:\nyolo cfg=experiment.yaml"
+    "text": "Using Config Files (Best Practice)\nFor reproducibility, put arguments into an experiment.yaml file:\n# experiment.yaml\ntask: detect\nmode: train\nmodel: yolo26s.pt\ndata: data.yaml    \nepochs: 100\nbatch: 16\nimgsz: 640\nRun with:\nyolo cfg=experiment.yaml\n# Or in Python\nmodel.train(cfg=\"experiment.yaml\")"
   },
   {
-    "objectID": "slides/3_Custom_Data_Training.html#using-config-files",
-    "href": "slides/3_Custom_Data_Training.html#using-config-files",
-    "title": "Ultralytics YOLO Foundations: Part 3",
-    "section": "Using Config Files",
-    "text": "Using Config Files\n# Python Equivalent\nfrom ultralytics import YOLO\n\nmodel = YOLO(\"yolo26s.pt\")\nmodel.train(cfg=\"experiment.yaml\")"
-  },
-  {
-    "objectID": "slides/3_Custom_Data_Training.html#experiment-tracking",
-    "href": "slides/3_Custom_Data_Training.html#experiment-tracking",
-    "title": "Ultralytics YOLO Foundations: Part 3",
+    "objectID": "slides/4_Custom_Data_Training.html#experiment-tracking",
+    "href": "slides/4_Custom_Data_Training.html#experiment-tracking",
+    "title": "Ultralytics YOLO Foundations: Part 4",
     "section": "Experiment Tracking",
-    "text": "Experiment Tracking\nUltralytics seamlessly integrates with popular MLOps tools to log metrics (mAP, loss) and matrices (confusion matrix) during training.\n\n\nSupported Integrations:\n\nTensorBoard (Built-in)\nWeights & Biases (W&B)\nComet\nClearML\nMLflow\n\n\n# Enable TensorBoard logging\nyolo settings tensorboard=True\n# In terminal\ntensorboard --logdir runs/train\n# or in colab\n%load_ext tensorboard\n%tensorboard --logdir path/to/runs\n\nDocs Reference: Integrations"
+    "text": "Experiment Tracking\nUltralytics seamlessly integrates with MLOps tools to log metrics (mAP, loss) and visuals (confusion matrix) during training.\n\n\nSupported Integrations: - TensorBoard (Built-in) - Weights & Biases (W&B) - Comet / ClearML / MLflow\n\n# Enable TensorBoard\nyolo settings tensorboard=True\n\n# View results (in terminal)\ntensorboard --logdir runs/train\n\nDocs Reference: Integrations"
   },
   {
-    "objectID": "slides/3_Custom_Data_Training.html#data-augmentation",
-    "href": "slides/3_Custom_Data_Training.html#data-augmentation",
-    "title": "Ultralytics YOLO Foundations: Part 3",
-    "section": "Data Augmentation",
-    "text": "Data Augmentation\nYOLO natively supports Albumentations to improve model robustness, applying default augmentations automatically if installed.\nTeaser: You’ll learn why and when to use data augmentation in Part 4 — it’s your key weapon against overfitting!\nDocs Reference: Albumentations Integration"
+    "objectID": "slides/4_Custom_Data_Training.html#the-training-spectrum",
+    "href": "slides/4_Custom_Data_Training.html#the-training-spectrum",
+    "title": "Ultralytics YOLO Foundations: Part 4",
+    "section": "The Training Spectrum",
+    "text": "The Training Spectrum\nEvery training run lands somewhere on this spectrum — knowing where is the first step to fixing it.\n\n\n\n\n\n\n\n\n🔴 Overfitting\n\n\nModel memorizes training data.\n\nTrain mAP &gt;&gt; Val mAP\nVal loss starts rising\n\nToo much capacity for your data\n\n\n\n\n\n\n\n\n\n\n🟢 Just Right\n\n\nModel generalizes to new data.\n\nTrain ≈ Val, both high\nBoth losses converge low\n\nThe goal — stay here\n\n\n\n\n\n\n\n\n\n\n🟠 Underfitting\n\n\nModel never learned the patterns.\n\nBoth Train and Val mAP low\nLosses barely decrease\n\nToo little capacity or training"
   },
   {
-    "objectID": "slides/3_Custom_Data_Training.html#summary",
-    "href": "slides/3_Custom_Data_Training.html#summary",
-    "title": "Ultralytics YOLO Foundations: Part 3",
+    "objectID": "slides/4_Custom_Data_Training.html#overfitting-the-symptom",
+    "href": "slides/4_Custom_Data_Training.html#overfitting-the-symptom",
+    "title": "Ultralytics YOLO Foundations: Part 4",
+    "section": "🔴 Overfitting: The Symptom",
+    "text": "🔴 Overfitting: The Symptom\n\nThe model memorizes training data instead of learning general patterns.\n\n\n\nWhat you see:\n\nTrain loss ↓, Val loss ↑\nTrain mAP climbs, Val mAP stalls\nGrowing gap between the two curves"
+  },
+  {
+    "objectID": "slides/4_Custom_Data_Training.html#underfitting-the-symptom",
+    "href": "slides/4_Custom_Data_Training.html#underfitting-the-symptom",
+    "title": "Ultralytics YOLO Foundations: Part 4",
+    "section": "🟠 Underfitting: The Symptom",
+    "text": "🟠 Underfitting: The Symptom\n\nThe model hasn’t learned the patterns — too simple, over-constrained, or undertrained.\n\n\n\nWhat you see:\n\nBoth Train and Val mAP low and flat\nLoss barely moves after the first epochs\nCurves close together — but both stuck high"
+  },
+  {
+    "objectID": "slides/4_Custom_Data_Training.html#class-imbalance-when-rare-classes-get-ignored",
+    "href": "slides/4_Custom_Data_Training.html#class-imbalance-when-rare-classes-get-ignored",
+    "title": "Ultralytics YOLO Foundations: Part 4",
+    "section": "Class Imbalance: When Rare Classes Get Ignored",
+    "text": "Class Imbalance: When Rare Classes Get Ignored\nIn a parking lot you’ll naturally collect 9,500 empty frames for every 500 cars — and the model can hit 95% accuracy by always predicting “empty.”\n\n\n\n\n\n\n\n\n\nFix: oversample the minority class so the model sees Cars often enough to learn them.\n\nTechnical Guide: Class Balancing with YOLO"
+  },
+  {
+    "objectID": "slides/4_Custom_Data_Training.html#data-augmentation-albumentations",
+    "href": "slides/4_Custom_Data_Training.html#data-augmentation-albumentations",
+    "title": "Ultralytics YOLO Foundations: Part 4",
+    "section": "Data Augmentation (Albumentations)",
+    "text": "Data Augmentation (Albumentations)\nThe training-side fix for 🔴 overfitting — show the model more variety so it can’t memorize.\nimport albumentations as A\nfrom ultralytics import YOLO\n\nmodel = YOLO(\"yolo26n.pt\")\n\n# Define custom transforms\ncustom_transforms = [\n    A.Blur(blur_limit=7, p=0.5),\n    A.HorizontalFlip(p=0.5),\n    A.RandomBrightnessContrast(p=0.5),\n]\n\n# Train the model with custom transforms\nmodel.train(data=\"data.yaml\", epochs=100, augmentations=custom_transforms)"
+  },
+  {
+    "objectID": "slides/4_Custom_Data_Training.html#diagnosing-your-training-run",
+    "href": "slides/4_Custom_Data_Training.html#diagnosing-your-training-run",
+    "title": "Ultralytics YOLO Foundations: Part 4",
+    "section": "Diagnosing Your Training Run",
+    "text": "Diagnosing Your Training Run\n\n\n\n\n\n\n\n\nWhat you see\nProblem\nActions\n\n\n\n\nTrain mAP &gt;&gt; Val mAP, Val loss rising\n🔴 Overfitting\nAdd augmentation · increase weight_decay · set patience\n\n\nBoth mAP low and flat, loss barely moves\n🟠 Underfitting\nBigger model · more epochs · raise lr0 · lower weight_decay\n\n\nOne class dominates predictions\n⚖️ Imbalance\nOversample minority · class weights\n\n\nVal metrics suspiciously perfect\n🕳️ Leakage\nRe-split with autosplit() · de-duplicate\n\n\nBoth losses converging, mAP climbing\n🟢 Healthy\nContinue training or deploy"
+  },
+  {
+    "objectID": "slides/4_Custom_Data_Training.html#summary",
+    "href": "slides/4_Custom_Data_Training.html#summary",
+    "title": "Ultralytics YOLO Foundations: Part 4",
     "section": "Summary",
-    "text": "Summary\n\nData Setup: Formatting datasets correctly for YOLO tasks and avoiding data leaks.\nLabeling tools: Using Ultralytics HUB and auto-labeling with SAM.\nTraining: Initiating and resuming training runs efficiently.\nHyperparameters: Understanding epochs, batch sizes, optimizers, and tracking experiments."
+    "text": "Summary\n\nFundamentals: Intuitive learning loop, terminology (Epoch, mAP), and avoiding data leakage.\nData Pipeline: YOLO dataset structure, data.yaml, manual labeling, and auto-labeling with SAM.\nTraining Kickoff: Transfer learning, resuming interrupted runs, and using config files.\nOptimization: Tuning hyperparameters (lr0, batch, imgsz) and tracking experiments.\nDiagnose & Fix: Identifying and resolving overfitting, underfitting, and class imbalance."
   },
   {
-    "objectID": "slides/3_Custom_Data_Training.html#next-steps",
-    "href": "slides/3_Custom_Data_Training.html#next-steps",
-    "title": "Ultralytics YOLO Foundations: Part 3",
+    "objectID": "slides/4_Custom_Data_Training.html#next-steps",
+    "href": "slides/4_Custom_Data_Training.html#next-steps",
+    "title": "Ultralytics YOLO Foundations: Part 4",
     "section": "Next Steps",
-    "text": "Next Steps\nNext up: Evaluation & Deployment\n\nHow to measure your model’s real-world accuracy (mAP, Precision, Recall).\nDeploying your trained model to run blazingly fast in production."
+    "text": "Next Steps\nNext up: Part 5 — Deployment\n\nExport models to optimized formats like ONNX, OpenVINO, and TensorRT.\nRun inference with exported models.\nTake your model to production!"
   },
   {
-    "objectID": "slides/3_Custom_Data_Training.html#qa",
-    "href": "slides/3_Custom_Data_Training.html#qa",
-    "title": "Ultralytics YOLO Foundations: Part 3",
-    "section": "Q&A",
-    "text": "Q&A\n\nThank You!\nAny questions?"
-  },
-  {
-    "objectID": "slides/2B_Real_World_Video_Engineering.html#the-standard-loop",
-    "href": "slides/2B_Real_World_Video_Engineering.html#the-standard-loop",
-    "title": "Real World Video Engineering",
-    "section": "The Standard Loop",
-    "text": "The Standard Loop\nA standard OpenCV inference loop looks like this:\nimport cv2\nfrom ultralytics import YOLO\n\ncap = cv2.VideoCapture(0)\nmodel = YOLO('yolov8n.pt')\n\nwhile True:\n    ret, frame = cap.read()       # Block 1\n    if not ret: break\n    \n    results = model(frame)        # Block 2\n    annotated = results[0].plot() # Block 3\n    \n    cv2.imshow(\"Camera\", annotated)\n    if cv2.waitKey(1) == ord('q'): break"
-  },
-  {
-    "objectID": "slides/2B_Real_World_Video_Engineering.html#where-time-goes",
-    "href": "slides/2B_Real_World_Video_Engineering.html#where-time-goes",
-    "title": "Real World Video Engineering",
-    "section": "Where Time Goes",
-    "text": "Where Time Goes\nIn a synchronous while loop, every operation waits for the previous one to finish.\n\ncap.read(): ~30ms (Waiting for the camera sensor or network packet)\nmodel(frame): ~20ms (Inference on GPU)\ncv2.imshow(): ~5ms (Rendering)\n\nTotal Time per Frame: ~55ms (Max ~18 FPS)\nIf you are reading an RTSP stream (e.g. from an IP Camera) that sends 30 FPS, reading frames slower than they arrive causes a buffer overflow resulting in massive delay (lag)."
-  },
-  {
-    "objectID": "slides/2B_Real_World_Video_Engineering.html#multithreading-in-python",
-    "href": "slides/2B_Real_World_Video_Engineering.html#multithreading-in-python",
-    "title": "Real World Video Engineering",
-    "section": "Multithreading in Python",
-    "text": "Multithreading in Python\nTo prevent the model inference from slowing down the camera reading, we can put them on separate Threads.\n\nThread 1 (Producer): Constantly reads frames from the camera as fast as possible.\nThread 2 (Consumer): Takes the latest frame and runs YOLO inference on it."
-  },
-  {
-    "objectID": "slides/2B_Real_World_Video_Engineering.html#the-producer-consumer-pattern",
-    "href": "slides/2B_Real_World_Video_Engineering.html#the-producer-consumer-pattern",
-    "title": "Real World Video Engineering",
-    "section": "The Producer-Consumer Pattern",
-    "text": "The Producer-Consumer Pattern\nWe need a safe way for Thread 1 to hand the frame to Thread 2. We use a Thread-Safe Queue (queue.Queue).\nfrom queue import Queue\nfrom threading import Thread\n\n# A queue to hold our frames\nframe_queue = Queue(maxsize=1) \nWhy maxsize=1? For real-time applications (like security cameras), we only care about the most recent frame. If inference is slow, we want to drop old frames, not process a backlog of delayed footage."
-  },
-  {
-    "objectID": "slides/2B_Real_World_Video_Engineering.html#the-async-reader-class",
-    "href": "slides/2B_Real_World_Video_Engineering.html#the-async-reader-class",
-    "title": "Real World Video Engineering",
-    "section": "The Async Reader Class",
-    "text": "The Async Reader Class\nimport cv2\nfrom threading import Thread\nfrom queue import Queue\n\nclass AsyncCamera:\n    def __init__(self, src=0):\n        self.cap = cv2.VideoCapture(src)\n        self.q = Queue(maxsize=1)\n        self.running = True\n        # Start the background thread\n        Thread(target=self._reader, daemon=True).start()\n\n    def _reader(self):\n        while self.running:\n            ret, frame = self.cap.read()\n            if not ret: break\n            \n            # Clear queue if full (drop old frame)\n            if self.q.full():\n                try: self.q.get_nowait()\n                except: pass\n                \n            # Put new frame in queue\n            self.q.put(frame)"
-  },
-  {
-    "objectID": "slides/2B_Real_World_Video_Engineering.html#consuming-the-queue",
-    "href": "slides/2B_Real_World_Video_Engineering.html#consuming-the-queue",
-    "title": "Real World Video Engineering",
-    "section": "Consuming the Queue",
-    "text": "Consuming the Queue\nNow our main loop only asks the Queue for frames, never blocking on the camera!\ncamera = AsyncCamera(0)\nmodel = YOLO('yolov8n.pt')\n\nwhile True:\n    # Get the latest frame from the background thread\n    frame = camera.q.get() \n    \n    # Run inference\n    results = model(frame)\n    annotated = results[0].plot()\n    \n    cv2.imshow(\"Async Cam\", annotated)\n    if cv2.waitKey(1) == ord('q'): \n        break\n        \ncamera.running = False"
-  },
-  {
-    "objectID": "slides/2B_Real_World_Video_Engineering.html#summary",
-    "href": "slides/2B_Real_World_Video_Engineering.html#summary",
-    "title": "Real World Video Engineering",
-    "section": "Summary",
-    "text": "Summary\n\nSynchronous loops (cap.read() + inference()) cause lag on live streams.\nProducer-Consumer Pattern: Separating reading and processing solves this.\nqueue.Queue (maxsize=1): The safest way to pass frames between threads and enforce dropping old frames to maintain real-time performance."
-  },
-  {
-    "objectID": "slides/2B_Real_World_Video_Engineering.html#next-steps",
-    "href": "slides/2B_Real_World_Video_Engineering.html#next-steps",
-    "title": "Real World Video Engineering",
-    "section": "Next Steps",
-    "text": "Next Steps\nLet’s head to the lab to build our own AsyncCamera class and test it!\n\nOpen labs/02b_video_engineering.ipynb"
-  },
-  {
-    "objectID": "slides/0_Image_Foundations.html#how-we-see-light-and-the-human-eye",
-    "href": "slides/0_Image_Foundations.html#how-we-see-light-and-the-human-eye",
-    "title": "Digital Image Foundations",
-    "section": "How We See: Light and The Human Eye",
-    "text": "How We See: Light and The Human Eye\n\n\n\n1. Illumination: Light from a source (e.g., the sun) hits an object.\n2. Reflection: The object absorbs some colors and reflects others.\n3. Capture: Reflected light enters the eye through the pupil.\n4. Processing: The lens focuses light onto the retina. Photoreceptors (rods and cones) convert it to electrical signals for the brain."
-  },
-  {
-    "objectID": "slides/0_Image_Foundations.html#how-computers-see-the-digital-camera",
-    "href": "slides/0_Image_Foundations.html#how-computers-see-the-digital-camera",
-    "title": "Digital Image Foundations",
-    "section": "How Computers “See”: The Digital Camera",
-    "text": "How Computers “See”: The Digital Camera"
-  },
-  {
-    "objectID": "slides/0_Image_Foundations.html#how-computers-see-step-by-step",
-    "href": "slides/0_Image_Foundations.html#how-computers-see-step-by-step",
-    "title": "Digital Image Foundations",
-    "section": "How Computers “See”: Step by Step",
-    "text": "How Computers “See”: Step by Step\n\n1. Capture: Just like the eye, the camera captures reflected light.\n2. Lens & Aperture: Light enters through an opening (aperture) and is focused by glass lenses.\n3. The Sensor: Instead of a retina, light hits a digital sensor (CMOS/CCD).\n4. Digitization: Millions of sensor pixels convert photons into electrical charges, creating a digital matrix (usually 8-bit).\n\n\n\n\n\n\n\nNote: In reality, lenses flip the image upside-down, and color sensors use a Bayer Filter to capture Red, Green, or Blue at each pixel."
-  },
-  {
-    "objectID": "slides/0_Image_Foundations.html#grayscale-images-pixels-coordinates",
-    "href": "slides/0_Image_Foundations.html#grayscale-images-pixels-coordinates",
-    "title": "Digital Image Foundations",
-    "section": "Grayscale Images: Pixels & Coordinates",
-    "text": "Grayscale Images: Pixels & Coordinates\n\nImages are 2D matrices of numbers. The origin (0,0) is top-left.\n8-bit Grayscale: Each pixel is a number from 0 (black) to 255 (white).\n\n\n\n# 8x8 matrix (8-bit grayscale: 0-255)\nimg = np.array([\n    [0,  0,  0,  0,  0,  0,  0,  0],\n    [0,255,255,  0,  0,255,255,  0],\n    [0,255,255,  0,  0,255,255,  0],\n    [0,  0,  0,  0,  0,  0,  0,  0],\n    [0,150,  0,  0,  0,  0,150,  0],\n    [0,  0,255,255,255,255,  0,  0],\n    [0,150,  0,  0,  0,  0,150,  0],\n    [0,  0,  0,  0,  0,  0,  0,  0]\n], dtype=np.uint8)"
-  },
-  {
-    "objectID": "slides/0_Image_Foundations.html#coordinates-vs.-array-indexing",
-    "href": "slides/0_Image_Foundations.html#coordinates-vs.-array-indexing",
-    "title": "Digital Image Foundations",
-    "section": "Coordinates vs. Array Indexing",
-    "text": "Coordinates vs. Array Indexing\n\n\n\nWe think in geometry: (x, y) = (width, height).\nNumPy thinks in matrices: matrix[row, col] = matrix[y, x].\nThis causes endless confusion when cropping with bounding boxes (x1, y1, x2, y2).\n\n\n# Assuming a bounding box (x1, y1, x2, y2)\n\n# WRONG (Crops wrong area or crashes)\ncrop = img[x1:x2, y1:y2] \n\n# CORRECT (y = row, x = col)\ncrop = img[y1:y2, x1:x2]"
-  },
-  {
-    "objectID": "slides/0_Image_Foundations.html#color-images-the-rgb-pixel",
-    "href": "slides/0_Image_Foundations.html#color-images-the-rgb-pixel",
-    "title": "Digital Image Foundations",
-    "section": "Color Images: The RGB Pixel",
-    "text": "Color Images: The RGB Pixel\n\nIn a color image, every pixel is a combination of 3 primary colors.\nA pixel at position \\((x, y)\\) is a vector of 3 values: \\([R, G, B]\\).\nEach value ranges from 0 to 255 (8-bit)."
-  },
-  {
-    "objectID": "slides/0_Image_Foundations.html#color-images-the-ml-perspective",
-    "href": "slides/0_Image_Foundations.html#color-images-the-ml-perspective",
-    "title": "Digital Image Foundations",
-    "section": "Color Images: The ML Perspective",
-    "text": "Color Images: The ML Perspective\n\nAlternative View: Instead of “pixels with 3 values”, we see 3 separate layers.\nThis is how Machine Learning models (CNNs) “see” images as Tensors.\nData structure: \\((Height \\times Width \\times 3)\\) or \\((3 \\times Height \\times Width)\\)."
-  },
-  {
-    "objectID": "slides/0_Image_Foundations.html#essential-image-libraries",
-    "href": "slides/0_Image_Foundations.html#essential-image-libraries",
-    "title": "Digital Image Foundations",
-    "section": "Essential Image Libraries",
-    "text": "Essential Image Libraries\n\n\n\n\n\n\n📷\n\n\nOpenCV\n\nVery fast C++ library mapped to Python.\n\nUses BGR channel order\nGreat for video streams\nLow-level transforms\n\n\n\n\n\n\n\n\n\n🖼️\n\n\nPillow (PIL)\n\nStandard Python image library.\n\nUses RGB channel order\nSimple drawing & resizing\n(Our primary tool)\n\n\n\n\n\n\n\n\n\n🔢\n\n\nNumPy\n\nThe core math library.\n\nImages are fundamentally numpy tensors\nMulti-dimensional array operations"
-  },
-  {
-    "objectID": "slides/0_Image_Foundations.html#the-smurf-effect-bgr-vs.-rgb",
-    "href": "slides/0_Image_Foundations.html#the-smurf-effect-bgr-vs.-rgb",
-    "title": "Digital Image Foundations",
-    "section": "The “Smurf Effect”: BGR vs. RGB",
-    "text": "The “Smurf Effect”: BGR vs. RGB\n\n\n\nOpenCV historically uses Blue-Green-Red (BGR).\nMost other libraries (Matplotlib, Pillow) expect Red-Green-Blue (RGB).\nIf you read an image with cv2.imread() and plot it directly in matplotlib, Red and Blue channels are swapped!\nFaces look blue, skies look red.\n\n\nBasic I/O Operations\nimport cv2\nimport matplotlib.pyplot as plt\n\n# 1. Read image (OpenCV loads BGR)\nimg_bgr = cv2.imread('dog.jpg')\n\n# 2. Convert to RGB for accurate display\nimg_rgb = cv2.cvtColor(img_bgr, cv2.COLOR_BGR2RGB)\n\n# 3. Display\nplt.imshow(img_rgb)\nplt.axis('off')\nplt.show()"
-  },
-  {
-    "objectID": "slides/0_Image_Foundations.html#summary",
-    "href": "slides/0_Image_Foundations.html#summary",
-    "title": "Digital Image Foundations",
-    "section": "Summary",
-    "text": "Summary\n\nLight & Cameras: How digital sensors capture light and turn it into data.\nPixels & Channels: Grayscale (2D) vs. Color RGB (3D) representations.\nLibraries: Pillow and NumPy basics.\nGotchas: BGR vs RGB (The Smurf Effect) and Array Indexing vs Coordinates."
-  },
-  {
-    "objectID": "slides/0_Image_Foundations.html#next-steps",
-    "href": "slides/0_Image_Foundations.html#next-steps",
-    "title": "Digital Image Foundations",
-    "section": "Next Steps",
-    "text": "Next Steps\nNext up: YOLO Inference\n\nUsing these images with state-of-the-art Computer Vision models.\nRunning inference directly out-of-the-box."
-  },
-  {
-    "objectID": "slides/0_Image_Foundations.html#qa",
-    "href": "slides/0_Image_Foundations.html#qa",
-    "title": "Digital Image Foundations",
-    "section": "Q&A",
-    "text": "Q&A\n\nThank You!\nAny questions?"
-  },
-  {
-    "objectID": "index.html",
-    "href": "index.html",
-    "title": "Ultralytics & Computer Vision For Developers",
-    "section": "",
-    "text": "Welcome to the Ultralytics & Computer Vision For Developers course. Follow the modules below in order to build your foundation in modern computer vision.\nGitHub Repository: NaifMersal/cv-for-developers-ultralytics\n\n\n\n🖼️ Preparatory Module\nHow computers perceive images.\n\nLearn about pixels, color channels, coordinate systems, and the basics behind digital cameras and computer vision libraries.\n\n\nPresentation Slides\nLab: Images as N-Dimensional Arrays \n\n\n\n🚀 Part 1: Tasks & Inference\nDiscover what YOLO can do out of the box.\n\nCovers running inference for Object Detection, Instance Segmentation, Classification, and Pose Estimation using CLI and Python.\n\n\nPresentation Slides\nLab: YOLO Tasks & Inference \n\n\n\n🔍 Part 2: Use Cases & Solutions\nBeyond bounding boxes: actionable insights.\n\nSolutions for region analytics, kinematic tracking, video heatmaps, and setting up external integrations.\n\n\nPresentation Slides\nLab: Real-World Solutions \n\n\n\n🎥 Part 2B: Video Engineering (BONUS)\nHandling RTSP and Concurrency.\n\nOvercome I/O bottlenecks using Threading and Queues to ensure your inference loops remain real-time without blocking the UI.\n\n\nPresentation Slides\nBONUS Lab: Async Video Streaming \n\n\n\n🛠️ Part 3: Custom Data & Training\nTeaching the model your custom data.\n\nProper data formatting, utilizing labeling tools natively, setting hyperparameters, and initiating training runs.\n\n\nPresentation Slides\nLab: Custom Training: Fine-tune on COCO8 \n\n\n\n📊 Part 4: Evaluation & Deployment\nHow good is your model and how to use it?\n\nUnderstanding confusion matrices, IoU, Precision, Recall, mAP metrics, and exporting to optimized formats like ONNX.\n\n\nPresentation Slides\nLab 4A: ROI-Driven Evaluation \nLab 4B: Technical Metrics & Diagnosis \n\n\n\n🤗 Part 5: HuggingFace for Computer Vision\nExpanding your toolkit with the HF Hub.\n\nLearn to use SAM 3 for zero-shot segmentation, visual embeddings for similarity search, and Vision LLMs for multimodal reasoning.\n\n\nPresentation Slides\nLab 5: HuggingFace for CV"
-  },
-  {
-    "objectID": "slides/1_Tasks_Inference.html#programs-vs.-machine-learning",
-    "href": "slides/1_Tasks_Inference.html#programs-vs.-machine-learning",
-    "title": "Ultralytics YOLO Foundations: Part 1",
-    "section": "Programs vs. Machine Learning",
-    "text": "Programs vs. Machine Learning\n\n\n\n\n\n\n\nconcept\n\n\ncluster_trad\n\nTraditional Programming\n\n\ncluster_ml\n\nMachine Learning\n\n\n\nti\n\nInput\n\n\n\ntf\n\nf(x)\nyou write it\n\n\n\nti-&gt;tf\n\n\n\n\n\nto\n\nOutput\n\n\n\ntf-&gt;to\n\n\n\n\n\nmi\n\nInput\n\n\n\nmf\n\nf(x)\nlearned from data\n\n\n\nmi-&gt;mf\n\n\n\n\n\nmo\n\nOutput\n\n\n\nmf-&gt;mo\n\n\n\n\n\ndata\n\n\nData\n\n\n\ndata-&gt;mf\n\n\ntrains\n\n\n\n\n\n\n\n\n\nWe’ll explore each of these output shapes hands-on during this session!"
-  },
-  {
-    "objectID": "slides/1_Tasks_Inference.html#ai-model-for-computer-vision",
-    "href": "slides/1_Tasks_Inference.html#ai-model-for-computer-vision",
-    "title": "Ultralytics YOLO Foundations: Part 1",
-    "section": "AI Model for Computer Vision",
-    "text": "AI Model for Computer Vision\n\n\n\n\n\n\n\ncv\n\n\n\ninput\n\n\nImage / Video\n\n\n\nmodel\n\nLearned f(x)\n(AI Model)\n\n\n\ninput-&gt;model\n\n\n\n\n\ncls\n\nClassification\n(C,)\n\n\n\nmodel-&gt;cls\n\n\n\n\n\ndet\n\nDetection\n(N, 6)\n\n\n\nmodel-&gt;det\n\n\n\n\n\nseg\n\nSegmentation\n(N, H, W)\n\n\n\nmodel-&gt;seg\n\n\n\n\n\npose\n\nPose\n(N, 17, 3)\n\n\n\nmodel-&gt;pose"
-  },
-  {
-    "objectID": "slides/1_Tasks_Inference.html#the-yolo-cli-structure",
-    "href": "slides/1_Tasks_Inference.html#the-yolo-cli-structure",
-    "title": "Ultralytics YOLO Foundations: Part 1",
-    "section": "The YOLO CLI Structure",
-    "text": "The YOLO CLI Structure\nInteracting with Ultralytics is simple:\n\nyolo TASK MODE ARGS\n\n\nTASK: What to solve? (detect, segment, classify, pose, obb)\nMODE: What ML stage? (predict, train, val, export, track, benchmark)\nARGS: Settings like model=weights/yolo26n.pt or source=\"image.jpg\""
-  },
-  {
-    "objectID": "slides/1_Tasks_Inference.html#predefined-classes-weights",
-    "href": "slides/1_Tasks_Inference.html#predefined-classes-weights",
-    "title": "Ultralytics YOLO Foundations: Part 1",
-    "section": "Predefined Classes & Weights",
-    "text": "Predefined Classes & Weights\nModels pre-trained on the COCO dataset recognize 80 common classes right out of the box. Using .pt models means we utilize these pre-learned weights without training!\nModel Naming Convention (e.g., yolo26n-seg.pt, yolo11x-cls.pt):\n\nFamily: e.g., yolo26, yolo11\nSize: n (Nano, fastest) up to x (Extra Large, most accurate)\nTask: default is detection. -seg (Segmentation), -cls (Classification), -pose (Pose Estimation)"
-  },
-  {
-    "objectID": "slides/1_Tasks_Inference.html#image-classification-output-concept",
-    "href": "slides/1_Tasks_Inference.html#image-classification-output-concept",
-    "title": "Ultralytics YOLO Foundations: Part 1",
-    "section": "Image Classification Output Concept",
-    "text": "Image Classification Output Concept\n\n\n\n\n\n\n\n\n\n\n\n\nThe model outputs probs, a probability for every possible class:\n\n\n\nClass ID\nClass Name\nProbability\n\n\n\n\n0\ncar\n0.95\n\n\n1\nbus\n0.03\n\n\n2\nperson\n0.01\n\n\n…\n…\n…"
-  },
-  {
-    "objectID": "slides/1_Tasks_Inference.html#from-probs-to-top1",
-    "href": "slides/1_Tasks_Inference.html#from-probs-to-top1",
-    "title": "Ultralytics YOLO Foundations: Part 1",
-    "section": "From probs to top1",
-    "text": "From probs to top1\n\n\n\n\n\n\n\n\n\n\n\n\nUltralytics pre-computes the answer for us:\n\nprobs: Raw probability array for all classes.\nprobs.top1 → 0 : Index of the highest-probability class.\nprobs.top1conf → 0.95 : Its confidence score.\n\n\n\n\n\n\nSingle-Class vs. Multi-Label Classification We just read top1 that is single-class (one winner). But because probs scores every class, we can also do multi-label classification: keep all classes whose probability exceeds a threshold (e.g., prob &gt; 0.50) to assign several labels to one image."
-  },
-  {
-    "objectID": "slides/1_Tasks_Inference.html#image-classification-in-action",
-    "href": "slides/1_Tasks_Inference.html#image-classification-in-action",
-    "title": "Ultralytics YOLO Foundations: Part 1",
-    "section": "Image Classification in Action",
-    "text": "Image Classification in Action\nIdentify what the entire image contains.\nyolo task=classify mode=predict model=yolo26n-cls.pt source=\"https://ultralytics.com/assets/bus.jpg\"\n# Python Equivalent\nfrom ultralytics import YOLO\n\nmodel = YOLO(\"yolo26n-cls.pt\")\nresults = model.predict(source=\"https://ultralytics.com/assets/bus.jpg\")\n\n# Access Output Format\nprobs = results[0].probs\nprint(f\"Top-1 Class: {probs.top1}\")          # Index of the most likely class\nprint(f\"Top-1 Confidence: {probs.top1conf}\") # Confidence score\nprint(f\"All Probabilities: {probs.data}\")    # Tensor of all class probabilities\nDocs Reference: Classification"
-  },
-  {
-    "objectID": "slides/1_Tasks_Inference.html#classification-output-example",
-    "href": "slides/1_Tasks_Inference.html#classification-output-example",
-    "title": "Ultralytics YOLO Foundations: Part 1",
-    "section": "Classification Output Example",
-    "text": "Classification Output Example"
-  },
-  {
-    "objectID": "slides/1_Tasks_Inference.html#object-detection-output-confidence",
-    "href": "slides/1_Tasks_Inference.html#object-detection-output-confidence",
-    "title": "Ultralytics YOLO Foundations: Part 1",
-    "section": "Object Detection Output & Confidence",
-    "text": "Object Detection Output & Confidence\n\n\n\n\n\n\n\n\n\n\n\n\nModel Output:\n\ncx, cy (7.5, 7.5): The center coordinates.\nw (8.0) & h (7.0): The box width and height.\nconf (0.85): The confidence score.\ncls (0): The class ID.\n\n\n\n\n\nFiltering Predictions We use a Confidence Threshold to automatically drop weak predictions (e.g., ignoring any box with conf &lt; 0.50)."
-  },
-  {
-    "objectID": "slides/1_Tasks_Inference.html#confidence-models-belief-vs.-ground-truth",
-    "href": "slides/1_Tasks_Inference.html#confidence-models-belief-vs.-ground-truth",
-    "title": "Ultralytics YOLO Foundations: Part 1",
-    "section": "Confidence: Model’s Belief vs. Ground Truth",
-    "text": "Confidence: Model’s Belief vs. Ground Truth\n\nQuestion: Does conf=1.0 mean there is a true object 100% of the time?\n\n\n\nAnswer: No.\n\n\nConfidence is just a “feeling”: How strongly the model believes this is the answer.\nIt does NOT guarantee the answer is correct in the real world.\n\n\nYou’ll learn how to actually measure correctness in Part 4 using Precision and Recall"
-  },
-  {
-    "objectID": "slides/1_Tasks_Inference.html#mapping-to-bounding-boxes",
-    "href": "slides/1_Tasks_Inference.html#mapping-to-bounding-boxes",
-    "title": "Ultralytics YOLO Foundations: Part 1",
-    "section": "Mapping to Bounding Boxes",
-    "text": "Mapping to Bounding Boxes\n\n\n\n\n\n\n\n\n\n\n\n\nMapping to \\((x_{min}, y_{min}, x_{max}, y_{max})\\):\n\\[\n\\begin{align*}\nx_{min} &= cx - \\frac{w}{2} = 7.5 - 4.0 = 3.5 \\\\\ny_{min} &= cy - \\frac{h}{2} = 7.5 - 3.5 = 4.0 \\\\\nx_{max} &= cx + \\frac{w}{2} = 7.5 + 4.0 = 11.5 \\\\\ny_{max} &= cy + \\frac{h}{2} = 7.5 + 3.5 = 11.0\n\\end{align*}\n\\]"
-  },
-  {
-    "objectID": "slides/1_Tasks_Inference.html#the-concept-of-n-objects",
-    "href": "slides/1_Tasks_Inference.html#the-concept-of-n-objects",
-    "title": "Ultralytics YOLO Foundations: Part 1",
-    "section": "The Concept of N Objects",
-    "text": "The Concept of N Objects\nRarely does an image contain exactly one object!\n\nYOLO evaluates the image and can predict multiple bounding boxes at once.\nThe single 6-element array [cx, cy, w, h, conf, cls] is stacked \\(N\\) times.\nResulting Output Shape: \\((N, 6)\\) (where \\(N\\) is the number of detected objects)."
-  },
-  {
-    "objectID": "slides/1_Tasks_Inference.html#object-detection-in-action",
-    "href": "slides/1_Tasks_Inference.html#object-detection-in-action",
-    "title": "Ultralytics YOLO Foundations: Part 1",
-    "section": "Object Detection in Action",
-    "text": "Object Detection in Action\nFind and localize objects using bounding boxes.\n# Live Example: Try this in your terminal!\nyolo task=detect mode=predict model=yolo26n.pt source=\"https://ultralytics.com/assets/bus.jpg\"\n# Python Equivalent\nimport os\nfrom ultralytics import YOLO\n\nmodel_path = \"yolo26n.pt\"\nif not os.path.exists(model_path):\n    model_path = \"../yolo26n.pt\"\nmodel = YOLO(model_path)\nresults = model.predict(source=\"https://ultralytics.com/assets/bus.jpg\")\n\n# Access Output Shape and Data\nboxes = results[0].boxes\nprint(f\"Boxes shape: {boxes.shape}\")  # (N, 6) -&gt; N boxes: x1, y1, x2, y2, conf, cls\nDocs Reference: Detection"
-  },
-  {
-    "objectID": "slides/1_Tasks_Inference.html#deep-dive-accessing-bounding-boxes",
-    "href": "slides/1_Tasks_Inference.html#deep-dive-accessing-bounding-boxes",
-    "title": "Ultralytics YOLO Foundations: Part 1",
-    "section": "Deep Dive: Accessing Bounding Boxes",
-    "text": "Deep Dive: Accessing Bounding Boxes\nThe result.boxes object provides several ways to access coordinates:\n\n.xyxy: \\([x_{min}, y_{min}, x_{max}, y_{max}]\\) (Top-left, Bottom-right)\n.xywh: \\([c_x, c_y, w, h]\\) (Center coordinates, width, height)\n.xyxyn / .xywhn: Normalized versions (values between 0.0 and 1.0)\n\nCode Example:\n# Accessing raw tensors\nboxes = result.boxes.xyxy   # [N, 4] tensor\nconf = result.boxes.conf    # [N] tensor\ncls = result.boxes.cls      # [N] tensor\n\n# Extracting first detection\nx1, y1, x2, y2 = boxes[0].tolist()"
-  },
-  {
-    "objectID": "slides/1_Tasks_Inference.html#detection-output-example",
-    "href": "slides/1_Tasks_Inference.html#detection-output-example",
-    "title": "Ultralytics YOLO Foundations: Part 1",
-    "section": "Detection Output Example",
-    "text": "Detection Output Example"
-  },
-  {
-    "objectID": "slides/1_Tasks_Inference.html#the-problem-with-absolute-pixels",
-    "href": "slides/1_Tasks_Inference.html#the-problem-with-absolute-pixels",
-    "title": "Ultralytics YOLO Foundations: Part 1",
-    "section": "The Problem with Absolute Pixels",
-    "text": "The Problem with Absolute Pixels\nWhy not just train the model on absolute pixel values like w = 8.0?\n\n\n\n\n\n\nImages come in all shapes and sizes (4K, 1080p, square, portrait).\nA car that is 800 pixels wide in a 4K image might only be 200 pixels wide in a 1080p image.\nIf the model learns “cars are 800 pixels wide”, it will fail on smaller images!"
-  },
-  {
-    "objectID": "slides/1_Tasks_Inference.html#the-solution-normalized-coordinates",
-    "href": "slides/1_Tasks_Inference.html#the-solution-normalized-coordinates",
-    "title": "Ultralytics YOLO Foundations: Part 1",
-    "section": "The Solution: Normalized Coordinates",
-    "text": "The Solution: Normalized Coordinates\n\nInstead of pixels, we teach the model using fractions of the image size (0.0 to 1.0).\n\n\n\n\\(cx_{norm} = cx_{pixel} / image\\_width\\)\n\\(w_{norm} = w_{pixel} / image\\_width\\)\n\n\n\nA car that takes up half the image width is always \\(w = 0.5\\), regardless of whether the image is 4K or 1080p!\n\n\n\nTraining vs. Predicting You MUST provide normalized coordinates (0.0 to 1.0) when training the model. However, when you use model.predict(), the Ultralytics Python API conveniently un-normalizes them back into standard absolute pixels (like boxes.xyxy) for immediate use!"
-  },
-  {
-    "objectID": "slides/1_Tasks_Inference.html#instance-segmentation-output-concept",
-    "href": "slides/1_Tasks_Inference.html#instance-segmentation-output-concept",
-    "title": "Ultralytics YOLO Foundations: Part 1",
-    "section": "Instance Segmentation Output Concept",
-    "text": "Instance Segmentation Output Concept\n\n\n\n\n\n\n\n\n\n\n\n\nModel Output (Mask / Polygon):\n\nMask Tensor: A 2D array (bitmap) of pixels indicating the object’s exact shape (1 = object, 0 = background).\nCoordinates: Sequence of \\((x, y)\\) polygon coordinates derived from the mask.\nconf (0.89): Confidence score.\ncls (0): Class ID."
-  },
-  {
-    "objectID": "slides/1_Tasks_Inference.html#instance-segmentation-in-action",
-    "href": "slides/1_Tasks_Inference.html#instance-segmentation-in-action",
-    "title": "Ultralytics YOLO Foundations: Part 1",
-    "section": "Instance Segmentation in Action",
-    "text": "Instance Segmentation in Action\nOutline the exact shape (pixels) of each object instance.\n# Live Example: See the masks!\nyolo task=segment mode=predict model=yolo26n-seg.pt source=\"https://ultralytics.com/assets/bus.jpg\"\n# Python Equivalent\nfrom ultralytics import YOLO\n\nmodel = YOLO(\"yolo26n-seg.pt\")\nresults = model.predict(source=\"https://ultralytics.com/assets/bus.jpg\")\n\n# Access Output Shape and Data\nmasks = results[0].masks\nprint(f\"Masks shape: {masks.data.shape}\")  # (N, H, W) -&gt; N masks of HxW size\nprint(masks.xy)                            # Polygon coordinates\nDocs Reference: Segmentation"
-  },
-  {
-    "objectID": "slides/1_Tasks_Inference.html#segmentation-output-example",
-    "href": "slides/1_Tasks_Inference.html#segmentation-output-example",
-    "title": "Ultralytics YOLO Foundations: Part 1",
-    "section": "Segmentation Output Example",
-    "text": "Segmentation Output Example"
-  },
-  {
-    "objectID": "slides/1_Tasks_Inference.html#pose-estimation-output-concept",
-    "href": "slides/1_Tasks_Inference.html#pose-estimation-output-concept",
-    "title": "Ultralytics YOLO Foundations: Part 1",
-    "section": "Pose Estimation Output Concept",
-    "text": "Pose Estimation Output Concept\n\n\n\n\n\n\n\n\n\n\n\n\nModel Output (Keypoints):\n\nx, y: Coordinate pair for each predefined keypoint.\nkp_conf (per keypoint): Confidence score for each keypoint’s location.\nconf (0.92): Overall person detection confidence score.\ncls (0): Class ID (always 0 = person for pose models)."
-  },
-  {
-    "objectID": "slides/1_Tasks_Inference.html#pose-estimation-in-action",
-    "href": "slides/1_Tasks_Inference.html#pose-estimation-in-action",
-    "title": "Ultralytics YOLO Foundations: Part 1",
-    "section": "Pose Estimation in Action",
-    "text": "Pose Estimation in Action\nEstimate human body keypoints (elbows, knees).\n# Live Example: Track keypoints!\nyolo task=pose mode=predict model=yolo26n-pose.pt source=\"https://ultralytics.com/assets/bus.jpg\"\n# Python Equivalent\nfrom ultralytics import YOLO\n\nmodel = YOLO(\"yolo26n-pose.pt\")\nresults = model.predict(source=\"https://ultralytics.com/assets/bus.jpg\")\n\n# Access Output Shape and Data\nkeypoints = results[0].keypoints\nprint(f\"Keypoints shape: {keypoints.data.shape}\")  # (N, 17, 3) -&gt; N persons, 17 keypoints, (x, y, conf)\nprint(keypoints.xy)                                # Keypoint coordinates\nDocs Reference: Pose"
-  },
-  {
-    "objectID": "slides/1_Tasks_Inference.html#pose-estimation-output-example",
-    "href": "slides/1_Tasks_Inference.html#pose-estimation-output-example",
-    "title": "Ultralytics YOLO Foundations: Part 1",
-    "section": "Pose Estimation Output Example",
-    "text": "Pose Estimation Output Example"
-  },
-  {
-    "objectID": "slides/1_Tasks_Inference.html#obb-oriented-bounding-box-output-concept",
-    "href": "slides/1_Tasks_Inference.html#obb-oriented-bounding-box-output-concept",
-    "title": "Ultralytics YOLO Foundations: Part 1",
-    "section": "OBB (Oriented Bounding Box) Output Concept",
-    "text": "OBB (Oriented Bounding Box) Output Concept\n\n\n\n\n\n\n\n\n\n\n\n\nModel Output (Oriented Box):\n\ncx, cy: The center coordinates.\nw & h: The box width and height.\nangle: The rotation angle of the box.\nconf: The confidence score.\ncls: The class ID."
-  },
-  {
-    "objectID": "slides/1_Tasks_Inference.html#obb-in-action",
-    "href": "slides/1_Tasks_Inference.html#obb-in-action",
-    "title": "Ultralytics YOLO Foundations: Part 1",
-    "section": "OBB in Action",
-    "text": "OBB in Action\nDetect objects with oriented bounding boxes (useful for aerial/satellite imagery or rotated objects).\nyolo task=obb mode=predict model=yolo26n-obb.pt source=\"https://ultralytics.com/images/boats.jpg\"\nfrom ultralytics import YOLO\n\nmodel = YOLO(\"yolo26n-obb.pt\")\nresults = model.predict(source=\"https://ultralytics.com/images/boats.jpg\")\n\n# Access Output Shape and Data\nobb = results[0].obb\nprint(f\"OBB shape: {obb.data.shape}\")  # (N, 7) -&gt; N boxes: cx, cy, w, h, angle, conf, cls\nprint(obb.xywhr)                       # Center x, y, width, height, rotation angle\nDocs Reference: OBB"
-  },
-  {
-    "objectID": "slides/1_Tasks_Inference.html#obb-output-example",
-    "href": "slides/1_Tasks_Inference.html#obb-output-example",
-    "title": "Ultralytics YOLO Foundations: Part 1",
-    "section": "OBB Output Example",
-    "text": "OBB Output Example"
-  },
-  {
-    "objectID": "slides/1_Tasks_Inference.html#object-tracking-in-action",
-    "href": "slides/1_Tasks_Inference.html#object-tracking-in-action",
-    "title": "Ultralytics YOLO Foundations: Part 1",
-    "section": "Object Tracking in Action",
-    "text": "Object Tracking in Action\nAssign distinct IDs to objects and track them continuously across video frames!\nyolo task=detect mode=track model=weights/yolo26n.pt source=\"path/to/video.mp4\"\nfrom ultralytics import YOLO\n\nmodel = YOLO(\"weights/yolo26n.pt\")\n# Use track() with stream=True for memory-efficient video processing\nresults = model.track(source=\"path/to/video.mp4\", stream=True)\n\n# Iterate through the video frames\nfor result in results:\n    boxes = result.boxes\n    if boxes.id is not None:\n        # Extract IDs as a list of integers\n        ids = boxes.id.int().tolist()\n        print(f\"Tracking IDs: {ids}\")  # e.g., [1, 2]\nDocs Reference: Tracking"
-  },
-  {
-    "objectID": "slides/1_Tasks_Inference.html#demonstration-object-tracking",
-    "href": "slides/1_Tasks_Inference.html#demonstration-object-tracking",
-    "title": "Ultralytics YOLO Foundations: Part 1",
-    "section": "Demonstration: Object Tracking",
-    "text": "Demonstration: Object Tracking"
-  },
-  {
-    "objectID": "slides/1_Tasks_Inference.html#predict-usage-python-batch-input",
-    "href": "slides/1_Tasks_Inference.html#predict-usage-python-batch-input",
-    "title": "Ultralytics YOLO Foundations: Part 1",
-    "section": "Predict Usage (Python): Batch Input",
-    "text": "Predict Usage (Python): Batch Input\nProcess multiple sources or directories efficiently!\nfrom ultralytics import YOLO\n\n# Load your model\nmodel = YOLO(\"weights/yolo26n.pt\")\n\n# Option 1: A list of specific sources\nsources = [\n    \"https://ultralytics.com/assets/bus.jpg\",\n    \"path/to/local/image.jpg\",\n    \"another_image.png\"\n]\nresults = model.predict(source=sources)\n\n# Option 2: An entire directory\n# results = model.predict(source=\"path/to/my_images_folder/\")"
-  },
-  {
-    "objectID": "slides/1_Tasks_Inference.html#predict-usage-python-processing-results",
-    "href": "slides/1_Tasks_Inference.html#predict-usage-python-processing-results",
-    "title": "Ultralytics YOLO Foundations: Part 1",
-    "section": "Predict Usage (Python): Processing Results",
-    "text": "Predict Usage (Python): Processing Results\nProcess the batch results or use a memory-efficient stream.\n# Process the batch results\nfor result in results:\n    boxes = result.boxes  # Bounding boxes\n    probs = result.probs  # Classification probabilities\n    result.show()         # Display each result\n    result.save(filename=f\"result_{result.path.name}\")\nStream/Generator: For very large datasets, you can use stream=True in the predict call:\nmodel.predict(source=\"dir/\", stream=True)"
-  },
-  {
-    "objectID": "slides/1_Tasks_Inference.html#summary",
-    "href": "slides/1_Tasks_Inference.html#summary",
-    "title": "Ultralytics YOLO Foundations: Part 1",
-    "section": "Summary",
-    "text": "Summary\n\nYOLO Basics: We explored how to use the CLI and Python API for various tasks.\nTasks: Object Detection, Image Classification, Instance Segmentation, Pose Estimation, and OBB.\nCoordinates: The importance of normalized coordinates over absolute pixels.\nInference: How to predict on single images, videos, and batches efficiently."
-  },
-  {
-    "objectID": "slides/1_Tasks_Inference.html#next-steps",
-    "href": "slides/1_Tasks_Inference.html#next-steps",
-    "title": "Ultralytics YOLO Foundations: Part 1",
-    "section": "Next Steps",
-    "text": "Next Steps\nNext up: Real World Use Cases & Solutions\n\nLearn how to extract actionable insights from trained models.\nDiscover out-of-the-box solutions for real-world problems.\nIntegrate object tracking, counting, and more into your applications."
-  },
-  {
-    "objectID": "slides/1_Tasks_Inference.html#qa",
-    "href": "slides/1_Tasks_Inference.html#qa",
-    "title": "Ultralytics YOLO Foundations: Part 1",
+    "objectID": "slides/4_Custom_Data_Training.html#qa",
+    "href": "slides/4_Custom_Data_Training.html#qa",
+    "title": "Ultralytics YOLO Foundations: Part 4",
     "section": "Q&A",
     "text": "Q&A\n\nThank You!\nAny questions?"
   },
@@ -910,408 +616,695 @@
     "text": "Q&A\n\nThank You!\nAny questions?"
   },
   {
-    "objectID": "slides/4_Evaluation_Deployment.html#binary-classification-basics",
-    "href": "slides/4_Evaluation_Deployment.html#binary-classification-basics",
-    "title": "Ultralytics YOLO Foundations: Part 4",
+    "objectID": "slides/1_Tasks_Inference.html#programs-vs.-machine-learning",
+    "href": "slides/1_Tasks_Inference.html#programs-vs.-machine-learning",
+    "title": "Ultralytics YOLO Foundations: Part 1",
+    "section": "Programs vs. Machine Learning",
+    "text": "Programs vs. Machine Learning\n\n\n\n\n\n\n\nconcept\n\n\ncluster_trad\n\nTraditional Programming\n\n\ncluster_ml\n\nMachine Learning\n\n\n\nti\n\nInput\n\n\n\ntf\n\nf(x)\nyou write it\n\n\n\nti-&gt;tf\n\n\n\n\n\nto\n\nOutput\n\n\n\ntf-&gt;to\n\n\n\n\n\nmi\n\nInput\n\n\n\nmf\n\nf(x)\nlearned from data\n\n\n\nmi-&gt;mf\n\n\n\n\n\nmo\n\nOutput\n\n\n\nmf-&gt;mo\n\n\n\n\n\ndata\n\n\nData\n\n\n\ndata-&gt;mf\n\n\ntrains\n\n\n\n\n\n\n\n\n\nWe’ll explore each of these output shapes hands-on during this session!"
+  },
+  {
+    "objectID": "slides/1_Tasks_Inference.html#ai-model-for-computer-vision",
+    "href": "slides/1_Tasks_Inference.html#ai-model-for-computer-vision",
+    "title": "Ultralytics YOLO Foundations: Part 1",
+    "section": "AI Model for Computer Vision",
+    "text": "AI Model for Computer Vision\n\n\n\n\n\n\n\ncv\n\n\n\ninput\n\n\nImage / Video\n\n\n\nmodel\n\nLearned f(x)\n(AI Model)\n\n\n\ninput-&gt;model\n\n\n\n\n\ncls\n\nClassification\n(C,)\n\n\n\nmodel-&gt;cls\n\n\n\n\n\ndet\n\nDetection\n(N, 6)\n\n\n\nmodel-&gt;det\n\n\n\n\n\nseg\n\nSegmentation\n(N, H, W)\n\n\n\nmodel-&gt;seg\n\n\n\n\n\npose\n\nPose\n(N, 17, 3)\n\n\n\nmodel-&gt;pose"
+  },
+  {
+    "objectID": "slides/1_Tasks_Inference.html#the-yolo-cli-structure",
+    "href": "slides/1_Tasks_Inference.html#the-yolo-cli-structure",
+    "title": "Ultralytics YOLO Foundations: Part 1",
+    "section": "The YOLO CLI Structure",
+    "text": "The YOLO CLI Structure\nInteracting with Ultralytics is simple:\n\nyolo TASK MODE ARGS\n\n\nTASK: What to solve? (detect, segment, classify, pose, obb)\nMODE: What ML stage? (predict, train, val, export, track, benchmark)\nARGS: Settings like model=weights/yolo26n.pt or source=\"image.jpg\""
+  },
+  {
+    "objectID": "slides/1_Tasks_Inference.html#predefined-classes-weights",
+    "href": "slides/1_Tasks_Inference.html#predefined-classes-weights",
+    "title": "Ultralytics YOLO Foundations: Part 1",
+    "section": "Predefined Classes & Weights",
+    "text": "Predefined Classes & Weights\nModels pre-trained on the COCO dataset recognize 80 common classes right out of the box. Using .pt models means we utilize these pre-learned weights without training!\nModel Naming Convention (e.g., yolo26n-seg.pt, yolo11x-cls.pt):\n\nFamily: e.g., yolo26, yolo11\nSize: n (Nano, fastest) up to x (Extra Large, most accurate)\nTask: default is detection. -seg (Segmentation), -cls (Classification), -pose (Pose Estimation)"
+  },
+  {
+    "objectID": "slides/1_Tasks_Inference.html#image-classification-output-concept",
+    "href": "slides/1_Tasks_Inference.html#image-classification-output-concept",
+    "title": "Ultralytics YOLO Foundations: Part 1",
+    "section": "Image Classification Output Concept",
+    "text": "Image Classification Output Concept\n\n\n\n\n\n\n\n\n\n\n\n\nThe model outputs probs, a probability for every possible class:\n\n\n\nClass ID\nClass Name\nProbability\n\n\n\n\n0\ncar\n0.95\n\n\n1\nbus\n0.03\n\n\n2\nperson\n0.01\n\n\n…\n…\n…"
+  },
+  {
+    "objectID": "slides/1_Tasks_Inference.html#from-probs-to-top1",
+    "href": "slides/1_Tasks_Inference.html#from-probs-to-top1",
+    "title": "Ultralytics YOLO Foundations: Part 1",
+    "section": "From probs to top1",
+    "text": "From probs to top1\n\n\n\n\n\n\n\n\n\n\n\n\nUltralytics pre-computes the answer for us:\n\nprobs: Raw probability array for all classes.\nprobs.top1 → 0 : Index of the highest-probability class.\nprobs.top1conf → 0.95 : Its confidence score.\n\n\n\n\n\n\nSingle-Class vs. Multi-Label Classification We just read top1 that is single-class (one winner). But because probs scores every class, we can also do multi-label classification: keep all classes whose probability exceeds a threshold (e.g., prob &gt; 0.50) to assign several labels to one image."
+  },
+  {
+    "objectID": "slides/1_Tasks_Inference.html#image-classification-in-action",
+    "href": "slides/1_Tasks_Inference.html#image-classification-in-action",
+    "title": "Ultralytics YOLO Foundations: Part 1",
+    "section": "Image Classification in Action",
+    "text": "Image Classification in Action\nIdentify what the entire image contains.\nyolo task=classify mode=predict model=yolo26n-cls.pt source=\"https://ultralytics.com/assets/bus.jpg\"\n# Python Equivalent\nfrom ultralytics import YOLO\n\nmodel = YOLO(\"yolo26n-cls.pt\")\nresults = model.predict(source=\"https://ultralytics.com/assets/bus.jpg\")\n\n# Access Output Format\nprobs = results[0].probs\nprint(f\"Top-1 Class: {probs.top1}\")          # Index of the most likely class\nprint(f\"Top-1 Confidence: {probs.top1conf}\") # Confidence score\nprint(f\"All Probabilities: {probs.data}\")    # Tensor of all class probabilities\nDocs Reference: Classification"
+  },
+  {
+    "objectID": "slides/1_Tasks_Inference.html#classification-output-example",
+    "href": "slides/1_Tasks_Inference.html#classification-output-example",
+    "title": "Ultralytics YOLO Foundations: Part 1",
+    "section": "Classification Output Example",
+    "text": "Classification Output Example"
+  },
+  {
+    "objectID": "slides/1_Tasks_Inference.html#object-detection-output-confidence",
+    "href": "slides/1_Tasks_Inference.html#object-detection-output-confidence",
+    "title": "Ultralytics YOLO Foundations: Part 1",
+    "section": "Object Detection Output & Confidence",
+    "text": "Object Detection Output & Confidence\n\n\n\n\n\n\n\n\n\n\n\n\nModel Output:\n\ncx, cy (7.5, 7.5): The center coordinates.\nw (8.0) & h (7.0): The box width and height.\nconf (0.85): The confidence score.\ncls (0): The class ID.\n\n\n\n\n\nFiltering Predictions We use a Confidence Threshold to automatically drop weak predictions (e.g., ignoring any box with conf &lt; 0.50)."
+  },
+  {
+    "objectID": "slides/1_Tasks_Inference.html#confidence-models-belief-vs.-ground-truth",
+    "href": "slides/1_Tasks_Inference.html#confidence-models-belief-vs.-ground-truth",
+    "title": "Ultralytics YOLO Foundations: Part 1",
+    "section": "Confidence: Model’s Belief vs. Ground Truth",
+    "text": "Confidence: Model’s Belief vs. Ground Truth\n\nQuestion: Does conf=1.0 mean there is a true object 100% of the time?\n\n\n\nAnswer: No.\n\n\nConfidence is just a “feeling”: How strongly the model believes this is the answer.\nIt does NOT guarantee the answer is correct in the real world.\n\n\nYou’ll learn how to actually measure correctness in Part 4 using Precision and Recall"
+  },
+  {
+    "objectID": "slides/1_Tasks_Inference.html#mapping-to-bounding-boxes",
+    "href": "slides/1_Tasks_Inference.html#mapping-to-bounding-boxes",
+    "title": "Ultralytics YOLO Foundations: Part 1",
+    "section": "Mapping to Bounding Boxes",
+    "text": "Mapping to Bounding Boxes\n\n\n\n\n\n\n\n\n\n\n\n\nMapping to \\((x_{min}, y_{min}, x_{max}, y_{max})\\):\n\\[\n\\begin{align*}\nx_{min} &= cx - \\frac{w}{2} = 7.5 - 4.0 = 3.5 \\\\\ny_{min} &= cy - \\frac{h}{2} = 7.5 - 3.5 = 4.0 \\\\\nx_{max} &= cx + \\frac{w}{2} = 7.5 + 4.0 = 11.5 \\\\\ny_{max} &= cy + \\frac{h}{2} = 7.5 + 3.5 = 11.0\n\\end{align*}\n\\]"
+  },
+  {
+    "objectID": "slides/1_Tasks_Inference.html#the-concept-of-n-objects",
+    "href": "slides/1_Tasks_Inference.html#the-concept-of-n-objects",
+    "title": "Ultralytics YOLO Foundations: Part 1",
+    "section": "The Concept of N Objects",
+    "text": "The Concept of N Objects\nRarely does an image contain exactly one object!\n\nYOLO evaluates the image and can predict multiple bounding boxes at once.\nThe single 6-element array [cx, cy, w, h, conf, cls] is stacked \\(N\\) times.\nResulting Output Shape: \\((N, 6)\\) (where \\(N\\) is the number of detected objects)."
+  },
+  {
+    "objectID": "slides/1_Tasks_Inference.html#object-detection-in-action",
+    "href": "slides/1_Tasks_Inference.html#object-detection-in-action",
+    "title": "Ultralytics YOLO Foundations: Part 1",
+    "section": "Object Detection in Action",
+    "text": "Object Detection in Action\nFind and localize objects using bounding boxes.\n# Live Example: Try this in your terminal!\nyolo task=detect mode=predict model=yolo26n.pt source=\"https://ultralytics.com/assets/bus.jpg\"\n# Python Equivalent\nimport os\nfrom ultralytics import YOLO\n\nmodel_path = \"yolo26n.pt\"\nif not os.path.exists(model_path):\n    model_path = \"../yolo26n.pt\"\nmodel = YOLO(model_path)\nresults = model.predict(source=\"https://ultralytics.com/assets/bus.jpg\")\n\n# Access Output Shape and Data\nboxes = results[0].boxes\nprint(f\"Boxes shape: {boxes.shape}\")  # (N, 6) -&gt; N boxes: x1, y1, x2, y2, conf, cls\nDocs Reference: Detection"
+  },
+  {
+    "objectID": "slides/1_Tasks_Inference.html#deep-dive-accessing-bounding-boxes",
+    "href": "slides/1_Tasks_Inference.html#deep-dive-accessing-bounding-boxes",
+    "title": "Ultralytics YOLO Foundations: Part 1",
+    "section": "Deep Dive: Accessing Bounding Boxes",
+    "text": "Deep Dive: Accessing Bounding Boxes\nThe result.boxes object provides several ways to access coordinates:\n\n.xyxy: \\([x_{min}, y_{min}, x_{max}, y_{max}]\\) (Top-left, Bottom-right)\n.xywh: \\([c_x, c_y, w, h]\\) (Center coordinates, width, height)\n.xyxyn / .xywhn: Normalized versions (values between 0.0 and 1.0)\n\nCode Example:\n# Accessing raw tensors\nboxes = result.boxes.xyxy   # [N, 4] tensor\nconf = result.boxes.conf    # [N] tensor\ncls = result.boxes.cls      # [N] tensor\n\n# Extracting first detection\nx1, y1, x2, y2 = boxes[0].tolist()"
+  },
+  {
+    "objectID": "slides/1_Tasks_Inference.html#detection-output-example",
+    "href": "slides/1_Tasks_Inference.html#detection-output-example",
+    "title": "Ultralytics YOLO Foundations: Part 1",
+    "section": "Detection Output Example",
+    "text": "Detection Output Example"
+  },
+  {
+    "objectID": "slides/1_Tasks_Inference.html#the-problem-with-absolute-pixels",
+    "href": "slides/1_Tasks_Inference.html#the-problem-with-absolute-pixels",
+    "title": "Ultralytics YOLO Foundations: Part 1",
+    "section": "The Problem with Absolute Pixels",
+    "text": "The Problem with Absolute Pixels\nWhy not just train the model on absolute pixel values like w = 8.0?\n\n\n\n\n\n\nImages come in all shapes and sizes (4K, 1080p, square, portrait).\nA car that is 800 pixels wide in a 4K image might only be 200 pixels wide in a 1080p image.\nIf the model learns “cars are 800 pixels wide”, it will fail on smaller images!"
+  },
+  {
+    "objectID": "slides/1_Tasks_Inference.html#the-solution-normalized-coordinates",
+    "href": "slides/1_Tasks_Inference.html#the-solution-normalized-coordinates",
+    "title": "Ultralytics YOLO Foundations: Part 1",
+    "section": "The Solution: Normalized Coordinates",
+    "text": "The Solution: Normalized Coordinates\n\nInstead of pixels, we teach the model using fractions of the image size (0.0 to 1.0).\n\n\n\n\\(cx_{norm} = cx_{pixel} / image\\_width\\)\n\\(w_{norm} = w_{pixel} / image\\_width\\)\n\n\n\nA car that takes up half the image width is always \\(w = 0.5\\), regardless of whether the image is 4K or 1080p!\n\n\n\nTraining vs. Predicting You MUST provide normalized coordinates (0.0 to 1.0) when training the model. However, when you use model.predict(), the Ultralytics Python API conveniently un-normalizes them back into standard absolute pixels (like boxes.xyxy) for immediate use!"
+  },
+  {
+    "objectID": "slides/1_Tasks_Inference.html#obb-oriented-bounding-box-output-concept",
+    "href": "slides/1_Tasks_Inference.html#obb-oriented-bounding-box-output-concept",
+    "title": "Ultralytics YOLO Foundations: Part 1",
+    "section": "OBB (Oriented Bounding Box) Output Concept",
+    "text": "OBB (Oriented Bounding Box) Output Concept\n\n\n\n\n\n\n\n\n\n\n\n\nModel Output (Oriented Box):\n\ncx, cy: The center coordinates.\nw & h: The box width and height.\nangle: The rotation angle of the box.\nconf: The confidence score.\ncls: The class ID."
+  },
+  {
+    "objectID": "slides/1_Tasks_Inference.html#obb-in-action",
+    "href": "slides/1_Tasks_Inference.html#obb-in-action",
+    "title": "Ultralytics YOLO Foundations: Part 1",
+    "section": "OBB in Action",
+    "text": "OBB in Action\nDetect objects with oriented bounding boxes (useful for aerial/satellite imagery or rotated objects).\nyolo task=obb mode=predict model=yolo26n-obb.pt source=\"https://ultralytics.com/images/boats.jpg\"\nfrom ultralytics import YOLO\n\nmodel = YOLO(\"yolo26n-obb.pt\")\nresults = model.predict(source=\"https://ultralytics.com/images/boats.jpg\")\n\n# Access Output Shape and Data\nobb = results[0].obb\nprint(f\"OBB shape: {obb.data.shape}\")  # (N, 7) -&gt; N boxes: cx, cy, w, h, angle, conf, cls\nprint(obb.xywhr)                       # Center x, y, width, height, rotation angle\nDocs Reference: OBB"
+  },
+  {
+    "objectID": "slides/1_Tasks_Inference.html#obb-output-example",
+    "href": "slides/1_Tasks_Inference.html#obb-output-example",
+    "title": "Ultralytics YOLO Foundations: Part 1",
+    "section": "OBB Output Example",
+    "text": "OBB Output Example"
+  },
+  {
+    "objectID": "slides/1_Tasks_Inference.html#instance-segmentation-output-concept",
+    "href": "slides/1_Tasks_Inference.html#instance-segmentation-output-concept",
+    "title": "Ultralytics YOLO Foundations: Part 1",
+    "section": "Instance Segmentation Output Concept",
+    "text": "Instance Segmentation Output Concept\n\n\n\n\n\n\n\n\n\n\n\n\nModel Output (Mask / Polygon):\n\nMask Tensor: A 2D array (bitmap) of pixels indicating the object’s exact shape (1 = object, 0 = background).\nCoordinates: Sequence of \\((x, y)\\) polygon coordinates derived from the mask.\nconf (0.89): Confidence score.\ncls (0): Class ID."
+  },
+  {
+    "objectID": "slides/1_Tasks_Inference.html#instance-segmentation-in-action",
+    "href": "slides/1_Tasks_Inference.html#instance-segmentation-in-action",
+    "title": "Ultralytics YOLO Foundations: Part 1",
+    "section": "Instance Segmentation in Action",
+    "text": "Instance Segmentation in Action\nOutline the exact shape (pixels) of each object instance.\n# Live Example: See the masks!\nyolo task=segment mode=predict model=yolo26n-seg.pt source=\"https://ultralytics.com/assets/bus.jpg\"\n# Python Equivalent\nfrom ultralytics import YOLO\n\nmodel = YOLO(\"yolo26n-seg.pt\")\nresults = model.predict(source=\"https://ultralytics.com/assets/bus.jpg\")\n\n# Access Output Shape and Data\nmasks = results[0].masks\nprint(f\"Masks shape: {masks.data.shape}\")  # (N, H, W) -&gt; N masks of HxW size\nprint(masks.xy)                            # Polygon coordinates\nDocs Reference: Segmentation"
+  },
+  {
+    "objectID": "slides/1_Tasks_Inference.html#segmentation-output-example",
+    "href": "slides/1_Tasks_Inference.html#segmentation-output-example",
+    "title": "Ultralytics YOLO Foundations: Part 1",
+    "section": "Segmentation Output Example",
+    "text": "Segmentation Output Example"
+  },
+  {
+    "objectID": "slides/1_Tasks_Inference.html#pose-estimation-output-concept",
+    "href": "slides/1_Tasks_Inference.html#pose-estimation-output-concept",
+    "title": "Ultralytics YOLO Foundations: Part 1",
+    "section": "Pose Estimation Output Concept",
+    "text": "Pose Estimation Output Concept\n\n\n\n\n\n\n\n\n\n\n\n\nModel Output (Keypoints):\n\nx, y: Coordinate pair for each predefined keypoint.\nkp_conf (per keypoint): Confidence score for each keypoint’s location.\nconf (0.92): Overall person detection confidence score.\ncls (0): Class ID (always 0 = person for pose models)."
+  },
+  {
+    "objectID": "slides/1_Tasks_Inference.html#pose-estimation-in-action",
+    "href": "slides/1_Tasks_Inference.html#pose-estimation-in-action",
+    "title": "Ultralytics YOLO Foundations: Part 1",
+    "section": "Pose Estimation in Action",
+    "text": "Pose Estimation in Action\nEstimate human body keypoints (elbows, knees).\n# Live Example: Track keypoints!\nyolo task=pose mode=predict model=yolo26n-pose.pt source=\"https://ultralytics.com/assets/bus.jpg\"\n# Python Equivalent\nfrom ultralytics import YOLO\n\nmodel = YOLO(\"yolo26n-pose.pt\")\nresults = model.predict(source=\"https://ultralytics.com/assets/bus.jpg\")\n\n# Access Output Shape and Data\nkeypoints = results[0].keypoints\nprint(f\"Keypoints shape: {keypoints.data.shape}\")  # (N, 17, 3) -&gt; N persons, 17 keypoints, (x, y, conf)\nprint(keypoints.xy)                                # Keypoint coordinates\nDocs Reference: Pose"
+  },
+  {
+    "objectID": "slides/1_Tasks_Inference.html#pose-estimation-output-example",
+    "href": "slides/1_Tasks_Inference.html#pose-estimation-output-example",
+    "title": "Ultralytics YOLO Foundations: Part 1",
+    "section": "Pose Estimation Output Example",
+    "text": "Pose Estimation Output Example"
+  },
+  {
+    "objectID": "slides/1_Tasks_Inference.html#sahi-sliced-aided-hyper-inference",
+    "href": "slides/1_Tasks_Inference.html#sahi-sliced-aided-hyper-inference",
+    "title": "Ultralytics YOLO Foundations: Part 1",
+    "section": "SAHI: Sliced Aided Hyper Inference",
+    "text": "SAHI: Sliced Aided Hyper Inference\nProblem: Tiny objects in high-res images (e.g., 4K) often vanish when resized to 640px.\n\n\nSolution — SAHI:\n\nSlice the large image into small, overlapping tiles.\nRun YOLO on each tile at full resolution.\nMerge all detections back together automatically.\n\n\n\n\nSAHI is a wrapper around inference — no retraining needed. Use it when objects are small relative to the full frame."
+  },
+  {
+    "objectID": "slides/1_Tasks_Inference.html#object-tracking-in-action",
+    "href": "slides/1_Tasks_Inference.html#object-tracking-in-action",
+    "title": "Ultralytics YOLO Foundations: Part 1",
+    "section": "Object Tracking in Action",
+    "text": "Object Tracking in Action\nAssign distinct IDs to objects and track them continuously across video frames!\nyolo task=detect mode=track model=weights/yolo26n.pt source=\"path/to/video.mp4\"\nfrom ultralytics import YOLO\n\nmodel = YOLO(\"weights/yolo26n.pt\")\n# Use track() with stream=True for memory-efficient video processing\nresults = model.track(source=\"path/to/video.mp4\", stream=True)\n\n# Iterate through the video frames\nfor result in results:\n    boxes = result.boxes\n    if boxes.id is not None:\n        # Extract IDs as a list of integers\n        ids = boxes.id.int().tolist()\n        print(f\"Tracking IDs: {ids}\")  # e.g., [1, 2]\nDocs Reference: Tracking"
+  },
+  {
+    "objectID": "slides/1_Tasks_Inference.html#demonstration-object-tracking",
+    "href": "slides/1_Tasks_Inference.html#demonstration-object-tracking",
+    "title": "Ultralytics YOLO Foundations: Part 1",
+    "section": "Demonstration: Object Tracking",
+    "text": "Demonstration: Object Tracking"
+  },
+  {
+    "objectID": "slides/1_Tasks_Inference.html#predict-usage-python-batch-input",
+    "href": "slides/1_Tasks_Inference.html#predict-usage-python-batch-input",
+    "title": "Ultralytics YOLO Foundations: Part 1",
+    "section": "Predict Usage (Python): Batch Input",
+    "text": "Predict Usage (Python): Batch Input\nProcess multiple sources or directories efficiently!\nfrom ultralytics import YOLO\n\n# Load your model\nmodel = YOLO(\"weights/yolo26n.pt\")\n\n# Option 1: A list of specific sources\nsources = [\n    \"https://ultralytics.com/assets/bus.jpg\",\n    \"path/to/local/image.jpg\",\n    \"another_image.png\"\n]\nresults = model.predict(source=sources)\n\n# Option 2: An entire directory\n# results = model.predict(source=\"path/to/my_images_folder/\")"
+  },
+  {
+    "objectID": "slides/1_Tasks_Inference.html#predict-usage-python-processing-results",
+    "href": "slides/1_Tasks_Inference.html#predict-usage-python-processing-results",
+    "title": "Ultralytics YOLO Foundations: Part 1",
+    "section": "Predict Usage (Python): Processing Results",
+    "text": "Predict Usage (Python): Processing Results\nProcess the batch results or use a memory-efficient stream.\n# Process the batch results\nfor result in results:\n    boxes = result.boxes  # Bounding boxes\n    probs = result.probs  # Classification probabilities\n    result.show()         # Display each result\n    result.save(filename=f\"result_{result.path.name}\")\nStream/Generator: For very large datasets, you can use stream=True in the predict call:\nmodel.predict(source=\"dir/\", stream=True)"
+  },
+  {
+    "objectID": "slides/1_Tasks_Inference.html#summary",
+    "href": "slides/1_Tasks_Inference.html#summary",
+    "title": "Ultralytics YOLO Foundations: Part 1",
+    "section": "Summary",
+    "text": "Summary\n\nYOLO Basics: We explored how to use the CLI and Python API for various tasks.\nTasks: Object Detection, Image Classification, Instance Segmentation, Pose Estimation, and OBB.\nCoordinates: The importance of normalized coordinates over absolute pixels.\nSAHI: Using Sliced Aided Hyper Inference for tiny objects.\nInference: How to predict on single images, videos, and batches efficiently."
+  },
+  {
+    "objectID": "slides/1_Tasks_Inference.html#next-steps",
+    "href": "slides/1_Tasks_Inference.html#next-steps",
+    "title": "Ultralytics YOLO Foundations: Part 1",
+    "section": "Next Steps",
+    "text": "Next Steps\nNext up: Real World Use Cases & Solutions\n\nLearn how to extract actionable insights from trained models.\nDiscover out-of-the-box solutions for real-world problems.\nIntegrate object tracking, counting, and more into your applications."
+  },
+  {
+    "objectID": "slides/1_Tasks_Inference.html#qa",
+    "href": "slides/1_Tasks_Inference.html#qa",
+    "title": "Ultralytics YOLO Foundations: Part 1",
+    "section": "Q&A",
+    "text": "Q&A\n\nThank You!\nAny questions?"
+  },
+  {
+    "objectID": "index.html",
+    "href": "index.html",
+    "title": "Ultralytics & Computer Vision For Developers",
+    "section": "",
+    "text": "Welcome to the Ultralytics & Computer Vision For Developers course. Follow the modules below in order to build your foundation in modern computer vision.\nGitHub Repository: NaifMersal/cv-for-developers-ultralytics\n\n\n\n🖼️ Preparatory Module\nHow computers perceive images.\n\nLearn about pixels, color channels, coordinate systems, and the basics behind digital cameras and computer vision libraries.\n\n\nPresentation Slides\nLab: Images as N-Dimensional Arrays \n\n\n\n🚀 Part 1: Tasks & Inference\nDiscover what YOLO can do out of the box.\n\nCovers running inference for Object Detection, Instance Segmentation, Classification, and Pose Estimation using CLI and Python.\n\n\nPresentation Slides\nLab: YOLO Tasks & Inference \n\n\n\n🔍 Part 2: Use Cases & Solutions\nBeyond bounding boxes: actionable insights.\n\nSolutions for region analytics, kinematic tracking, video heatmaps, and setting up external integrations.\n\n\nPresentation Slides\nLab: Real-World Solutions \n\n\n\n🎥 Part 2B: Video Engineering (BONUS)\nHandling RTSP and Concurrency.\n\nOvercome I/O bottlenecks using Threading and Queues to ensure your inference loops remain real-time without blocking the UI.\n\n\nPresentation Slides\nBONUS Lab: Async Video Streaming \n\n\n\n📊 Part 3: Model Evaluation\nHow good is your model?\n\nUnderstanding confusion matrices, IoU, Precision, Recall, and mAP metrics to evaluate model performance professionally.\n\n\nPresentation Slides\nLab: ROI-Driven Evaluation \n\n\n\n🛠️ Part 4: Custom Data & Training\nTeaching the model your custom data.\n\nData formatting, labeling tools, loss functions, hyperparameter tuning, augmentation, and diagnosing overfitting vs. underfitting.\n\n\nPresentation Slides\nLab 4A: Custom Training: Fine-tune on COCO8 \nLab 4B: Technical Metrics & Diagnosis \n\n\n\n🚀 Part 5: Deployment\nTaking your model to production.\n\nExporting to optimized formats like ONNX, OpenVINO, and TensorRT for high-performance inference on various hardware.\n\n\nPresentation Slides\n\n\n\n🤗 Part 6: HuggingFace for Computer Vision\nExpanding your toolkit with the HF Hub.\n\nLearn to use SAM 3 for zero-shot segmentation, visual embeddings for similarity search, and Vision LLMs for multimodal reasoning.\n\n\nPresentation Slides\nLab 6: HuggingFace for CV"
+  },
+  {
+    "objectID": "slides/0_Image_Foundations.html#how-we-see-light-and-the-human-eye",
+    "href": "slides/0_Image_Foundations.html#how-we-see-light-and-the-human-eye",
+    "title": "Digital Image Foundations",
+    "section": "How We See: Light and The Human Eye",
+    "text": "How We See: Light and The Human Eye\n\n\n\n1. Illumination: Light from a source (e.g., the sun) hits an object.\n2. Reflection: The object absorbs some colors and reflects others.\n3. Capture: Reflected light enters the eye through the pupil.\n4. Processing: The lens focuses light onto the retina. Photoreceptors (rods and cones) convert it to electrical signals for the brain."
+  },
+  {
+    "objectID": "slides/0_Image_Foundations.html#how-computers-see-the-digital-camera",
+    "href": "slides/0_Image_Foundations.html#how-computers-see-the-digital-camera",
+    "title": "Digital Image Foundations",
+    "section": "How Computers “See”: The Digital Camera",
+    "text": "How Computers “See”: The Digital Camera"
+  },
+  {
+    "objectID": "slides/0_Image_Foundations.html#how-computers-see-step-by-step",
+    "href": "slides/0_Image_Foundations.html#how-computers-see-step-by-step",
+    "title": "Digital Image Foundations",
+    "section": "How Computers “See”: Step by Step",
+    "text": "How Computers “See”: Step by Step\n\n1. Capture: Just like the eye, the camera captures reflected light.\n2. Lens & Aperture: Light enters through an opening (aperture) and is focused by glass lenses.\n3. The Sensor: Instead of a retina, light hits a digital sensor (CMOS/CCD).\n4. Digitization: Millions of sensor pixels convert photons into electrical charges, creating a digital matrix (usually 8-bit).\n\n\n\n\n\n\n\nNote: In reality, lenses flip the image upside-down, and color sensors use a Bayer Filter to capture Red, Green, or Blue at each pixel."
+  },
+  {
+    "objectID": "slides/0_Image_Foundations.html#grayscale-images-pixels-coordinates",
+    "href": "slides/0_Image_Foundations.html#grayscale-images-pixels-coordinates",
+    "title": "Digital Image Foundations",
+    "section": "Grayscale Images: Pixels & Coordinates",
+    "text": "Grayscale Images: Pixels & Coordinates\n\nImages are 2D matrices of numbers. The origin (0,0) is top-left.\n8-bit Grayscale: Each pixel is a number from 0 (black) to 255 (white).\n\n\n\n# 8x8 matrix (8-bit grayscale: 0-255)\nimg = np.array([\n    [0,  0,  0,  0,  0,  0,  0,  0],\n    [0,255,255,  0,  0,255,255,  0],\n    [0,255,255,  0,  0,255,255,  0],\n    [0,  0,  0,  0,  0,  0,  0,  0],\n    [0,150,  0,  0,  0,  0,150,  0],\n    [0,  0,255,255,255,255,  0,  0],\n    [0,150,  0,  0,  0,  0,150,  0],\n    [0,  0,  0,  0,  0,  0,  0,  0]\n], dtype=np.uint8)"
+  },
+  {
+    "objectID": "slides/0_Image_Foundations.html#coordinates-vs.-array-indexing",
+    "href": "slides/0_Image_Foundations.html#coordinates-vs.-array-indexing",
+    "title": "Digital Image Foundations",
+    "section": "Coordinates vs. Array Indexing",
+    "text": "Coordinates vs. Array Indexing\n\n\n\nWe think in geometry: (x, y) = (width, height).\nNumPy thinks in matrices: matrix[row, col] = matrix[y, x].\nThis causes endless confusion when cropping with bounding boxes (x1, y1, x2, y2).\n\n\n# Assuming a bounding box (x1, y1, x2, y2)\n\n# WRONG (Crops wrong area or crashes)\ncrop = img[x1:x2, y1:y2] \n\n# CORRECT (y = row, x = col)\ncrop = img[y1:y2, x1:x2]"
+  },
+  {
+    "objectID": "slides/0_Image_Foundations.html#color-images-the-rgb-pixel",
+    "href": "slides/0_Image_Foundations.html#color-images-the-rgb-pixel",
+    "title": "Digital Image Foundations",
+    "section": "Color Images: The RGB Pixel",
+    "text": "Color Images: The RGB Pixel\n\nIn a color image, every pixel is a combination of 3 primary colors.\nA pixel at position \\((x, y)\\) is a vector of 3 values: \\([R, G, B]\\).\nEach value ranges from 0 to 255 (8-bit)."
+  },
+  {
+    "objectID": "slides/0_Image_Foundations.html#color-images-the-ml-perspective",
+    "href": "slides/0_Image_Foundations.html#color-images-the-ml-perspective",
+    "title": "Digital Image Foundations",
+    "section": "Color Images: The ML Perspective",
+    "text": "Color Images: The ML Perspective\n\nAlternative View: Instead of “pixels with 3 values”, we see 3 separate layers.\nThis is how Machine Learning models (CNNs) “see” images as Tensors.\nData structure: \\((Height \\times Width \\times 3)\\) or \\((3 \\times Height \\times Width)\\)."
+  },
+  {
+    "objectID": "slides/0_Image_Foundations.html#essential-image-libraries",
+    "href": "slides/0_Image_Foundations.html#essential-image-libraries",
+    "title": "Digital Image Foundations",
+    "section": "Essential Image Libraries",
+    "text": "Essential Image Libraries\n\n\n\n\n\n\n📷\n\n\nOpenCV\n\nVery fast C++ library mapped to Python.\n\nUses BGR channel order\nGreat for video streams\nLow-level transforms\n\n\n\n\n\n\n\n\n\n🖼️\n\n\nPillow (PIL)\n\nStandard Python image library.\n\nUses RGB channel order\nSimple drawing & resizing\n(Our primary tool)\n\n\n\n\n\n\n\n\n\n🔢\n\n\nNumPy\n\nThe core math library.\n\nImages are fundamentally numpy tensors\nMulti-dimensional array operations"
+  },
+  {
+    "objectID": "slides/0_Image_Foundations.html#the-smurf-effect-bgr-vs.-rgb",
+    "href": "slides/0_Image_Foundations.html#the-smurf-effect-bgr-vs.-rgb",
+    "title": "Digital Image Foundations",
+    "section": "The “Smurf Effect”: BGR vs. RGB",
+    "text": "The “Smurf Effect”: BGR vs. RGB\n\n\n\nOpenCV historically uses Blue-Green-Red (BGR).\nMost other libraries (Matplotlib, Pillow) expect Red-Green-Blue (RGB).\nIf you read an image with cv2.imread() and plot it directly in matplotlib, Red and Blue channels are swapped!\nFaces look blue, skies look red.\n\n\nBasic I/O Operations\nimport cv2\nimport matplotlib.pyplot as plt\n\n# 1. Read image (OpenCV loads BGR)\nimg_bgr = cv2.imread('dog.jpg')\n\n# 2. Convert to RGB for accurate display\nimg_rgb = cv2.cvtColor(img_bgr, cv2.COLOR_BGR2RGB)\n\n# 3. Display\nplt.imshow(img_rgb)\nplt.axis('off')\nplt.show()"
+  },
+  {
+    "objectID": "slides/0_Image_Foundations.html#summary",
+    "href": "slides/0_Image_Foundations.html#summary",
+    "title": "Digital Image Foundations",
+    "section": "Summary",
+    "text": "Summary\n\nLight & Cameras: How digital sensors capture light and turn it into data.\nPixels & Channels: Grayscale (2D) vs. Color RGB (3D) representations.\nLibraries: Pillow and NumPy basics.\nGotchas: BGR vs RGB (The Smurf Effect) and Array Indexing vs Coordinates."
+  },
+  {
+    "objectID": "slides/0_Image_Foundations.html#next-steps",
+    "href": "slides/0_Image_Foundations.html#next-steps",
+    "title": "Digital Image Foundations",
+    "section": "Next Steps",
+    "text": "Next Steps\nNext up: YOLO Inference\n\nUsing these images with state-of-the-art Computer Vision models.\nRunning inference directly out-of-the-box."
+  },
+  {
+    "objectID": "slides/0_Image_Foundations.html#qa",
+    "href": "slides/0_Image_Foundations.html#qa",
+    "title": "Digital Image Foundations",
+    "section": "Q&A",
+    "text": "Q&A\n\nThank You!\nAny questions?"
+  },
+  {
+    "objectID": "slides/2B_Real_World_Video_Engineering.html#the-standard-loop",
+    "href": "slides/2B_Real_World_Video_Engineering.html#the-standard-loop",
+    "title": "Real World Video Engineering",
+    "section": "The Standard Loop",
+    "text": "The Standard Loop\nA standard OpenCV inference loop looks like this:\nimport cv2\nfrom ultralytics import YOLO\n\ncap = cv2.VideoCapture(0)\nmodel = YOLO('yolov8n.pt')\n\nwhile True:\n    ret, frame = cap.read()       # Block 1\n    if not ret: break\n    \n    results = model(frame)        # Block 2\n    annotated = results[0].plot() # Block 3\n    \n    cv2.imshow(\"Camera\", annotated)\n    if cv2.waitKey(1) == ord('q'): break"
+  },
+  {
+    "objectID": "slides/2B_Real_World_Video_Engineering.html#where-time-goes",
+    "href": "slides/2B_Real_World_Video_Engineering.html#where-time-goes",
+    "title": "Real World Video Engineering",
+    "section": "Where Time Goes",
+    "text": "Where Time Goes\nIn a synchronous while loop, every operation waits for the previous one to finish.\n\ncap.read(): ~30ms (Waiting for the camera sensor or network packet)\nmodel(frame): ~20ms (Inference on GPU)\ncv2.imshow(): ~5ms (Rendering)\n\nTotal Time per Frame: ~55ms (Max ~18 FPS)\nIf you are reading an RTSP stream (e.g. from an IP Camera) that sends 30 FPS, reading frames slower than they arrive causes a buffer overflow resulting in massive delay (lag)."
+  },
+  {
+    "objectID": "slides/2B_Real_World_Video_Engineering.html#multithreading-in-python",
+    "href": "slides/2B_Real_World_Video_Engineering.html#multithreading-in-python",
+    "title": "Real World Video Engineering",
+    "section": "Multithreading in Python",
+    "text": "Multithreading in Python\nTo prevent the model inference from slowing down the camera reading, we can put them on separate Threads.\n\nThread 1 (Producer): Constantly reads frames from the camera as fast as possible.\nThread 2 (Consumer): Takes the latest frame and runs YOLO inference on it."
+  },
+  {
+    "objectID": "slides/2B_Real_World_Video_Engineering.html#the-producer-consumer-pattern",
+    "href": "slides/2B_Real_World_Video_Engineering.html#the-producer-consumer-pattern",
+    "title": "Real World Video Engineering",
+    "section": "The Producer-Consumer Pattern",
+    "text": "The Producer-Consumer Pattern\nWe need a safe way for Thread 1 to hand the frame to Thread 2. We use a Thread-Safe Queue (queue.Queue).\nfrom queue import Queue\nfrom threading import Thread\n\n# A queue to hold our frames\nframe_queue = Queue(maxsize=1) \nWhy maxsize=1? For real-time applications (like security cameras), we only care about the most recent frame. If inference is slow, we want to drop old frames, not process a backlog of delayed footage."
+  },
+  {
+    "objectID": "slides/2B_Real_World_Video_Engineering.html#the-async-reader-class",
+    "href": "slides/2B_Real_World_Video_Engineering.html#the-async-reader-class",
+    "title": "Real World Video Engineering",
+    "section": "The Async Reader Class",
+    "text": "The Async Reader Class\nimport cv2\nfrom threading import Thread\nfrom queue import Queue\n\nclass AsyncCamera:\n    def __init__(self, src=0):\n        self.cap = cv2.VideoCapture(src)\n        self.q = Queue(maxsize=1)\n        self.running = True\n        # Start the background thread\n        Thread(target=self._reader, daemon=True).start()\n\n    def _reader(self):\n        while self.running:\n            ret, frame = self.cap.read()\n            if not ret: break\n            \n            # Clear queue if full (drop old frame)\n            if self.q.full():\n                try: self.q.get_nowait()\n                except: pass\n                \n            # Put new frame in queue\n            self.q.put(frame)"
+  },
+  {
+    "objectID": "slides/2B_Real_World_Video_Engineering.html#consuming-the-queue",
+    "href": "slides/2B_Real_World_Video_Engineering.html#consuming-the-queue",
+    "title": "Real World Video Engineering",
+    "section": "Consuming the Queue",
+    "text": "Consuming the Queue\nNow our main loop only asks the Queue for frames, never blocking on the camera!\ncamera = AsyncCamera(0)\nmodel = YOLO('yolov8n.pt')\n\nwhile True:\n    # Get the latest frame from the background thread\n    frame = camera.q.get() \n    \n    # Run inference\n    results = model(frame)\n    annotated = results[0].plot()\n    \n    cv2.imshow(\"Async Cam\", annotated)\n    if cv2.waitKey(1) == ord('q'): \n        break\n        \ncamera.running = False"
+  },
+  {
+    "objectID": "slides/2B_Real_World_Video_Engineering.html#summary",
+    "href": "slides/2B_Real_World_Video_Engineering.html#summary",
+    "title": "Real World Video Engineering",
+    "section": "Summary",
+    "text": "Summary\n\nSynchronous loops (cap.read() + inference()) cause lag on live streams.\nProducer-Consumer Pattern: Separating reading and processing solves this.\nqueue.Queue (maxsize=1): The safest way to pass frames between threads and enforce dropping old frames to maintain real-time performance."
+  },
+  {
+    "objectID": "slides/2B_Real_World_Video_Engineering.html#next-steps",
+    "href": "slides/2B_Real_World_Video_Engineering.html#next-steps",
+    "title": "Real World Video Engineering",
+    "section": "Next Steps",
+    "text": "Next Steps\nLet’s head to the lab to build our own AsyncCamera class and test it!\n\nOpen labs/02b_video_engineering.ipynb"
+  },
+  {
+    "objectID": "slides/3_Evaluation.html#binary-classification-basics",
+    "href": "slides/3_Evaluation.html#binary-classification-basics",
+    "title": "Ultralytics YOLO Foundations: Part 3",
     "section": "Binary Classification Basics",
     "text": "Binary Classification Basics\nEvery prediction falls into one of four categories. Example: detecting a “Car”\n\n\n\n\n\n\n\n\n\nPredicted: Car\nPredicted: Not Car\n\n\nActual: Car\n✅ True Positive\nCorrect detection\n❌ False Negative\nMissed car\n\n\nActual: Not Car\n⚠️ False Positive\nFalse alarm\n✅ True Negative\nCorrect rejection"
   },
   {
-    "objectID": "slides/4_Evaluation_Deployment.html#scenario-smart-parking-camera",
-    "href": "slides/4_Evaluation_Deployment.html#scenario-smart-parking-camera",
-    "title": "Ultralytics YOLO Foundations: Part 4",
+    "objectID": "slides/3_Evaluation.html#scenario-smart-parking-camera",
+    "href": "slides/3_Evaluation.html#scenario-smart-parking-camera",
+    "title": "Ultralytics YOLO Foundations: Part 3",
     "section": "Scenario: Smart Parking Camera",
     "text": "Scenario: Smart Parking Camera\n\nA camera at a parking entrance classifies each frame as Car Present or Not:\n\n\nDataset: 24 hours, 10,000 frames (~9s interval)\n\n\n\n\nCount\n%\n\n\n\n\nCar Present\n500\n5%\n\n\nEmpty Spot\n9,500\n95%\n\n\n\nMost of the time, the spot is empty."
   },
   {
-    "objectID": "slides/4_Evaluation_Deployment.html#the-problem-with-accuracy",
-    "href": "slides/4_Evaluation_Deployment.html#the-problem-with-accuracy",
-    "title": "Ultralytics YOLO Foundations: Part 4",
+    "objectID": "slides/3_Evaluation.html#the-problem-with-accuracy",
+    "href": "slides/3_Evaluation.html#the-problem-with-accuracy",
+    "title": "Ultralytics YOLO Foundations: Part 3",
     "section": "The Problem with Accuracy",
     "text": "The Problem with Accuracy\nA “lazy” model that always predicts “Empty”:\n\n\nFinds 0 cars\nGets all 9,500 empty spots correct\n\n\n\n\\[Accuracy = \\frac{9{,}500}{10{,}000} = 95\\%\\]\n\n\n95% Accuracy — yet it never detects a single car. This is the Class Imbalance Problem."
   },
   {
-    "objectID": "slides/4_Evaluation_Deployment.html#balanced-accuracy-a-quick-fix",
-    "href": "slides/4_Evaluation_Deployment.html#balanced-accuracy-a-quick-fix",
-    "title": "Ultralytics YOLO Foundations: Part 4",
+    "objectID": "slides/3_Evaluation.html#balanced-accuracy-a-quick-fix",
+    "href": "slides/3_Evaluation.html#balanced-accuracy-a-quick-fix",
+    "title": "Ultralytics YOLO Foundations: Part 3",
     "section": "Balanced Accuracy: A Quick Fix",
     "text": "Balanced Accuracy: A Quick Fix\nInstead of overall accuracy, we average the per-class accuracies so each class counts equally.\n\nApplied to our “Lazy” Model:\n\nCar Accuracy: 0 / 500 = 0%\nEmpty Accuracy: 9,500 / 9,500 = 100%\nBalanced Accuracy: \\((0\\% + 100\\%) / 2 = \\mathbf{50\\%}\\)\n\n\n\nBalanced Accuracy correctly flags the lazy model as a failure, even though its “standard” accuracy was 95%!"
   },
   {
-    "objectID": "slides/4_Evaluation_Deployment.html#balanced-accuracy-the-hidden-problem",
-    "href": "slides/4_Evaluation_Deployment.html#balanced-accuracy-the-hidden-problem",
-    "title": "Ultralytics YOLO Foundations: Part 4",
+    "objectID": "slides/3_Evaluation.html#balanced-accuracy-the-hidden-problem",
+    "href": "slides/3_Evaluation.html#balanced-accuracy-the-hidden-problem",
+    "title": "Ultralytics YOLO Foundations: Part 3",
     "section": "Balanced Accuracy: The Hidden Problem",
     "text": "Balanced Accuracy: The Hidden Problem\nWhat if our model catches every car, but is “trigger-happy”?\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\nCar Accuracy: 100%\nEmpty Accuracy: 80%\n\n\\[\\frac{100\\% + 80\\%}{2} = \\mathbf{90\\%}\\]\n\n\n\n\n\n90% looks great — but that’s 1,900 false alarms hidden inside the score.\n\n\n\n\n\n\n\n\nThe TN “Trap”: The 7,600 True Negatives (correctly ignoring empty spots) are what inflate the accuracy while the false alarms flood your system."
   },
   {
-    "objectID": "slides/4_Evaluation_Deployment.html#precision-and-recall",
-    "href": "slides/4_Evaluation_Deployment.html#precision-and-recall",
-    "title": "Ultralytics YOLO Foundations: Part 4",
+    "objectID": "slides/3_Evaluation.html#precision-and-recall",
+    "href": "slides/3_Evaluation.html#precision-and-recall",
+    "title": "Ultralytics YOLO Foundations: Part 3",
     "section": "Precision and Recall",
     "text": "Precision and Recall\nTwo metrics that ignore True Negatives entirely (correctly classified Empty spot):\n\nPrecision: When the model flags a “Car”, is it actually a Car? (Quality) \\[Precision = \\frac{TP}{TP + FP}\\]\nRecall: Out of all actual Cars, how many did the model find? (Quantity) \\[Recall = \\frac{TP}{TP + FN}\\]"
   },
   {
-    "objectID": "slides/4_Evaluation_Deployment.html#case-study-two-models",
-    "href": "slides/4_Evaluation_Deployment.html#case-study-two-models",
-    "title": "Ultralytics YOLO Foundations: Part 4",
+    "objectID": "slides/3_Evaluation.html#case-study-two-models",
+    "href": "slides/3_Evaluation.html#case-study-two-models",
+    "title": "Ultralytics YOLO Foundations: Part 3",
     "section": "Case Study: Two Models",
     "text": "Case Study: Two Models\nWe have 500 actual cars. How would these two models handle them?\n\nModel A: “Over-Sensitive” (Flags everything)\nModel B: “Cautious” (Flags only sure bets)"
   },
   {
-    "objectID": "slides/4_Evaluation_Deployment.html#model-a-over-sensitive",
-    "href": "slides/4_Evaluation_Deployment.html#model-a-over-sensitive",
-    "title": "Ultralytics YOLO Foundations: Part 4",
+    "objectID": "slides/3_Evaluation.html#model-a-over-sensitive",
+    "href": "slides/3_Evaluation.html#model-a-over-sensitive",
+    "title": "Ultralytics YOLO Foundations: Part 3",
     "section": "Model A: “Over-Sensitive”",
     "text": "Model A: “Over-Sensitive”\nFlags everything — never misses a car\n\n\n\n\n\n\n\n\n\n\n\nRecall: 500 / 500 = 100%\nPrecision: 500 / 2,400 ≈ 20.8%"
   },
   {
-    "objectID": "slides/4_Evaluation_Deployment.html#model-b-cautious",
-    "href": "slides/4_Evaluation_Deployment.html#model-b-cautious",
-    "title": "Ultralytics YOLO Foundations: Part 4",
+    "objectID": "slides/3_Evaluation.html#model-b-cautious",
+    "href": "slides/3_Evaluation.html#model-b-cautious",
+    "title": "Ultralytics YOLO Foundations: Part 3",
     "section": "Model B: “Cautious”",
     "text": "Model B: “Cautious”\nOnly flags when very confident\n\n\n\n\n\n\n\n\n\n\n\nRecall: 350 / 500 = 70%\nPrecision: 350 / 350 = 100%"
   },
   {
-    "objectID": "slides/4_Evaluation_Deployment.html#reminder-model-output-confidence-neq-label",
-    "href": "slides/4_Evaluation_Deployment.html#reminder-model-output-confidence-neq-label",
-    "title": "Ultralytics YOLO Foundations: Part 4",
+    "objectID": "slides/3_Evaluation.html#reminder-model-output-confidence-neq-label",
+    "href": "slides/3_Evaluation.html#reminder-model-output-confidence-neq-label",
+    "title": "Ultralytics YOLO Foundations: Part 3",
     "section": "(Reminder) Model Output: Confidence \\(\\neq\\) Label",
     "text": "(Reminder) Model Output: Confidence \\(\\neq\\) Label\n\n\n\n  \n    🧠 Model\n    Raw confidence scores\n  \n  ↓\n  \n    ⚙️ Threshold Gate\n    Is score ≥ threshold?\n  \n  ↓\n  \n    🏷️ Label\n    \"Car\" / \"Not Car\"\n  \n\n\n The Model outputs scores, not decisions:\n\n“I am 72% sure this is a car.”\n\n\nWe decide the label:\n\nClassification: top score wins (top1)\nDetection: only boxes above the confidence threshold are shown"
   },
   {
-    "objectID": "slides/4_Evaluation_Deployment.html#interactive-demo-threshold-trade-off",
-    "href": "slides/4_Evaluation_Deployment.html#interactive-demo-threshold-trade-off",
-    "title": "Ultralytics YOLO Foundations: Part 4",
+    "objectID": "slides/3_Evaluation.html#interactive-demo-threshold-trade-off",
+    "href": "slides/3_Evaluation.html#interactive-demo-threshold-trade-off",
+    "title": "Ultralytics YOLO Foundations: Part 3",
     "section": "Interactive Demo: Threshold Trade-off",
     "text": "Interactive Demo: Threshold Trade-off"
   },
   {
-    "objectID": "slides/4_Evaluation_Deployment.html#the-trade-off-precision-vs.-recall",
-    "href": "slides/4_Evaluation_Deployment.html#the-trade-off-precision-vs.-recall",
-    "title": "Ultralytics YOLO Foundations: Part 4",
+    "objectID": "slides/3_Evaluation.html#the-trade-off-precision-vs.-recall",
+    "href": "slides/3_Evaluation.html#the-trade-off-precision-vs.-recall",
+    "title": "Ultralytics YOLO Foundations: Part 3",
     "section": "The Trade-off: Precision vs. Recall",
     "text": "The Trade-off: Precision vs. Recall\nRaising or lowering your confidence threshold shifts the balance:\n\n\n🎯 High Threshold (0.80)\nStrict — only “sure bets” pass\n↑ Precision (fewer false alarms)\n↓ Recall (more misses)\n\n🔍 Low Threshold (0.20)\nLoose — catch everything\n↑ Recall (fewer misses)\n↓ Precision (more false alarms)"
   },
   {
-    "objectID": "slides/4_Evaluation_Deployment.html#f1-score-balancing-precision-recall",
-    "href": "slides/4_Evaluation_Deployment.html#f1-score-balancing-precision-recall",
-    "title": "Ultralytics YOLO Foundations: Part 4",
+    "objectID": "slides/3_Evaluation.html#f1-score-balancing-precision-recall",
+    "href": "slides/3_Evaluation.html#f1-score-balancing-precision-recall",
+    "title": "Ultralytics YOLO Foundations: Part 3",
     "section": "F1 Score: Balancing Precision & Recall",
     "text": "F1 Score: Balancing Precision & Recall\nWhich single number combines both?\n\\[F_1 = 2 \\times \\frac{Precision \\times Recall}{Precision + Recall}\\]\n\n\n\nA 0 in either metric drags the whole score down — you can’t hide behind one strong number."
   },
   {
-    "objectID": "slides/4_Evaluation_Deployment.html#f1-score-model-comparison",
-    "href": "slides/4_Evaluation_Deployment.html#f1-score-model-comparison",
-    "title": "Ultralytics YOLO Foundations: Part 4",
+    "objectID": "slides/3_Evaluation.html#f1-score-model-comparison",
+    "href": "slides/3_Evaluation.html#f1-score-model-comparison",
+    "title": "Ultralytics YOLO Foundations: Part 3",
     "section": "F1 Score: Model Comparison",
     "text": "F1 Score: Model Comparison\n\n\n\n\n\n\n\n\n\n\n\n\nF1 exposes Model A’s flaw: 1,900 false alarms inflate Recall but tank Precision — F1 = 34.4%."
   },
   {
-    "objectID": "slides/4_Evaluation_Deployment.html#choosing-the-right-threshold",
-    "href": "slides/4_Evaluation_Deployment.html#choosing-the-right-threshold",
-    "title": "Ultralytics YOLO Foundations: Part 4",
+    "objectID": "slides/3_Evaluation.html#choosing-the-right-threshold",
+    "href": "slides/3_Evaluation.html#choosing-the-right-threshold",
+    "title": "Ultralytics YOLO Foundations: Part 3",
     "section": "Choosing the Right Threshold",
     "text": "Choosing the Right Threshold\n\n\n\n\n\n\n\n\n\n\n\n\n\nUltralytics saves F1_curve.png and R_curve.png in your training results automatically."
   },
   {
-    "objectID": "slides/4_Evaluation_Deployment.html#case-study-translating-metrics-to-roi",
-    "href": "slides/4_Evaluation_Deployment.html#case-study-translating-metrics-to-roi",
-    "title": "Ultralytics YOLO Foundations: Part 4",
+    "objectID": "slides/3_Evaluation.html#case-study-translating-metrics-to-roi",
+    "href": "slides/3_Evaluation.html#case-study-translating-metrics-to-roi",
+    "title": "Ultralytics YOLO Foundations: Part 3",
     "section": "Case Study: Translating Metrics to ROI",
     "text": "Case Study: Translating Metrics to ROI\nAccuracy and F1 are great for engineers, but management speaks one language: Money.\n\nScenario: A Digital Factory produces high-end circuit boards. We deploy a YOLO model to detect “Defective Solders” before shipping."
   },
   {
-    "objectID": "slides/4_Evaluation_Deployment.html#cost-of-every-prediction",
-    "href": "slides/4_Evaluation_Deployment.html#cost-of-every-prediction",
-    "title": "Ultralytics YOLO Foundations: Part 4",
+    "objectID": "slides/3_Evaluation.html#cost-of-every-prediction",
+    "href": "slides/3_Evaluation.html#cost-of-every-prediction",
+    "title": "Ultralytics YOLO Foundations: Part 3",
     "section": "Cost of Every Prediction",
     "text": "Cost of Every Prediction\nEvery prediction in our Digital Factory has a tangible financial consequence:\n\n✅ True Positive (TP): Defect caught, scrapped early. (Baseline)\n✅ True Negative (TN): Good board ships. (Baseline)\n❌ False Negative (FN): Defective board ships to a customer. Cost: $500 (Warranty, shipping, brand damage).\n⚠️ False Positive (FP): Good board flagged as defective. Requires manual inspection. Cost: $25 (Labor)."
   },
   {
-    "objectID": "slides/4_Evaluation_Deployment.html#the-financial-confusion-matrix",
-    "href": "slides/4_Evaluation_Deployment.html#the-financial-confusion-matrix",
-    "title": "Ultralytics YOLO Foundations: Part 4",
+    "objectID": "slides/3_Evaluation.html#the-financial-confusion-matrix",
+    "href": "slides/3_Evaluation.html#the-financial-confusion-matrix",
+    "title": "Ultralytics YOLO Foundations: Part 3",
     "section": "The Financial Confusion Matrix",
     "text": "The Financial Confusion Matrix\nIf we test our model on a batch of 10,000 boards (where 5% actually have defects):\n\n\n\n\n\n\n\n\n\nPredicted: Defect\nPredicted: Good\n\n\nActual: Defect\n✅ TP\nCost: $0\n❌ FN (Missed)\nCost: $500 each\n\n\nActual: Good\n⚠️ FP (False Alarm)\nCost: $25 each\n✅ TN\nCost: $0\n\n\n\n\nTotal Financial Loss = \\((FN \\times \\$500) + (FP \\times \\$25)\\)"
   },
   {
-    "objectID": "slides/4_Evaluation_Deployment.html#baselines-the-cost-of-dumb-decisions",
-    "href": "slides/4_Evaluation_Deployment.html#baselines-the-cost-of-dumb-decisions",
-    "title": "Ultralytics YOLO Foundations: Part 4",
+    "objectID": "slides/3_Evaluation.html#baselines-the-cost-of-dumb-decisions",
+    "href": "slides/3_Evaluation.html#baselines-the-cost-of-dumb-decisions",
+    "title": "Ultralytics YOLO Foundations: Part 3",
     "section": "Baselines: The Cost of “Dumb” Decisions",
-    "text": "Baselines: The Cost of “Dumb” Decisions\nWhat if we didn’t use AI at all? Let’s look at the financial impact of the two simplest “Dummy” strategies:\n\n\n🚢 “Ship Everything”\nAssume every board is Good\n\nFalse Negatives (FN): 500\nCost: \\(500 \\times 500\\)\nTotal Loss: $250,000\n\n\n⚙️ “Scrap Everything”\nAssume every board is Defective\n\nFalse Positives (FP): 9,500\nCost: \\(9,500 \\times 25\\)\nTotal Loss: $237,500\n\n\n\n\n\n\nThe Conclusion: Even a “basic” model saves the company hundreds of thousands of dollars per batch. Now let’s see how much more we can save by optimizing."
+    "text": "Baselines: The Cost of “Dumb” Decisions\nWhat if we didn’t use AI at all? Let’s look at the financial impact of the two simplest “Dummy” strategies:\n\n\n🚢 “Ship Everything”\nAssume every board is Good\n\nFalse Negatives (FN): 500\nCost: $500$ $\nTotal Loss: $250,000\n\n\n⚙️ “Scrap Everything”\nAssume every board is Defective\n\nFalse Positives (FP): 9500\nCost: $9,500$ $\nTotal Loss: $237,500\n\n\n\n\n\n\nThe Conclusion: Even a “basic” model saves the company hundreds of thousands of dollars per batch. Now let’s see how much more we can save by optimizing."
   },
   {
-    "objectID": "slides/4_Evaluation_Deployment.html#optimizing-for-profit-not-just-f1",
-    "href": "slides/4_Evaluation_Deployment.html#optimizing-for-profit-not-just-f1",
-    "title": "Ultralytics YOLO Foundations: Part 4",
+    "objectID": "slides/3_Evaluation.html#optimizing-for-profit-not-just-f1",
+    "href": "slides/3_Evaluation.html#optimizing-for-profit-not-just-f1",
+    "title": "Ultralytics YOLO Foundations: Part 3",
     "section": "Optimizing for Profit, Not Just F1",
-    "text": "Optimizing for Profit, Not Just F1\nRemember how F1 balances Precision and Recall? When money is involved, the balance changes. A missed defect (FN) is 20x more expensive than a false alarm (FP).\n\n\nOption A: Max F1 Score\nBalanced threshold (conf=0.35)\n\nFN (Missed): 81 boards \\(\\times \\$500\\) = \\(\\$40,500\\)\nFP (False Alarms): 0 boards \\(\\times \\$25\\) = \\(\\$0\\)\nTotal Loss: $40,500\n\n\nOption B: Max ROI\nLoose threshold (conf=0.20)\n\nFN (Missed): 22 boards \\(\\times \\$500\\) = \\(\\$11,000\\)\nFP (False Alarms): 2 boards \\(\\times \\$25\\) = \\(\\$50\\)\nTotal Loss: $11,050\n\n\n\n\n\n\nBy lowering our threshold and accepting a few False Positives, we saved the business nearly $30,000 per batch. We optimized for the business metric, not the machine learning metric."
+    "text": "Optimizing for Profit, Not Just F1\nRemember how F1 balances Precision and Recall? When money is involved, the balance changes.\n\n\nOption A: Max F1 Score\nBalanced threshold (conf=0.35)\n\nFN (Missed): 76 boards \\(\\times \\$500\\) = \\(\\$38,000\\)\nFP (False Alarms): 0 boards \\(\\times \\$25\\) = \\(\\$0\\)\nTotal Loss: $38,000\n\n\nOption B: Max ROI\nLoose threshold (conf=0.20)\n\nFN (Missed): 13 boards \\(\\times \\$500\\) = \\(\\$6,500\\)\nFP (False Alarms): 4 boards \\(\\times \\$25\\) = \\(\\$100\\)\nTotal Loss: $6,600\n\n\n\n\n\n\nBy lowering our threshold and accepting a few False Positives, we saved the business over $31,400 per batch. We optimized for the business metric, not the machine learning metric."
   },
   {
-    "objectID": "slides/4_Evaluation_Deployment.html#the-cost-curve",
-    "href": "slides/4_Evaluation_Deployment.html#the-cost-curve",
-    "title": "Ultralytics YOLO Foundations: Part 4",
+    "objectID": "slides/3_Evaluation.html#the-cost-curve",
+    "href": "slides/3_Evaluation.html#the-cost-curve",
+    "title": "Ultralytics YOLO Foundations: Part 3",
     "section": "The Cost Curve",
     "text": "The Cost Curve\nJust like we plotted the F1 curve, we can plot a Cost Curve to find the optimal threshold for deployment."
   },
   {
-    "objectID": "slides/4_Evaluation_Deployment.html#lab-4a-roi-driven-evaluation",
-    "href": "slides/4_Evaluation_Deployment.html#lab-4a-roi-driven-evaluation",
-    "title": "Ultralytics YOLO Foundations: Part 4",
+    "objectID": "slides/3_Evaluation.html#lab-4a-roi-driven-evaluation",
+    "href": "slides/3_Evaluation.html#lab-4a-roi-driven-evaluation",
+    "title": "Ultralytics YOLO Foundations: Part 3",
     "section": "🧪 Lab 4A: ROI-Driven Evaluation",
     "text": "🧪 Lab 4A: ROI-Driven Evaluation\nNow it’s your turn to play the role of the Business Lead!\n\nOpen labs/04a_roi_evaluation.ipynb\nScroll to the “ROI-Driven Evaluation” section.\nFind the optimal threshold for the Shoplifting Detection case study in Lab 4A.\n\n\n\n\nScenario Summary:\n\nGoal: Minimize Total Financial Loss.\nCosts: Missed Shoplifter ($50) vs. Wrongful Accusal ($2,500)."
   },
   {
-    "objectID": "slides/4_Evaluation_Deployment.html#the-threshold-dilemma",
-    "href": "slides/4_Evaluation_Deployment.html#the-threshold-dilemma",
-    "title": "Ultralytics YOLO Foundations: Part 4",
+    "objectID": "slides/3_Evaluation.html#the-threshold-dilemma",
+    "href": "slides/3_Evaluation.html#the-threshold-dilemma",
+    "title": "Ultralytics YOLO Foundations: Part 3",
     "section": "The Threshold Dilemma",
     "text": "The Threshold Dilemma\nAll metrics so far (\\(F1\\), \\(ROI\\), \\(Precision\\)) require us to choose a threshold first.\n\n\n🎯 The “Decision” View\nUseful for deployment. “At 0.45 confidence, what is my profit?”\n\nPick one point on the curve.\nOptimize for a specific business case.\nGood for operational decisions.\n\n\n📊 The “Model” View\nUseful for benchmarking. “Is this model fundamentally better than the last one?”\n\nEvaluate over all thresholds.\nCompare architectures fairly.\nThis is where Average Precision (AP) comes in."
   },
   {
-    "objectID": "slides/4_Evaluation_Deployment.html#the-pr-curve-average-precision-ap",
-    "href": "slides/4_Evaluation_Deployment.html#the-pr-curve-average-precision-ap",
-    "title": "Ultralytics YOLO Foundations: Part 4",
+    "objectID": "slides/3_Evaluation.html#the-pr-curve-average-precision-ap",
+    "href": "slides/3_Evaluation.html#the-pr-curve-average-precision-ap",
+    "title": "Ultralytics YOLO Foundations: Part 3",
     "section": "The PR Curve & Average Precision (AP)",
     "text": "The PR Curve & Average Precision (AP)\n\n\n\n\nStep 1: Gather We take every “Car” prediction the model made across the whole test set.\n\n\n\nStep 2: Sort We sort them from highest confidence (e.g., \\(0.99\\)) to lowest (e.g., \\(0.10\\)).\n\n\n\nStep 3: Calculate We calculate Precision and Recall at every single step of that sorted list.\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\nAverage Precision (AP) is simply the area under this Precision-Recall (PR) curve!"
   },
   {
-    "objectID": "slides/4_Evaluation_Deployment.html#from-binary-to-multi-class-one-vs-rest-most-common",
-    "href": "slides/4_Evaluation_Deployment.html#from-binary-to-multi-class-one-vs-rest-most-common",
-    "title": "Ultralytics YOLO Foundations: Part 4",
+    "objectID": "slides/3_Evaluation.html#from-binary-to-multi-class-one-vs-rest-most-common",
+    "href": "slides/3_Evaluation.html#from-binary-to-multi-class-one-vs-rest-most-common",
+    "title": "Ultralytics YOLO Foundations: Part 3",
     "section": "From Binary to Multi-Class: One-vs-Rest (most common)",
     "text": "From Binary to Multi-Class: One-vs-Rest (most common)\nWhen we have many classes, we reduce the problem to binary by isolating each class.\n\n\nPick one class as Positive — everything else is Negative. Repeat for every class.\n\n\n\n\nThis logic applies to any binary metric like Precision, Recall, AP, etc."
   },
   {
-    "objectID": "slides/4_Evaluation_Deployment.html#per-class-recall-formula",
-    "href": "slides/4_Evaluation_Deployment.html#per-class-recall-formula",
-    "title": "Ultralytics YOLO Foundations: Part 4",
+    "objectID": "slides/3_Evaluation.html#per-class-recall-formula",
+    "href": "slides/3_Evaluation.html#per-class-recall-formula",
+    "title": "Ultralytics YOLO Foundations: Part 3",
     "section": "Per-Class Recall Formula",
     "text": "Per-Class Recall Formula\nFor a specific class \\(i\\), treat it as “positive” and all others as “negative”:\n\\[Recall_i = \\frac{TP_i}{TP_i + FN_i}\\]\n\n\n\n\n\n\n\\(TP_i\\) — instances of class \\(i\\) correctly predicted as class \\(i\\)\n\n\n\n\n\n\n\n\\(FN_i\\) — instances of class \\(i\\) predicted as any other class"
   },
   {
-    "objectID": "slides/4_Evaluation_Deployment.html#ways-to-aggregate-per-class-scores",
-    "href": "slides/4_Evaluation_Deployment.html#ways-to-aggregate-per-class-scores",
-    "title": "Ultralytics YOLO Foundations: Part 4",
+    "objectID": "slides/3_Evaluation.html#ways-to-aggregate-per-class-scores",
+    "href": "slides/3_Evaluation.html#ways-to-aggregate-per-class-scores",
+    "title": "Ultralytics YOLO Foundations: Part 3",
     "section": "Ways to Aggregate Per-Class Scores",
     "text": "Ways to Aggregate Per-Class Scores\nOnce you have a score per class, you combine them into a single number:\n\n\n\n\n\n\n\n\n\nStrategy\nFormula\nCharacter\n\n\n\n\nMacro\n\\(\\frac{\\sum M_i}{n}\\)\nAll classes equally weighted\n\n\nMicro\n\\(\\frac{\\sum \\text{Num}_i}{\\sum \\text{Denom}_i}\\)\nPooled counts (treats every sample equally)\n\n\nWeighted\n\\(\\frac{\\sum M_i \\cdot S_i}{\\sum S_i}\\)\nWeighted by class size (Support)\n\n\n\n\n\n\\(M_i\\): Metric per class (\\(P, R, AP\\))  \\(S_i\\): Support (class size)  \\(\\text{Num}_i / \\text{Denom}_i\\): Numerator / Denominator (e.g., \\(TP / (TP+FP)\\))\n\n\n\n\n\n\nmAP = Macro-Average of per-class AP scores. Every class contributes equally."
   },
   {
-    "objectID": "slides/4_Evaluation_Deployment.html#but-does-location-matter",
-    "href": "slides/4_Evaluation_Deployment.html#but-does-location-matter",
-    "title": "Ultralytics YOLO Foundations: Part 4",
+    "objectID": "slides/3_Evaluation.html#but-does-location-matter",
+    "href": "slides/3_Evaluation.html#but-does-location-matter",
+    "title": "Ultralytics YOLO Foundations: Part 3",
     "section": "But Does Location Matter?",
     "text": "But Does Location Matter?\nPrecision and Recall measure whether a classification is correct.\nFor object detection, the model must also get the location right.\n\n\nA confident prediction placed in the wrong spot is still a wrong prediction.\n\n\n\nThat’s where Intersection over Union (IoU) comes in."
   },
   {
-    "objectID": "slides/4_Evaluation_Deployment.html#intersection-over-union-iou",
-    "href": "slides/4_Evaluation_Deployment.html#intersection-over-union-iou",
-    "title": "Ultralytics YOLO Foundations: Part 4",
+    "objectID": "slides/3_Evaluation.html#intersection-over-union-iou",
+    "href": "slides/3_Evaluation.html#intersection-over-union-iou",
+    "title": "Ultralytics YOLO Foundations: Part 3",
     "section": "Intersection over Union (IoU)",
     "text": "Intersection over Union (IoU)\nHow perfectly does the predicted bounding box overlap the ground truth box?\n\n\n\n\n\n\n\n\n\nRule of Thumb: A prediction is typically considered a “True Positive” (correct) if the IoU is &gt; 0.50."
   },
   {
-    "objectID": "slides/4_Evaluation_Deployment.html#the-double-penalty-of-iou",
-    "href": "slides/4_Evaluation_Deployment.html#the-double-penalty-of-iou",
-    "title": "Ultralytics YOLO Foundations: Part 4",
+    "objectID": "slides/3_Evaluation.html#the-double-penalty-of-iou",
+    "href": "slides/3_Evaluation.html#the-double-penalty-of-iou",
+    "title": "Ultralytics YOLO Foundations: Part 3",
     "section": "The “Double Penalty” of IoU",
     "text": "The “Double Penalty” of IoU\nA prediction must be accurate in location (\\(IoU \\ge 0.5\\)) to count as a True Positive (TP).\n\n\n\n\n\n\n\n\n\n\n\n\nWhat happens when \\(IoU &lt; 0.5\\)?\n\n\n\nIt hurts your score twice:\n\nFP: The bad box is a false alarm\nFN: The real object is counted as missed\n\n\n\n\nOne poor prediction = penalised as both an extra detection and a missed object."
   },
   {
-    "objectID": "slides/4_Evaluation_Deployment.html#handling-multiple-detections",
-    "href": "slides/4_Evaluation_Deployment.html#handling-multiple-detections",
-    "title": "Ultralytics YOLO Foundations: Part 4",
+    "objectID": "slides/3_Evaluation.html#handling-multiple-detections",
+    "href": "slides/3_Evaluation.html#handling-multiple-detections",
+    "title": "Ultralytics YOLO Foundations: Part 3",
     "section": "Handling Multiple Detections",
     "text": "Handling Multiple Detections\nA common question is: “What if the model predicts multiple boxes for the exact same object?”\n\n\n\n\n\n\n\n\n\n\n\n\nRule: One Ground Truth = Only One TP\n\nThe Winner: Highest IoU (Pred 1) becomes the True Positive (TP).\nThe Duplicate: Extra boxes (Pred 2) become False Positives (FP)."
   },
   {
-    "objectID": "slides/4_Evaluation_Deployment.html#mean-average-precision-map",
-    "href": "slides/4_Evaluation_Deployment.html#mean-average-precision-map",
-    "title": "Ultralytics YOLO Foundations: Part 4",
+    "objectID": "slides/3_Evaluation.html#mean-average-precision-map",
+    "href": "slides/3_Evaluation.html#mean-average-precision-map",
+    "title": "Ultralytics YOLO Foundations: Part 3",
     "section": "Mean Average Precision (mAP)",
     "text": "Mean Average Precision (mAP)\n\nmAP50: Accuracy considering only “easy” detections (IoU &gt; 0.50).\nmAP50-95: The strict evaluation averaged across multiple IoU thresholds (from 0.50 to 0.95)."
   },
   {
-    "objectID": "slides/4_Evaluation_Deployment.html#segmentation-mask-iou-miou",
-    "href": "slides/4_Evaluation_Deployment.html#segmentation-mask-iou-miou",
-    "title": "Ultralytics YOLO Foundations: Part 4",
+    "objectID": "slides/3_Evaluation.html#segmentation-mask-iou-miou",
+    "href": "slides/3_Evaluation.html#segmentation-mask-iou-miou",
+    "title": "Ultralytics YOLO Foundations: Part 3",
     "section": "Segmentation: Mask IoU (mIoU)",
     "text": "Segmentation: Mask IoU (mIoU)\nFor segmentation, we evaluate how well the pixels overlap, not just bounding boxes.\n\n\n\n\n\n\n\n\n\n\n\n\nmIoU (Jaccard Index)\n\\[\n\\begin{aligned}\n\\text{mIoU} &= \\frac{\\text{Area of Overlap}}{\\text{Area of Union}} \\\\[12pt]\n&= \\mathbf{\\frac{TP}{TP + FP + FN}}\n\\end{aligned}\n\\]\n\n\n\nIn Ultralytics, Mask mAP is the primary metric for yolo segment, calculated using pixel-wise IoU thresholds."
   },
   {
-    "objectID": "slides/4_Evaluation_Deployment.html#the-dice-coefficient-f1",
-    "href": "slides/4_Evaluation_Deployment.html#the-dice-coefficient-f1",
-    "title": "Ultralytics YOLO Foundations: Part 4",
+    "objectID": "slides/3_Evaluation.html#the-dice-coefficient-f1",
+    "href": "slides/3_Evaluation.html#the-dice-coefficient-f1",
+    "title": "Ultralytics YOLO Foundations: Part 3",
     "section": "The Dice Coefficient (F1)",
     "text": "The Dice Coefficient (F1)\nThe most common metric in Medical AI. It is mathematically identical to the F1-score at the pixel level.\n\n\n\n\n\n\n\n\n\n\n\n\n\\[\n\\begin{aligned}\n\\text{Dice} &= \\frac{2 \\times \\text{Area of Overlap}}{\\text{Area of GT} + \\text{Area of Pred}} \\\\[12pt]\n&= \\mathbf{\\frac{2TP}{2TP + FP + FN}}\n\\end{aligned}\n\\]\n\n\n\nWhy Dice? Better for small objects (like tumors) and more balanced error penalization."
   },
   {
-    "objectID": "slides/4_Evaluation_Deployment.html#validating-the-model-yolo-clipython",
-    "href": "slides/4_Evaluation_Deployment.html#validating-the-model-yolo-clipython",
-    "title": "Ultralytics YOLO Foundations: Part 4",
+    "objectID": "slides/3_Evaluation.html#validating-the-model-yolo-clipython",
+    "href": "slides/3_Evaluation.html#validating-the-model-yolo-clipython",
+    "title": "Ultralytics YOLO Foundations: Part 3",
     "section": "Validating the Model (YOLO CLI/Python)",
     "text": "Validating the Model (YOLO CLI/Python)\nWe use the val mode to evaluate a trained model. YOLO automatically generates graphs (confusion_matrix.png, PR_curve.png) in your runs/detect/val folder.\n\nCLIPython\n\n\nyolo val model=best.pt data=data.yaml\n\n\nfrom ultralytics import YOLO\n\nmodel = YOLO(\"best.pt\")\nmetrics = model.val(data=\"data.yaml\")\n\n\n\nDocs Reference: Model Evaluation Insights"
   },
   {
-    "objectID": "slides/4_Evaluation_Deployment.html#reading-your-results-running-val",
-    "href": "slides/4_Evaluation_Deployment.html#reading-your-results-running-val",
-    "title": "Ultralytics YOLO Foundations: Part 4",
+    "objectID": "slides/3_Evaluation.html#reading-your-results-running-val",
+    "href": "slides/3_Evaluation.html#reading-your-results-running-val",
+    "title": "Ultralytics YOLO Foundations: Part 3",
     "section": "Reading Your Results: Running val()",
     "text": "Reading Your Results: Running val()\nWhen you run model.val(), you get a metrics object with all the key numbers:\nfrom ultralytics import YOLO\n\nmodel = YOLO(\"best.pt\")\nmetrics = model.val(data=\"data.yaml\")\n\n# Key metrics to access:\nprint(f\"mAP@0.5:   {metrics.box.map50}\")    # Generous IoU threshold\nprint(f\"mAP@0.5-0.95: {metrics.box.map}\")      # Strict across 10 IoU thresholds\nprint(f\"Precision: {metrics.box.mp}\")       # Overall precision\nprint(f\"Recall:    {metrics.box.mr}\")       # Overall recall\nDocs Reference: Validation Results"
   },
   {
-    "objectID": "slides/4_Evaluation_Deployment.html#what-if-your-metrics-reveal-a-problem",
-    "href": "slides/4_Evaluation_Deployment.html#what-if-your-metrics-reveal-a-problem",
-    "title": "Ultralytics YOLO Foundations: Part 4",
-    "section": "What If Your Metrics Reveal a Problem?",
-    "text": "What If Your Metrics Reveal a Problem?\nYou can now read your validation results — but what do you do when the numbers look bad?\n\nThe most common culprits are:\n\nClass imbalance — rare classes get ignored during training\nOverfitting or underfitting — the model hasn’t generalized\nPoor hyperparameters — learning rate, weight decay, stopping too early or too late\n\n\n\nLet’s go through each one."
-  },
-  {
-    "objectID": "slides/4_Evaluation_Deployment.html#class-imbalance-fixing-the-bias",
-    "href": "slides/4_Evaluation_Deployment.html#class-imbalance-fixing-the-bias",
-    "title": "Ultralytics YOLO Foundations: Part 4",
-    "section": "Class Imbalance: Fixing the Bias",
-    "text": "Class Imbalance: Fixing the Bias\nHow do we stop the model from ignoring rare classes during training?\n\n\n\n\n\n\n\n\n\nHere we oversample (duplicating images) the minority class (car) to make it learnable.\n\nTechnical Guide: Class Balancing with YOLO"
-  },
-  {
-    "objectID": "slides/4_Evaluation_Deployment.html#the-training-spectrum",
-    "href": "slides/4_Evaluation_Deployment.html#the-training-spectrum",
-    "title": "Ultralytics YOLO Foundations: Part 4",
-    "section": "The Training Spectrum",
-    "text": "The Training Spectrum\nEvery training run lands somewhere on this spectrum — knowing where is the first step to fixing it.\n\n\n\n\n\n\n\n\n🔴 Overfitting\n\n\nModel memorizes training data.\n\nTrain mAP &gt;&gt; Val mAP\nVal loss starts rising\n\nToo much capacity for your data\n\n\n\n\n\n\n\n\n\n\n🟢 Just Right\n\n\nModel generalizes to new data.\n\nTrain ≈ Val, both high\nBoth losses converge low\n\nThe goal — stay here\n\n\n\n\n\n\n\n\n\n\n🟠 Underfitting\n\n\nModel never learned the patterns.\n\nBoth Train and Val mAP low\nLosses barely decrease\n\nToo little capacity or training"
-  },
-  {
-    "objectID": "slides/4_Evaluation_Deployment.html#overfitting-the-symptom",
-    "href": "slides/4_Evaluation_Deployment.html#overfitting-the-symptom",
-    "title": "Ultralytics YOLO Foundations: Part 4",
-    "section": "🔴 Overfitting: The Symptom",
-    "text": "🔴 Overfitting: The Symptom\n\nThe model memorizes training data instead of learning general patterns.\n\n\n\nWhat you see:\n\nTrain loss ↓, Val loss ↑\nTrain mAP climbs, Val mAP stalls\nGrowing gap between the two curves"
-  },
-  {
-    "objectID": "slides/4_Evaluation_Deployment.html#overfitting-the-fixes",
-    "href": "slides/4_Evaluation_Deployment.html#overfitting-the-fixes",
-    "title": "Ultralytics YOLO Foundations: Part 4",
-    "section": "🔴 Overfitting: The Fixes",
-    "text": "🔴 Overfitting: The Fixes\n\n\nMore Data Variety (best cure)\nVaried scenes the model can’t memorize.\nAugmentation\nFlip, mosaic, color jitter — on by default in YOLO.\nSmaller Model\nSmall dataset? Start with yolo11n or yolo11s.\n\nIncrease weight_decay\nmodel.train(data=\"data.yaml\", weight_decay=0.001)\nEarly Stopping\nmodel.train(data=\"data.yaml\", patience=20)\n\n\n\n\n\n\n\nTip\n\n\nStart with augmentation + patience. If overfitting persists, raise weight_decay."
-  },
-  {
-    "objectID": "slides/4_Evaluation_Deployment.html#underfitting-the-symptom",
-    "href": "slides/4_Evaluation_Deployment.html#underfitting-the-symptom",
-    "title": "Ultralytics YOLO Foundations: Part 4",
-    "section": "🟠 Underfitting: The Symptom",
-    "text": "🟠 Underfitting: The Symptom\n\nThe model hasn’t learned the patterns — too simple, over-constrained, or undertrained.\n\n\n\nWhat you see:\n\nBoth Train and Val mAP low and flat\nLoss barely moves after the first epochs\nCurves close together — but both stuck high"
-  },
-  {
-    "objectID": "slides/4_Evaluation_Deployment.html#underfitting-the-fixes",
-    "href": "slides/4_Evaluation_Deployment.html#underfitting-the-fixes",
-    "title": "Ultralytics YOLO Foundations: Part 4",
-    "section": "🟠 Underfitting: The Fixes",
-    "text": "🟠 Underfitting: The Fixes\n\n\nBigger Model\nTry yolo11m or yolo11l.\nTrain Longer\nIncrease epochs.\nHigher Learning Rate\nTry lr0=0.02 (default 0.01).\n\nLess Regularization\nmodel.train(data=\"data.yaml\", weight_decay=0.0001)\nCheck Your Labels\nMislabeled data is impossible to learn from — audit before tuning."
-  },
-  {
-    "objectID": "slides/4_Evaluation_Deployment.html#healthy-training-generalizing",
-    "href": "slides/4_Evaluation_Deployment.html#healthy-training-generalizing",
-    "title": "Ultralytics YOLO Foundations: Part 4",
-    "section": "🟢 Healthy Training: “Generalizing”",
-    "text": "🟢 Healthy Training: “Generalizing”\n\n\n\nThe Ideal State:\n\nTrain and val metrics rise together\nBoth losses decrease steadily and plateau low\nModel generalizes — performs well on unseen data"
-  },
-  {
-    "objectID": "slides/4_Evaluation_Deployment.html#diagnosing-your-training-run",
-    "href": "slides/4_Evaluation_Deployment.html#diagnosing-your-training-run",
-    "title": "Ultralytics YOLO Foundations: Part 4",
-    "section": "Diagnosing Your Training Run",
-    "text": "Diagnosing Your Training Run\nUse this as a reference when reading your own loss curves.\n\n\n\n\n\n\n\n\nWhat you see\nProblem\nActions\n\n\n\n\nTrain mAP &gt;&gt; Val mAP, Val loss rising\n🔴 Overfitting\nAdd augmentation · increase weight_decay · set patience\n\n\nBoth mAP low and flat, loss barely moves\n🟠 Underfitting\nBigger model · more epochs · raise lr0 · lower weight_decay\n\n\nBoth losses converging, mAP climbing\n🟢 Healthy\nContinue training or deploy\n\n\n\n\n\n\n\n\n\nTip\n\n\nAlways watch both curves. 99% train accuracy means nothing if val is failing."
-  },
-  {
-    "objectID": "slides/4_Evaluation_Deployment.html#your-toolkit-for-better-training",
-    "href": "slides/4_Evaluation_Deployment.html#your-toolkit-for-better-training",
-    "title": "Ultralytics YOLO Foundations: Part 4",
-    "section": "Your Toolkit for Better Training",
-    "text": "Your Toolkit for Better Training\nYou can diagnose the problem — now here are the levers to fix it.\n\n\n\n\nTool\nFixes\n\n\n\n\nData Augmentation\nOverfitting, small datasets, domain shift\n\n\nLearning Rate\nUnstable or stalled training\n\n\nWeight Decay\nOverfitting (model memorizing)\n\n\nEarly Stopping\nWasted compute, overfitting"
-  },
-  {
-    "objectID": "slides/4_Evaluation_Deployment.html#what-data-augmentation-does",
-    "href": "slides/4_Evaluation_Deployment.html#what-data-augmentation-does",
-    "title": "Ultralytics YOLO Foundations: Part 4",
-    "section": "What Data Augmentation Does",
-    "text": "What Data Augmentation Does\nConcept: Artificially increase training data variety by applying transformations to existing images.\n\n\n\n\n\n\n\n\n\nWhen it helps:\n\nOverfitting (model needs more variety)\nSmall datasets\nDomain shift (different lighting/angles in production)"
-  },
-  {
-    "objectID": "slides/4_Evaluation_Deployment.html#data-augmentation-python",
-    "href": "slides/4_Evaluation_Deployment.html#data-augmentation-python",
-    "title": "Ultralytics YOLO Foundations: Part 4",
-    "section": "Data Augmentation (Python)",
-    "text": "Data Augmentation (Python)\nYOLO natively supports Albumentations to improve model robustness:\npip install albumentations ultralytics\nimport albumentations as A\nfrom ultralytics import YOLO\n\nmodel = YOLO(\"yolo26n.pt\")\n\n# Define custom Albumentations transforms\ncustom_transforms = [\n    A.Blur(blur_limit=7, p=0.5),\n    A.RandomCrop(width=256, height=256),\n    A.HorizontalFlip(p=0.5),\n    A.RandomBrightnessContrast(brightness_limit=0.2, contrast_limit=0.2, p=0.5),\n]\n\n# Train the model with custom transforms\nmodel.train(data=\"data.yaml\", epochs=100, augmentations=custom_transforms)\nDocs Reference: Albumentations Integration"
-  },
-  {
-    "objectID": "slides/4_Evaluation_Deployment.html#hyperparameters-learning-rate-lr0",
-    "href": "slides/4_Evaluation_Deployment.html#hyperparameters-learning-rate-lr0",
-    "title": "Ultralytics YOLO Foundations: Part 4",
-    "section": "Hyperparameters: Learning Rate (lr0)",
-    "text": "Hyperparameters: Learning Rate (lr0)\n\n\n🔴 Too High: Spikes/noise. Model “jumps” over the optimal solution.\n\n\n\n\n\n\n\n\n\n\n\n\n\n🔵 Too Small: Flat line. Model is too “timid” to learn.\n\n\n\n\n\n\n\n\n\n\n\n\n\n🟢 Just Right: Smooth, rapid decay to a low plateau."
-  },
-  {
-    "objectID": "slides/4_Evaluation_Deployment.html#hyperparameters-weight-decay",
-    "href": "slides/4_Evaluation_Deployment.html#hyperparameters-weight-decay",
-    "title": "Ultralytics YOLO Foundations: Part 4",
-    "section": "Hyperparameters: Weight Decay",
-    "text": "Hyperparameters: Weight Decay\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\nSetting\nEffect\n\n\n\n\nToo low\nMemorization → 🔴 Overfitting\n\n\nToo high\nOver-constrained → 🟠 Underfitting"
-  },
-  {
-    "objectID": "slides/4_Evaluation_Deployment.html#hyperparameters-early-stopping",
-    "href": "slides/4_Evaluation_Deployment.html#hyperparameters-early-stopping",
-    "title": "Ultralytics YOLO Foundations: Part 4",
-    "section": "Hyperparameters: Early Stopping",
-    "text": "Hyperparameters: Early Stopping\n\n\n\nThe Concept: Stop training if validation metrics haven’t improved for \\(N\\) epochs.\n\npatience (Default: 50)\nfrom ultralytics import YOLO\n\nmodel = YOLO(\"yolo26n.pt\")\n# Stop if no improvement for 10 epochs\nmodel.train(data=\"data.yaml\", \n            epochs=100, \n            patience=10)"
-  },
-  {
-    "objectID": "slides/4_Evaluation_Deployment.html#evaluation-key-takeaways",
-    "href": "slides/4_Evaluation_Deployment.html#evaluation-key-takeaways",
-    "title": "Ultralytics YOLO Foundations: Part 4",
+    "objectID": "slides/3_Evaluation.html#evaluation-key-takeaways",
+    "href": "slides/3_Evaluation.html#evaluation-key-takeaways",
+    "title": "Ultralytics YOLO Foundations: Part 3",
     "section": "Evaluation: Key Takeaways",
-    "text": "Evaluation: Key Takeaways\n\nMetrics: Use mAP50 for a quick sanity check, mAP50-95 for a strict production-ready evaluation\nDiagnose your curves: overfitting, underfitting, and healthy training each have a clear, distinct signature\nFix deliberately: augmentation, weight decay, and early stopping cover the majority of training problems"
+    "text": "Evaluation: Key Takeaways\n\nConfusion matrix first: Precision, Recall, and F1 each tell a different story — pick the one that matches your cost of mistakes.\nThreshold is a business decision: ROI curves, not just F1, choose where to set it.\nmAP for detection: Use mAP50 for a quick sanity check, mAP50-95 for a strict production-ready evaluation.\nIoU underpins everything: mAP, mIoU, Dice — all built on the same overlap idea.\nWhen metrics look bad: You’ve identified the what, now we need to fix the why in Part 4.\n\n\n\n\n\nWhen your model’s validation metrics are solid, it’s ready for the next step — either more training or moving to production."
   },
   {
-    "objectID": "slides/4_Evaluation_Deployment.html#lab-4b-technical-performance-diagnosis",
-    "href": "slides/4_Evaluation_Deployment.html#lab-4b-technical-performance-diagnosis",
-    "title": "Ultralytics YOLO Foundations: Part 4",
-    "section": "🧪 Lab 4B: Technical Performance & Diagnosis",
-    "text": "🧪 Lab 4B: Technical Performance & Diagnosis\nNow that you know how to read the curves, let’s fix a model!\n\nOpen labs/04b_evaluation_technical.ipynb\nCompare different YOLO model sizes (nano vs small).\nVerify Intersection over Union (IoU) math.\nIdentify signs of overfitting in a training run.\n\n\n\n\nGoal: Learn to distinguish between a model that “memorizes” and one that “generalizes.”\n\n\n\n\n\n\n\nWhen your model’s validation metrics are solid, it’s ready for the next step — getting it into production."
+    "objectID": "slides/3_Evaluation.html#next-steps",
+    "href": "slides/3_Evaluation.html#next-steps",
+    "title": "Ultralytics YOLO Foundations: Part 3",
+    "section": "Next Steps",
+    "text": "Next Steps\nNext up: Part 4 — Custom Data & Training\n\nLearn the mathematical “Loss” that drives the model.\nFormat your own dataset and fix Class Imbalance.\nDiagnose and solve Overfitting and Underfitting.\nFine-tune hyperparameters for production performance."
   },
   {
-    "objectID": "slides/4_Evaluation_Deployment.html#exporting-models",
-    "href": "slides/4_Evaluation_Deployment.html#exporting-models",
-    "title": "Ultralytics YOLO Foundations: Part 4",
+    "objectID": "slides/3_Evaluation.html#qa",
+    "href": "slides/3_Evaluation.html#qa",
+    "title": "Ultralytics YOLO Foundations: Part 3",
+    "section": "Q&A",
+    "text": "Q&A\n\nThank You!\nAny questions?"
+  },
+  {
+    "objectID": "slides/5_Deployment.html#exporting-models",
+    "href": "slides/5_Deployment.html#exporting-models",
+    "title": "Ultralytics YOLO Foundations: Part 5",
     "section": "Exporting Models",
     "text": "Exporting Models\nA PyTorch .pt file is great for research, but slow in production. Convert to optimized formats using the export mode!\n\nCLIPython\n\n\n# Export to ONNX (Great for CPU)\nyolo export model=best.pt format=onnx\n\n# Export to OpenVINO (Intel) or TensorRT (Nvidia GPUs)\nyolo export model=best.pt format=openvino\n\n\nfrom ultralytics import YOLO\n\nmodel = YOLO(\"best.pt\")\nmodel.export(format=\"onnx\")\nmodel.export(format=\"openvino\")\n\n\n\nDocs Reference: Export"
   },
   {
-    "objectID": "slides/4_Evaluation_Deployment.html#inference-with-exported-models",
-    "href": "slides/4_Evaluation_Deployment.html#inference-with-exported-models",
-    "title": "Ultralytics YOLO Foundations: Part 4",
+    "objectID": "slides/5_Deployment.html#inference-with-exported-models",
+    "href": "slides/5_Deployment.html#inference-with-exported-models",
+    "title": "Ultralytics YOLO Foundations: Part 5",
     "section": "Inference with Exported Models",
     "text": "Inference with Exported Models\nYou don’t need complex deployment code to use your exported models. The Ultralytics API loads them just like a standard PyTorch .pt file!\n\nCLIPython\n\n\nyolo predict model=best.onnx source=\"https://ultralytics.com/assets/bus.jpg\"\n\n\nfrom ultralytics import YOLO\n\nmodel = YOLO(\"best.onnx\")\nresults = model.predict(source=\"https://ultralytics.com/assets/bus.jpg\")\nprint(results[0].boxes) \n\n\n\nDocs Reference: Predict with Exported Models"
   },
   {
-    "objectID": "slides/4_Evaluation_Deployment.html#the-ultralytics-ecosystem",
-    "href": "slides/4_Evaluation_Deployment.html#the-ultralytics-ecosystem",
-    "title": "Ultralytics YOLO Foundations: Part 4",
+    "objectID": "slides/5_Deployment.html#the-ultralytics-ecosystem",
+    "href": "slides/5_Deployment.html#the-ultralytics-ecosystem",
+    "title": "Ultralytics YOLO Foundations: Part 5",
     "section": "The Ultralytics Ecosystem",
     "text": "The Ultralytics Ecosystem\n\n  \n    🎯\n    TasksDetect · Segment · Pose · OBB\n  \n  \n    ⚡\n    SolutionsAdvanced logic, out-of-the-box\n  \n  \n    🗂️\n    DatasetsStructure labels for every task\n  \n  \n    🛠️\n    ToolsCLI · YAML · Hyperparameters\n  \n  \n    📊\n    EvaluationMetrics · Thresholds · PR curves\n  \n  \n    🚀\n    DeploymentExport for production speed"
   },
   {
-    "objectID": "slides/4_Evaluation_Deployment.html#whats-next",
-    "href": "slides/4_Evaluation_Deployment.html#whats-next",
-    "title": "Ultralytics YOLO Foundations: Part 4",
+    "objectID": "slides/5_Deployment.html#whats-next",
+    "href": "slides/5_Deployment.html#whats-next",
+    "title": "Ultralytics YOLO Foundations: Part 5",
     "section": "What’s Next?",
-    "text": "What’s Next?\n\n  \n    📷\n    Smart Security\n    Detect intruders, vehicles, and anomalies in real time.\n  \n  \n    🏥\n    Medical Imaging\n    Identify tumors, lesions, or instrument counts in scans.\n  \n  \n    🚗\n    Autonomous Vehicles\n    Detect pedestrians, signs, and road hazards at speed.\n  \n  \n    🛒\n    Retail Analytics\n    Track foot traffic, shelf stock, and customer behaviour."
+    "text": "What’s Next?\nNext up: Part 6 — HuggingFace for Computer Vision\n\nZero-shot segmentation with SAM 3.\nVisual embeddings for similarity search.\nVision LLMs for multimodal reasoning."
   },
   {
-    "objectID": "slides/4_Evaluation_Deployment.html#qa",
-    "href": "slides/4_Evaluation_Deployment.html#qa",
-    "title": "Ultralytics YOLO Foundations: Part 4",
+    "objectID": "slides/5_Deployment.html#qa",
+    "href": "slides/5_Deployment.html#qa",
+    "title": "Ultralytics YOLO Foundations: Part 5",
     "section": "Q&A",
     "text": "Q&A\n\nThank You!\nAny questions?"
   }
