@@ -17,164 +17,583 @@ format:
       data-background-opacity: "0.15"
 ---
 
-# The "Learning" Intuition {.sdaia-dark background-gradient="linear-gradient(135deg, #1C355E, #00C9A7)"}
+# How a Model Learns {.sdaia-dark background-gradient="linear-gradient(135deg, #1C355E, #00C9A7)"}
 
-Teaching the model to write its own function.
+From a single feature to a full classifier — built up step by step.
 
-## Recap: Traditional vs. Machine Learning
+## From Part 1: f(image) → output {vertical-align="center"}
 
-In **Part 1**, we saw that Machine Learning flips the paradigm. Instead of writing the logic, we let the data "train" the function.
-
-```{dot}
-//| echo: false
-//| fig-width: 10
-//| fig-height: 4.2
-digraph concept {
-    graph [rankdir=LR fontname="Helvetica" nodesep=0.4 ranksep=1.5]
-    node  [fontname="Helvetica" fontcolor=white style=filled shape=box penwidth=0 margin="0.25,0.15" fontsize=13]
-    edge  [penwidth=2.5 arrowsize=1.0 fontname="Helvetica" fontsize=12]
-
-    // ── Traditional row ──
-    subgraph cluster_trad {
-        label="Traditional Programming" fontcolor="#8899bb" fontsize=13 style=dashed color="#3A5070" margin=18
-        ti [label="Input" fillcolor="#2D4E7E"]
-        tf [label="f(x)\nyou write it" fillcolor="#4a4a6a"]
-        to [label="Output" fillcolor="#2D4E7E"]
-        ti -> tf [color="#8899bb"]
-        tf -> to [color="#8899bb"]
-    }
-
-    // ── Machine Learning row ──
-    subgraph cluster_ml {
-        label="Machine Learning" fontcolor="#00C9A7" fontsize=13 style=dashed color="#00C9A7" margin=18
-        mi   [label="Input" fillcolor="#2D4E7E"]
-        mf   [label="f(x)\nlearned from data" fillcolor="#00C9A7" fontcolor="#1C355E" fontname="Helvetica-Bold"]
-        mo   [label="Output" fillcolor="#2D4E7E"]
-        data [label="Data" fillcolor="#1a4060" shape=cylinder]
-        { rank=same; mf; data }
-        mi   -> mf [color="#00C9A7"]
-        mf   -> mo [color="#00C9A7"]
-        data -> mf [label="trains" color="#5599aa" style=dashed fontcolor="#5599aa" fontsize=11]
-    }
-}
-```
+::: {.sdaia-v-center}
+In **Part 1**: a model is `f`, learned from data, mapping image → output.
 
 ::: {.fragment .fade-up}
-**Goal:** We provide **Input** (Images) and **Ground Truth** (Labels). The model adjusts itself until its **Output** matches the Ground Truth.
+That's *what* it does — not *how* it learns.
 :::
 
-## The Feedback Loop: How a Model Learns
-
-Learning is a cycle of making a guess, seeing how wrong it is, and adjusting.
-
 ::: {.fragment .fade-up}
-1. **Predict:** Model guesses where the objects are.
-2. **Compare:** We compare the guess to the **Ground Truth** labels.
-3. **Loss:** We calculate a "Loss" score (how wrong the guess was).
-4. **Update:** We adjust the model's weights to make the loss smaller next time.
+**This section:** how `f` goes from random guesses to useful predictions.
 :::
 
 ::: {.callout-note appearance="minimal" .fragment}
-This cycle repeats thousands of times over **Epochs** (one pass through the full dataset).
+We'll build it up from a toy color classifier, then scale to YOLO.
+:::
 :::
 
-# Why We Need "Loss" {.sdaia-dark background-gradient="linear-gradient(135deg, #1C355E, #00C9A7)"}
+## The Learning Loop {vertical-align="center"}
 
-The math that drives the learning.
-
-## Business Metrics vs. Training Loss
-
-In **Part 3**, we used metrics like **mAP, Precision, and Recall**. Why can't the model just use those to learn?
+::: {.sdaia-v-center}
+Training isn't magic; it's a repetitive cycle of refinement.
 
 ::: {.fragment .fade-up}
-**The Problem:** Business metrics are **"jumpy"** (discrete). 
-- If a bounding box moves 1 pixel, the IoU might drop from 0.51 to 0.49.
-- Suddenly, a "Success" becomes a "Failure."
-- This "cliff" makes it impossible for the model to know which way to improve.
+1. **Define a Function:** Create a mapping from data to predictions ($f$).
 :::
 
 ::: {.fragment .fade-up}
-**The Solution:** We need a **"Smooth" Metric** (Loss Function) that gives a gradient—telling the model exactly how much better or worse it's getting with every tiny adjustment.
+2. **Evaluate Performance:** Measure exactly how "wrong" the current function is (**Loss**).
 :::
 
-## What is a Loss Function?
+::: {.fragment .fade-up}
+3. **Optimize & Repeat:** Update the function's parameters to reduce that error (**Optimization**).
+:::
 
-> A **single number** that measures how wrong the model's prediction is — the lower, the better.
+::: {.callout-note appearance="minimal" .fragment}
+We start with a guess and "tune" the knobs until we're happy with the results.
+:::
+:::
+
+
+## A Naive Classifier from Color
+
+**Task:** *Is this a red car?* — output should eventually be a probability.
 
 ::: {.fragment .fade-up}
-``` {=html}
-<div style="display:flex; align-items:stretch; gap:1.2rem; margin-top:1rem; font-size:0.88em; justify-content:center;">
-  <div style="background:rgba(28,53,94,0.08); border-radius:10px; padding:0.8rem 1.2rem; text-align:center; min-width:140px;">
-    🧠 <strong>Prediction</strong><br>
-    <span style="color:#64748b; font-size:0.82em;">model output</span>
-  </div>
-  <div style="display:flex; align-items:center; font-size:1.3rem; color:#94a3b8;">→</div>
-  <div style="background:rgba(220,53,69,0.10); border:2px dashed #dc3545; border-radius:10px; padding:0.8rem 1.2rem; text-align:center; min-width:160px;">
-    ⚖️ <strong>Loss Function</strong><br>
-    <span style="color:#dc3545; font-size:0.82em;">measures the gap</span>
-  </div>
-  <div style="display:flex; align-items:center; font-size:1.3rem; color:#94a3b8;">→</div>
-  <div style="background:rgba(0,201,167,0.10); border-radius:10px; padding:0.8rem 1.2rem; text-align:center; min-width:140px;">
-    🔧 <strong>Weight Update</strong><br>
-    <span style="color:#00C9A7; font-size:0.82em;">model improves</span>
-  </div>
-</div>
+**Simplest feature:** average red pixel value (0-255).
+
+$$f(\text{image}) \approx x_{\text{red}}(\text{image})$$
+
+:::
+
+```{python}
+#| echo: false
+#| fig-align: center
+import matplotlib.pyplot as plt
+import numpy as np
+import sys; import os; sys.path.insert(0, os.path.abspath('.')); sys.path.insert(0, os.path.abspath('slides')); 
+from plot_utils import draw_base_car, draw_base_human
+
+fig, axes = plt.subplots(1, 2, figsize=(8.5, 3.8))
+fig.patch.set_alpha(0.0)
+
+draw_base_car(axes[0])
+draw_base_human(axes[1])
+
+img_car = axes[0].images[0].get_array()
+img_human = axes[1].images[0].get_array()
+
+scale = 255.0 if np.max(img_car) <= 1.0 else 1.0
+
+avg_red_car = float(np.mean(img_car[:, :, 0])) * scale
+avg_red_human = float(np.mean(img_human[:, :, 0])) * scale
+
+axes[0].set_title(
+    f"Red car  ·  y = 1\n" + r"$f(\text{image}) \approx " + f"{avg_red_car:.0f}$",
+    fontsize=12, color='#1C355E', pad=10)
+axes[1].set_title(
+    f"Not a red car  ·  y = 0\n" + r"$f(\text{image}) \approx " + f"{avg_red_human:.0f}$",
+    fontsize=12, color='#1C355E', pad=10)
+
+plt.tight_layout()
+plt.show()
+```
+
+## From a Number to a Probability {vertical-align="center"}
+
+::: {.sdaia-v-center}
+The average red value lands in `[0, 255]` — but it's just a raw number. To **learn**, we need parameters.
+
+::: {.fragment .fade-up}
+Add weights to calculate a **score** ($z$):
+
+$$z = w \cdot x_{\text{red}} + b$$
+
+:::
+
+::: {.fragment .fade-up style="font-size: 0.9em; margin-bottom: 1rem;"}
+- **$w$ (Weight):** How much does "redness" matter?
+- **$b$ (Bias):** Baseline assumption (are red cars common?)
+:::
+
+::: {.fragment .fade-up}
+Now $z$ depends on $w$ and $b$ — but it's **unbounded**: it can go negative or exceed 1.
+:::
+
+::: {.callout-note appearance="minimal" .fragment style="width: 80%; margin: 1.5rem auto 0;"}
+**Problem:** We need a function that maps **any real number → [0, 1]** for a probability.
+:::
+:::
+
+## The Sigmoid
+
+:::: {.columns style="display: flex !important; align-items: center !important;"}
+
+::: {.column width="40%"}
+### The Squashing Function
+
+$$\sigma(z) = \frac{1}{1 + e^{-z}}$$
+
+::: {.fragment .fade-up style="margin-top: 1.5rem;"}
+- Large **+z** → near **1.0**
+- Large **−z** → near **0.0**
+- **z = 0** → **0.5**
+:::
+
+:::
+
+::: {.column width="60%"}
+```{python}
+#| echo: false
+#| fig-align: center
+import matplotlib.pyplot as plt
+import numpy as np
+
+brand_dark = '#1C355E'
+brand_teal = '#00C9A7'
+
+z = np.linspace(-7, 7, 200)
+sigma = 1 / (1 + np.exp(-z))
+
+fig, ax = plt.subplots(figsize=(6, 3.8))
+fig.patch.set_alpha(0.0)
+ax.patch.set_alpha(0.0)
+
+# Main curve
+ax.plot(z, sigma, color=brand_teal, linewidth=4, label=r'$\sigma(z)$')
+
+# Guides
+ax.axhline(y=0.5, color=brand_dark, linestyle='--', alpha=0.2, linewidth=1)
+ax.axvline(x=0, color=brand_dark, linestyle='--', alpha=0.2, linewidth=1)
+
+# Highlight center
+ax.plot(0, 0.5, 'o', color=brand_dark, markersize=8)
+ax.annotate('Uncertainty (0.5)', xy=(0.3, 0.45), fontsize=10, color=brand_dark)
+
+# Limits
+ax.annotate('Certainty (1.0)', xy=(-6.5, 0.92), fontsize=10, color=brand_teal, alpha=0.8)
+ax.annotate('Impossible (0.0)', xy=(-6.5, 0.05), fontsize=10, color=brand_teal, alpha=0.8)
+
+# Styling
+ax.set_xlabel('Input Score (z)', fontsize=11, color=brand_dark, labelpad=10)
+ax.set_ylabel(r'Probability $\sigma(z)$', fontsize=11, color=brand_dark, labelpad=10)
+ax.set_title('Sigmoid: From Scores to Probabilities', fontsize=13, fontweight='bold', color=brand_dark, pad=15)
+
+ax.spines['top'].set_visible(False)
+ax.spines['right'].set_visible(False)
+ax.spines['bottom'].set_color(brand_dark)
+ax.spines['left'].set_color(brand_dark)
+ax.tick_params(colors=brand_dark, labelsize=9)
+ax.set_ylim(-0.05, 1.05)
+ax.grid(True, alpha=0.05)
+
+plt.tight_layout()
+plt.show()
 ```
 :::
 
-## MSE — The Most Intuitive Loss
+::::
 
-**Mean Squared Error** is the simplest, most widely used loss in machine learning.
+::: {.fragment .fade-up style="text-align: center; margin-top: 0.5rem;"}
+**Prediction:**
+$$f(\text{image}) = \sigma(\underbrace{w \cdot x_{\text{red}} + b}_{\text{score } z})$$
 
-::: {.fragment .fade-up}
-$$\mathcal{L}_{\text{MSE}} = \frac{1}{n}\sum_{i=1}^{n}\bigl(y_i - \hat{y}_i\bigr)^2$$
-
-| Symbol | Meaning |
-|:---:|:---|
-| $y_i$ | Ground-truth value (the label) |
-| $\hat{y}_i$ | Model's predicted value |
-| $(y_i - \hat{y}_i)^2$ | Squared error — big mistakes hurt **much more** |
 :::
 
-::: {.callout-tip appearance="minimal" .fragment .fade-up}
-Each task eventually gets a better-tuned loss (cross-entropy for classes, IoU-based for boxes) — but **MSE is the intuition** behind all of them.
+
+
+## Why Metrics Aren't Enough for Learning
+
+We have predictions. From **Part 3**, we know how to *grade* them — `mAP`, Precision, Recall. So why not just train against those?
+
+:::: {.columns style="margin-top: 0.5rem;"}
+
+::: {.column width="48%"}
+::: {.callout-important appearance="simple" icon="false"}
+## Discrete (Problem)
+**mAP, Precision, Recall**
+
+Small weight changes → **zero change** in the metric.
+:::
+:::
+
+::: {.column width="4%"}
+:::
+
+::: {.column width="48%"}
+::: {.callout-tip appearance="simple" icon="false"}
+## Smooth (Solution)
+**Training Loss**
+
+Every tiny adjustment is mathematically measurable.
+:::
+:::
+
+::::
+
+::: {.fragment .fade-up style="margin-top: -0.5rem;"}
+```{python}
+#| echo: false
+#| fig-align: center
+import matplotlib.pyplot as plt
+import numpy as np
+
+brand_dark = '#1C355E'
+brand_teal = '#00C9A7'
+brand_red  = '#dc3545'
+brand_grey = '#94a3b8'
+
+# Data
+x = np.linspace(0, 10, 100)
+y_step = np.floor(x / 2)
+y_smooth = (x - 5)**2 / 5
+
+fig, axes = plt.subplots(1, 2, figsize=(9.5, 2.0))
+fig.patch.set_alpha(0.0)
+
+for ax in axes:
+    ax.patch.set_alpha(0.0)
+    for spine in ax.spines.values():
+        spine.set_visible(False)
+    ax.tick_params(colors=brand_grey, labelsize=9)
+    ax.set_xticks([])
+    ax.set_yticks([])
+    # Add a subtle bottom axis
+    ax.axhline(y=ax.get_ylim()[0], color=brand_dark, linewidth=1, alpha=0.2)
+
+# Discrete Plot
+axes[0].plot(x, y_step, color=brand_red, linewidth=3, drawstyle='steps-post', alpha=0.8)
+axes[0].set_xlabel("Model Weights", fontsize=9, color=brand_grey, labelpad=5)
+axes[0].annotate('No gradient (flat)', xy=(3, 1), xytext=(0.5, 3.5),
+            fontsize=10, color=brand_red, fontweight='bold',
+            arrowprops=dict(arrowstyle='->', color=brand_red, lw=1.5, connectionstyle="arc3,rad=.2"))
+
+# Smooth Plot
+axes[1].plot(x, y_smooth, color=brand_teal, linewidth=3, alpha=0.8)
+axes[1].set_xlabel("Model Weights", fontsize=9, color=brand_grey, labelpad=5)
+axes[1].annotate('Clear gradient', xy=(8, 1.8), xytext=(2.5, 3.5),
+            fontsize=10, color=brand_teal, fontweight='bold',
+            arrowprops=dict(arrowstyle='->', color=brand_teal, lw=1.5, connectionstyle="arc3,rad=-.2"))
+
+plt.subplots_adjust(bottom=0.25)
+plt.tight_layout()
+plt.show()
+```
+:::
+
+::: {.fragment .fade-up style="text-align: center; margin-top: -0.5rem;"}
+**So we need a smooth substitute.** Enter the **loss**.
+:::
+
+::: {.fragment .fade-up}
+::: {.callout-note appearance="minimal" style="font-size: 0.8em; margin-top: 0.5rem;"}
+*We skip deeper technical details to keep the intuition front and center.*
+:::
+:::
+
+## Measuring Wrongness — The Idea {vertical-align="center"}
+
+::: {.sdaia-v-center}
+To evaluate our model, we need a mathematical definition of "wrongness."
+
+:::: {.columns style="margin-top: 1.5rem;"}
+
+::: {.column .fragment .fade-up width="31%"}
+::: {.callout-note appearance="simple" icon="false" style="height: 100%;"}
+## 🤔 Instinct
+Measure the raw difference between target and prediction.
+
+::: {style="text-align: center; font-size: 1.1em; margin-top: 1.5rem;"}
+$\text{err} = y - f(x)$
+:::
+:::
+:::
+
+::: {.column width="3.5%"}
+:::
+
+::: {.column .fragment .fade-up width="31%"}
+::: {.callout-important appearance="simple" icon="false" style="height: 100%;"}
+## 🚨 The Flaw
+Target = $0$, Prediction = $1$
+
+::: {style="text-align: center; font-size: 1.1em; margin: 0.5rem 0;"}
+$0 - 1 = \mathbf{-1}$
+:::
+
+The model seeks the *lowest* number. It thinks $-1$ is **better** than $0$ (perfect)!
+:::
+:::
+
+::: {.column width="3.5%"}
+:::
+
+::: {.column .fragment .fade-up width="31%"}
+::: {.callout-tip appearance="simple" icon="false" style="height: 100%;"}
+## 💡 The Fix
+A mistake of $-1$ is just as bad as $+1$.
+
+Square the difference:
+
+::: {style="text-align: center; font-size: 1.1em; margin-top: 0.5rem;"}
+$\text{err}^2 = (y - f(x))^2$
+:::
+:::
+:::
+
+::::
+:::
+
+## Measuring Wrongness — Example
+
+**Let's start with a random guess:** `w = 0.06`, `b = -14.0`
+
+:::: {.columns style="margin-top: 0.2rem;"}
+
+::: {.column width="48%"}
+::: {style="text-align: center;"}
+**Image A — Red Car**
+
+::: {style="font-size: 0.9em; color: #475569; margin: 0;"}
+$x_{\text{red}} \approx 247$
+:::
+:::
+:::
+
+::: {.column width="4%"}
+:::
+
+::: {.column width="48%"}
+::: {style="text-align: center;"}
+**Image B — Not a Red Car**
+
+::: {style="font-size: 0.9em; color: #475569; margin: 0;"}
+$x_{\text{red}} \approx 212$
+:::
+:::
+:::
+
+::::
+
+```{python}
+#| echo: false
+#| fig-align: center
+import matplotlib.pyplot as plt
+from plot_utils import draw_base_car, draw_base_human
+
+fig, axes = plt.subplots(1, 2, figsize=(8.5, 2.0))
+fig.patch.set_alpha(0.0)
+
+draw_base_car(axes[0])
+draw_base_human(axes[1])
+
+axes[0].set_title("")
+axes[1].set_title("")
+
+plt.tight_layout(pad=0.2)
+plt.show()
+```
+
+:::: {.columns style="margin-top: -0.8rem;"}
+
+::: {.column width="48%"}
+::: {.callout-note appearance="minimal" style="font-size: 0.85em;"}
+Score: $z = 0.06(247) - 14.0 = 0.82$  
+Prediction: **$f(x) = \sigma(0.82) \approx 0.69$**
+
+$\text{err} = (1 - 0.69)^2 = \mathbf{0.10}$
+:::
+:::
+
+::: {.column width="4%"}
+:::
+
+::: {.column width="48%"}
+::: {.callout-note appearance="minimal" style="font-size: 0.85em;"}
+Score: $z = 0.06(212) - 14.0 = -1.28$  
+Prediction: **$f(x) = \sigma(-1.28) \approx 0.22$**
+
+
+$\text{err} = (0 - 0.22)^2 = \mathbf{0.05}$
+:::
+:::
+
+::::
+
+## Formalizing the Loss (MSE) {vertical-align="center"}
+
+::: {.sdaia-v-center}
+To get a single metric for the whole dataset, we average these squared errors.
+
+::: {.fragment .fade-up style="text-align: center; font-size: 1.2em; margin-bottom: 1.5rem;"}
+For our two images:
+**Loss** = $\frac{0.10 + 0.05}{2}$ = **0.075**
+:::
+
+::: {.fragment .fade-up}
+This is called **Mean Squared Error (MSE)**:
+$$\mathcal{L}_{\text{MSE}} = \frac{1}{n}\sum_{i=1}^{n}\bigl(y_i - f(x_i)\bigr)^2$$
+
+:::
+
+::: {.callout-note appearance="minimal" .fragment style="margin-top: 1.5rem;"}
+**Note:** We use MSE here for simplicity to build intuition. In practice, modern classifiers use **Cross-Entropy Loss**, which mathematically penalizes highly-confident wrong guesses much more harshly.
+:::
 :::
 
 ## Following the Gradient
 
-> How does the model actually use the loss to improve?
-
-::: {.fragment .fade-up}
-It finds the **direction that decreases the loss the fastest** — the gradient — and takes a small step that way. This is called **gradient descent**.
-:::
+Two knobs (`w`, `b`). The **gradient** points where loss drops fastest. Step a little that way. Repeat. → **gradient descent**.
 
 ::: {.fragment .fade-up}
 ```{=html}
 <iframe src="assets/html/demo_gradient_descent.html"
-        width="100%" height="370px"
-        style="border:none; border-radius:12px; overflow:hidden;"
+        width="100%" height="320px"
+        style="border:none; border-radius:12px; overflow:hidden; margin-top: -10px;"
         scrolling="no">
 </iframe>
 ```
 :::
 
+::: {.fragment .fade-up style="font-size: 0.9em; margin-top: 0.5rem;"}
+- **Learning Rate:** The *size* of the step. Too large = overshoot; too small = takes forever.
+- **Epochs:** Repeating this process for the entire dataset.
+:::
+
+## Scaling Up: From Color to YOLO
+
+Our toy: **2 weights**, **1 feature** (avg red).
+
+::: {.fragment .fade-up}
+**YOLO — same idea, scaled:**
+
+- **Millions of weights**, learns its own features via **Convolutions** (filters that automatically detect edges/textures/shapes).
+- Answers many questions per object: *where* (box), *what* (class), *how sharp* (boundary).
+:::
+
+::: {.fragment .fade-up}
+One loss isn't enough → YOLO **sums several**, one per question.
+:::
+
 ## YOLO's Loss: Three Signals
 
-YOLO's training loss is the **sum of three components**, each measuring a different type of mistake:
+Total loss = sum of three components, each catching a different mistake:
 
-::: {.fragment .fade-up style="margin-top: 0.5rem;"}
+::: {.fragment .fade-up style="font-size: 0.85em;"}
 | Component | Also called | What it penalizes |
 |:---|:---:|:---|
-| **Box Loss** | `box_loss` | Wrong bounding-box coordinates (position & size) |
-| **Class Loss** | `cls_loss` | Wrong class label (Car vs. Truck vs. Person) |
-| **Distribution Focal Loss** | `dfl_loss` | Imprecise box boundary distributions |
+| **Box Loss** | `box_loss` | Wrong coordinates |
+| **Class Loss** | `cls_loss` | Wrong label |
+| **DFL Loss** | `dfl_loss` | Uncertain box edges |
 :::
 
-::: {.fragment .fade-up style="margin-top: 1rem;"}
-$$\mathcal{L}_{total} = \lambda_{box}\,\mathcal{L}_{box} + \lambda_{cls}\,\mathcal{L}_{cls} + \lambda_{dfl}\,\mathcal{L}_{dfl}$$
+::: {.fragment .fade-up}
+$$\mathcal{L}_{\text{total}} = \lambda_{\text{box}}\mathcal{L}_{\text{box}} + \lambda_{\text{cls}}\mathcal{L}_{\text{cls}} + \lambda_{\text{dfl}}\mathcal{L}_{\text{dfl}}$$
 :::
 
-# Diagnosing Training {.sdaia-dark background-gradient="linear-gradient(135deg, #1C355E, #00C9A7)"}
+# Practical Data Pipeline {.sdaia-dark background-gradient="linear-gradient(135deg, #1C355E, #00C9A7)"}
+
+Formatting your data for YOLO.
+
+## Understanding the Data Setup
+
+Different formats for different tasks:
+
+- **Classification**: Relies *entirely* on folder structure (e.g., `train/cat/`, `train/dog/`).
+- **Detection & Segmentation**: Uses standard **YOLO format**, pairing images with `.txt` label files.
+
+```text
+my_dataset/
+├── images/
+│   ├── train/
+│   └── val/
+└── labels/
+    ├── train/
+    └── val/
+```
+
+## Inside the Labels
+
+- **Object Detection** (`.txt` Bounding Box):
+  `<class_index> <x_center> <y_center> <width> <height>`
+
+- **Instance Segmentation** (`.txt` Polygon):
+  `<class_index> <x1> <y1> <x2> <y2> ... <xn> <yn>`
+
+**⚠ Note:** Coordinates must **always be normalized** (0.0 to 1.0) to keep annotations independent of image resolution!
+
+## The `data.yaml` File
+
+Linking indices to names and defining paths.
+
+```yaml
+# data.yaml
+path: ../my_dataset
+train: images/train
+val: images/val
+
+names:
+  0: my_custom_object
+  1: another_object
+```
+
+## Labeling: Manual + Auto
+
+Typing coordinates by hand is impossible — use visual tools:
+
+- **Manual annotation:** [Ultralytics HUB](https://docs.ultralytics.com/hub/), Roboflow, or CVAT — upload images, draw boxes/polygons, export in YOLO format.
+- **Auto-labeling with [SAM](https://docs.ultralytics.com/models/sam/)** (Segment Anything): run on raw images to generate masks/boxes, then review & correct. Drastically faster than drawing manually.
+
+# Kickoff Training {.sdaia-dark background-gradient="linear-gradient(135deg, #1C355E, #00C9A7)"}
+
+Hyperparameters and configs.
+
+## Training
+
+We can start training directly from the command line or Python API:
+
+```bash
+yolo train model=weights/yolo26n.pt data=data.yaml epochs=100 imgsz=640 batch=-1
+```
+
+```python
+# Python Equivalent
+from ultralytics import YOLO
+
+model = YOLO("weights/yolo26n.pt")
+results = model.train(data="data.yaml", epochs=100, imgsz=640, batch=-1)
+```
+
+## Transfer Learning
+
+- **`.pt` (Pretrained weights):** Starts with general features (edges, shapes) from large datasets. Fast training, needs little data. (*Always recommended!*)
+- **`.yaml` (Architecture Definition):** Blank blueprint. Random weights, meaning you train entirely from scratch.
+
+*Use a `.pt` model for all custom dataset training to leverage Transfer Learning.*
+
+## Important Hyperparameters
+
+- `epochs` (Default: 100): Pass through the ENTIRE dataset. More = learns more, but risks overfitting.
+- `batch` (Default: 16): Images processed at once.
+  - Higher = faster, stable, takes more GPU memory.
+  - Smaller = adds noise, longer training.
+  - *Pro-tip*: Use `batch: -1` for **AutoBatch** to maximize your GPU memory!
+- `imgsz` (Default: 640): Target image size. Larger sizes (e.g., 1024) capture more detail but use more RAM.
+
+## Hyperparameters: Tuning the Steps
+
+- **Learning Rate (`lr0`)** (Default: `0.01`): Controls step size—too large and the ball overshoots, too small and training is slow.
+- **Weight Decay** (Default: `0.0005`): Penalizes large weights to prevent memorization (🔴 Overfitting).
+- **Patience (`patience`)** (Default: `100`): Stop training if validation metrics haven't improved for $N$ epochs.
+
+# Diagnosing & Fixing Training {.sdaia-dark background-gradient="linear-gradient(135deg, #1C355E, #00C9A7)"}
 
 Reading the curves to fix what training isn't learning.
 
@@ -348,43 +767,9 @@ plt.show()
 
 ::::
 
-## Diagnosing Your Training Run
+## Class Imbalance: When Rare Classes Get Ignored
 
-*Use this as a reference when reading your own loss curves.*
-
-| What you see | Problem | Actions |
-|:---|:---:|:---|
-| Train mAP >> Val mAP, Val loss rising | 🔴 **Overfitting** | Add augmentation · increase `weight_decay` · set `patience` |
-| Both mAP low and flat, loss barely moves | 🟠 **Underfitting** | Bigger model · more `epochs` · raise `lr0` · lower `weight_decay` |
-| Both losses converging, mAP climbing | 🟢 **Healthy** | Continue training or deploy |
-
-::: {.callout-tip}
-**Always watch both curves.** 99% train accuracy means nothing if val is failing.
-:::
-
-# Practical Data Pipeline {.sdaia-dark background-gradient="linear-gradient(135deg, #1C355E, #00C9A7)"}
-
-Formatting and fixing your data for YOLO.
-
-## What If Your Metrics Reveal a Problem?
-
-You can now read your validation results — but what do you do when the numbers look bad?
-
-::: {.fragment .fade-up}
-The most common culprits are:
-
-- **Class imbalance** — rare classes get ignored during training
-- **Overfitting or underfitting** — the model hasn't generalized
-- **Poor hyperparameters** — learning rate, weight decay, stopping too early or too late
-:::
-
-::: {.fragment .fade-up}
-We'll fix the **data-side** problem here (imbalance). The training-side fixes (augmentation, hyperparameters) come next.
-:::
-
-## Class Imbalance: Fixing the Bias
-
-How do we stop the model from ignoring rare classes during training?
+In a parking lot you'll naturally collect **9,500 empty frames** for every **500 cars** — and the model can hit 95% accuracy by *always* predicting "empty."
 
 ```{python}
 #| echo: false
@@ -432,57 +817,18 @@ plt.tight_layout()
 plt.show()
 ```
 
-Here we oversample (duplicating images) the minority class (car) to make it learnable.
-
-## Understanding the Data Setup
-
-Different formats for different tasks:
-
-- **Classification**: Relies *entirely* on folder structure (e.g., `train/cat/`, `train/dog/`).
-- **Detection & Segmentation**: Uses standard **YOLO format**, pairing images with `.txt` label files.
-
-```text
-my_dataset/
-├── images/
-│   ├── train/
-│   └── val/
-└── labels/
-    ├── train/
-    └── val/
-```
-
-## Inside the Labels
-
-- **Object Detection** (`.txt` Bounding Box):
-  `<class_index> <x_center> <y_center> <width> <height>`
-
-- **Instance Segmentation** (`.txt` Polygon):
-  `<class_index> <x1> <y1> <x2> <y2> ... <xn> <yn>`
-
-**⚠ Note:** Coordinates must **always be normalized** (0.0 to 1.0) to keep annotations independent of image resolution!
-
-## The `data.yaml` File
-
-Linking indices to names and defining paths.
-
-```yaml
-# data.yaml
-path: ../my_dataset
-train: images/train
-val: images/val
-
-names:
-  0: my_custom_object
-  1: another_object
-```
+**Fix:** oversample the minority class so the model sees Cars often enough to learn them.
 
 ## Data Leakage: The Silent Killer
+
+The fourth failure mode — the one your curves *won't* warn you about.
 
 **The Problem:** Validation/test data accidentally ends up in the training set.
 
 **The Danger:** Val metrics look "perfect," but the model fails in production.
 
 **How to Avoid:**
+
 - Use `autosplit()` for automatic, safe partitioning.
 - Avoid manually copying images between split folders.
 - Check for duplicates/hashes before training.
@@ -491,80 +837,9 @@ names:
 **Suspiciously perfect metrics? Check for leakage!**
 :::
 
-## Labeling Your Own Data
-
-Typing coordinates manually is impossible. Use **Ultralytics HUB**, Roboflow, or CVAT.
-
-1. Upload your images.
-2. Draw bounding boxes or polygons visually.
-3. Export in **YOLO format** for a ready-to-train dataset structure!
-
-*Docs Reference: [Ultralytics HUB](https://docs.ultralytics.com/hub/)*
-
-## AutoLabeling with SAM
-
-Speed up labeling using **SAM** (Segment Anything Model):
-
-1. **Zero-Shot Labeling:** Bypass manual labeling for generic objects.
-2. Run SAM on your raw dataset to generate masks/boxes.
-3. Review and correct the auto-generated labels—drastically faster than drawing manually!
-
-*Docs Reference: [Segment Anything Models (SAM)](https://docs.ultralytics.com/models/sam/)*
-
-# Kickoff Training {.sdaia-dark background-gradient="linear-gradient(135deg, #1C355E, #00C9A7)"}
-
-Hyperparameters and Configs.
-
-## Training
-
-We can start training directly from the command line or Python API:
-
-```bash
-yolo train model=weights/yolo26n.pt data=data.yaml epochs=100 imgsz=640 batch=-1
-```
-
-```python
-# Python Equivalent
-from ultralytics import YOLO
-
-model = YOLO("weights/yolo26n.pt")
-results = model.train(data="data.yaml", epochs=100, imgsz=640, batch=-1)
-```
-
-## Transfer Learning
-
-- **`.pt` (Pretrained weights):** Starts with general features (edges, shapes) from large datasets. Fast training, needs little data. (*Always recommended!*)
-- **`.yaml` (Architecture Definition):** Blank blueprint. Random weights, meaning you train entirely from scratch.
-
-*Use a `.pt` model for all custom dataset training to leverage Transfer Learning.*
-
-## Important Hyperparameters
-
-- `epochs` (Default: 100): Pass through the ENTIRE dataset. More = learns more, but risks overfitting.
-- `batch` (Default: 16): Images processed at once.
-  - Higher = faster, stable, takes more GPU memory.
-  - Smaller = adds noise, longer training.
-  - *Pro-tip*: Use `batch: -1` for **AutoBatch** to maximize your GPU memory!
-- `imgsz` (Default: 640): Target image size. Larger sizes (e.g., 1024) capture more detail but use more RAM.
-
-## Hyperparameters: Tuning the Steps
-
-- **Learning Rate (`lr0`)**: Controls step size—too large and the ball overshoots, too small and training is slow.
-- **Weight Decay**: Penalizes large weights to prevent memorization (🔴 Overfitting).
-- **Patience (`early_stopping`)**: Stop training if validation metrics haven't improved for $N$ epochs.
-
-## 💡 Tip for Tiny Objects: SAHI
-
-**Problem:** A 4K image resized to 640px makes tiny objects *invisible* to YOLO.
-
-**Solution — [SAHI](https://docs.ultralytics.com/guides/sahi-tiled-inference/):**
-1. **Slice** the large image into small, overlapping tiles.
-2. **Run YOLO** on each tile at full resolution.
-3. **Merge** all detections back together automatically.
-
 ## Data Augmentation (Albumentations)
 
-YOLO natively supports **Albumentations** to improve model robustness:
+The training-side fix for **🔴 overfitting** — show the model more variety so it can't memorize.
 
 ```python
 import albumentations as A
@@ -583,15 +858,28 @@ custom_transforms = [
 model.train(data="data.yaml", epochs=100, augmentations=custom_transforms)
 ```
 
+## Diagnosing Your Training Run
+
+| What you see | Problem | Actions |
+|:---|:---:|:---|
+| Train mAP >> Val mAP, Val loss rising | 🔴 **Overfitting** | Add augmentation · increase `weight_decay` · set `patience` |
+| Both mAP low and flat, loss barely moves | 🟠 **Underfitting** | Bigger model · more `epochs` · raise `lr0` · lower `weight_decay` |
+| One class dominates predictions | ⚖️ **Imbalance** | Oversample minority · class weights |
+| Val metrics suspiciously perfect | 🕳️ **Leakage** | Re-split with `autosplit()` · de-duplicate |
+| Both losses converging, mAP climbing | 🟢 **Healthy** | Continue training or deploy |
+
+
+
 # Conclusion {.sdaia-dark background-gradient="linear-gradient(135deg, #1C355E, #00C9A7)"}
 
 ## Summary
 
-- **Intuition**: Learning $f(x)$ from data using feedback.
-- **Loss**: The smooth metric that guides optimization (MSE, Box, Class).
-- **Diagnosis**: Reading loss curves to spot Overfitting vs. Underfitting.
-- **Practicality**: YOLO formatting, Class Imbalance, and Auto-labeling with SAM.
-- **Levers**: Tuning Learning Rate, Weight Decay, and Augmentation.
+- **Intuition**: A model is `f(image) → number`. Training nudges weights until predictions match reality.
+- **Loss**: A smooth measure of "how wrong" — drives gradient descent. YOLO sums three: box, class, distribution.
+- **Data Pipeline**: YOLO folder format, `data.yaml`, manual + auto labeling.
+- **Kickoff**: Transfer learning + `epochs`, `batch`, `imgsz`, `lr0`, `weight_decay`, `patience`.
+- **Diagnose & Fix**: Overfitting, underfitting, class imbalance, data leakage — and the lever for each.
+
 
 ## Next Steps
 
