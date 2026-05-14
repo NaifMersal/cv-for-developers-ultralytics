@@ -9,7 +9,7 @@
 <link href="../site_libs/quarto-html/quarto-syntax-highlighting-587c61ba64f3a5504c4d52d930310e48.css" rel="stylesheet" id="quarto-text-highlighting-styles"><meta charset="utf-8">
   <meta name="generator" content="quarto-1.8.26">
 
-  <meta name="dcterms.date" content="2026-05-09">
+  <meta name="dcterms.date" content="2026-05-14">
   <title>Ultralytics YOLO Foundations: Part 4</title>
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -203,7 +203,7 @@
 <div class="quarto-title-authors">
 </div>
 
-  <p class="date">2026-05-09</p>
+  <p class="date">2026-05-14</p>
 </section>
 <section>
 <section id="how-a-model-learns" class="title-slide slide level1 sdaia-dark center" data-background-gradient="linear-gradient(135deg, #1C355E, #00C9A7)">
@@ -268,7 +268,7 @@
 <p><strong>Simplest feature:</strong> average red pixel value (0-255).</p>
 <p><span class="math display">\[f(\text{image}) \approx x_{\text{red}}(\text{image})\]</span></p>
 </div>
-<div id="f9c96b2a" class="cell" data-execution_count="1">
+<div id="c06f038c" class="cell" data-execution_count="1">
 <div class="cell-output cell-output-display">
 <div class="quarto-figure quarto-figure-center">
 <figure>
@@ -320,7 +320,7 @@
 </ul>
 </div>
 </div><div class="column" style="width:60%;">
-<div id="e86e083c" class="cell" data-execution_count="2">
+<div id="a259d7c8" class="cell" data-execution_count="2">
 <div class="cell-output cell-output-display">
 <div class="quarto-figure quarto-figure-center">
 <figure>
@@ -366,7 +366,7 @@
 </div>
 </div></div>
 <div class="fragment fade-up" style="margin-top: -0.5rem;">
-<div id="55092164" class="cell" data-execution_count="3">
+<div id="b8fdaf01" class="cell" data-execution_count="3">
 <div class="cell-output cell-output-display">
 <div class="quarto-figure quarto-figure-center">
 <figure>
@@ -474,7 +474,7 @@
 </div>
 </div>
 </div></div>
-<div id="f10764c4" class="cell" data-execution_count="4">
+<div id="4bac2f1b" class="cell" data-execution_count="4">
 <div class="cell-output cell-output-display">
 <div class="quarto-figure quarto-figure-center">
 <figure>
@@ -852,7 +852,7 @@ Prediction: <strong><span class="math inline">\(f(x) = \sigma(-1.28) \approx 0.2
 <li>Growing gap between the two curves</li>
 </ul>
 </div><div class="column" style="width:58%;">
-<div id="f561899a" class="cell" data-execution_count="5">
+<div id="50c16946" class="cell" data-execution_count="5">
 <div class="cell-output cell-output-display">
 <div class="quarto-figure quarto-figure-center">
 <figure>
@@ -877,7 +877,7 @@ Prediction: <strong><span class="math inline">\(f(x) = \sigma(-1.28) \approx 0.2
 <li>Curves close together — but both stuck high</li>
 </ul>
 </div><div class="column" style="width:55%;">
-<div id="01f0973c" class="cell" data-execution_count="6">
+<div id="ddf12e76" class="cell" data-execution_count="6">
 <div class="cell-output cell-output-display">
 <div class="quarto-figure quarto-figure-center">
 <figure>
@@ -891,7 +891,7 @@ Prediction: <strong><span class="math inline">\(f(x) = \sigma(-1.28) \approx 0.2
 <section id="class-imbalance-when-rare-classes-get-ignored" class="slide level2">
 <h2>Class Imbalance: When Rare Classes Get Ignored</h2>
 <p>In a parking lot you’ll naturally collect <strong>9,500 empty frames</strong> for every <strong>500 cars</strong> — and the model can hit 95% accuracy by <em>always</em> predicting “empty.”</p>
-<div id="dc3d110b" class="cell" data-execution_count="7">
+<div id="8fb38faf" class="cell" data-execution_count="7">
 <div class="cell-output cell-output-display">
 <div class="quarto-figure quarto-figure-center">
 <figure>

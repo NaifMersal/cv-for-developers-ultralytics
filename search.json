@@ -1288,6 +1288,55 @@
     "text": "Inference with Exported Models\nYou don’t need complex deployment code to use your exported models. The Ultralytics API loads them just like a standard PyTorch .pt file!\n\nCLIPython\n\n\nyolo predict model=best.onnx source=\"https://ultralytics.com/assets/bus.jpg\"\n\n\nfrom ultralytics import YOLO\n\nmodel = YOLO(\"best.onnx\")\nresults = model.predict(source=\"https://ultralytics.com/assets/bus.jpg\")\nprint(results[0].boxes) \n\n\n\nDocs Reference: Predict with Exported Models"
   },
   {
+    "objectID": "slides/5_Deployment.html#deployment-strategies",
+    "href": "slides/5_Deployment.html#deployment-strategies",
+    "title": "Ultralytics YOLO Foundations: Part 5",
+    "section": "Deployment Strategies",
+    "text": "Deployment Strategies\nWhere your model lives depends on your application’s requirements.\n\n\n☁️ Cloud\n\nScale: Handle millions of requests.\nEase: Managed GPUs (AWS, GCP).\nTooling: Kubernetes, Ray Serve.\nBest for: SaaS, Web Apps.\n\n\n📱 Edge / Local\n\nLatency: Real-time response (&lt;30ms).\nPrivacy: Data never leaves the device.\nOffline: Works without internet.\nBest for: Robotics, Mobile, Security."
+  },
+  {
+    "objectID": "slides/5_Deployment.html#model-optimization-quantization",
+    "href": "slides/5_Deployment.html#model-optimization-quantization",
+    "title": "Ultralytics YOLO Foundations: Part 5",
+    "section": "Model Optimization: Quantization",
+    "text": "Model Optimization: Quantization\nMoving from FP32 (Training) to FP16 or INT8 can provide massive speedups.\n\n\n\nPrecision\nModel Size\nTheoretical Speed\nRelative Accuracy\n\n\n\n\nFP32\n100%\n1x (Baseline)\n100% (Baseline)\n\n\nFP16\n~50%\n~2x\nMinimal / No Loss\n\n\nINT8\n~25%\n~4x+\n1-3% Typical Drop\n\n\n\n\n\n\n\n\n\nNote\n\n\nActual gains depend heavily on your target hardware (e.g., NVIDIA Tensor Cores vs. Apple Neural Engine) and your calibration dataset.\n\n\n\n# Export with half-precision or INT8 quantization\nmodel.export(format=\"engine\", half=True)     # TensorRT FP16\nmodel.export(format=\"engine\", int8=True)     # TensorRT INT8"
+  },
+  {
+    "objectID": "slides/5_Deployment.html#benchmarking-performance",
+    "href": "slides/5_Deployment.html#benchmarking-performance",
+    "title": "Ultralytics YOLO Foundations: Part 5",
+    "section": "Benchmarking Performance",
+    "text": "Benchmarking Performance\nDon’t guess the performance—measure it on your target hardware.\nfrom ultralytics.utils.benchmarks import benchmark\n\n# Benchmark on current hardware across multiple formats\nbenchmark(model=\"yolo26n.pt\", data=\"coco8.yaml\", device=\"cpu\")\nMetrics included: * Inference time (ms) per image. * Throughput (FPS). * Model Size (MB). * ONNX, OpenVINO, TensorRT comparisons."
+  },
+  {
+    "objectID": "slides/5_Deployment.html#docker-containerization",
+    "href": "slides/5_Deployment.html#docker-containerization",
+    "title": "Ultralytics YOLO Foundations: Part 5",
+    "section": "Docker & Containerization",
+    "text": "Docker & Containerization\nAvoid “it works on my machine” issues by using standardized environments.\n\nPull ImageRun Container\n\n\n# Get the official Ultralytics image with GPU support\ndocker pull ultralytics/ultralytics:latest-python\n\n\n# Run inference inside a container\ndocker run -it --ipc=host --gpus all ultralytics/ultralytics \\\n  yolo predict model=yolo26n.pt source='https://ultralytics.com/images/bus.jpg'\n\n\n\nDocs Reference: Docker Guide"
+  },
+  {
+    "objectID": "slides/5_Deployment.html#edge-mobile-deployment",
+    "href": "slides/5_Deployment.html#edge-mobile-deployment",
+    "title": "Ultralytics YOLO Foundations: Part 5",
+    "section": "Edge & Mobile Deployment",
+    "text": "Edge & Mobile Deployment\nUltralytics supports a wide range of hardware-specific formats.\n\nNVIDIA Jetson: TensorRT (.engine)\nApple (iPhone/Mac): CoreML (.mlpackage)\nAndroid / IoT: TFLite (.tflite)\nWeb Browsers: TensorFlow.js / ONNX.js\nVision Sensors: Sony IMX500 (Raspberry Pi AI Camera).\n\n\nPro Tip: Use the half=True or int8=True argument when exporting for mobile to keep the app size small!"
+  },
+  {
+    "objectID": "slides/5_Deployment.html#production-best-practices",
+    "href": "slides/5_Deployment.html#production-best-practices",
+    "title": "Ultralytics YOLO Foundations: Part 5",
+    "section": "Production Best Practices",
+    "text": "Production Best Practices\nTo ensure a smooth transition from development to the real world:\n\nWarm-up: Run 1-2 dummy inferences to initialize hardware/drivers before processing live data.\nEnvironment Parity: Match your production OS/Drivers to your testing environment (use Docker!).\nInput Validation: Ensure production images are the same resolution as training (e.g., imgsz=640).\nMonitoring: Log inference times and confidence scores to detect Data Drift."
+  },
+  {
+    "objectID": "slides/5_Deployment.html#ultralytics-hub",
+    "href": "slides/5_Deployment.html#ultralytics-hub",
+    "title": "Ultralytics YOLO Foundations: Part 5",
+    "section": "Ultralytics HUB 🚀",
+    "text": "Ultralytics HUB 🚀\nThe all-in-one platform for no-code model management.\n\nCloud Training: Track experiments without managing GPUs.\nDataset Management: Label and version your data.\nOne-Click Deployment: Deploy models directly to iOS and Android apps using the HUB App.\nAPI Access: Managed endpoints for your custom models.\n\nCheck it out at hub.ultralytics.com"
+  },
+  {
     "objectID": "slides/5_Deployment.html#the-ultralytics-ecosystem",
     "href": "slides/5_Deployment.html#the-ultralytics-ecosystem",
     "title": "Ultralytics YOLO Foundations: Part 5",
@@ -1299,7 +1348,7 @@
     "href": "slides/5_Deployment.html#whats-next",
     "title": "Ultralytics YOLO Foundations: Part 5",
     "section": "What’s Next?",
-    "text": "What’s Next?\nNext up: Part 6 — HuggingFace for Computer Vision\n\nZero-shot segmentation with SAM 3.\nVisual embeddings for similarity search.\nVision LLMs for multimodal reasoning."
+    "text": "What’s Next?\nNext up: Part 6 — HuggingFace for Computer Vision\n\nZero-shot segmentation with SAM 3.\nVisual embeddings for similarity search with DINOv3.\nVision LLMs for multimodal reasoning (Qwen 3.5)."
   },
   {
     "objectID": "slides/5_Deployment.html#qa",

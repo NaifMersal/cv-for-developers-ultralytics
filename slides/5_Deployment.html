@@ -9,7 +9,7 @@
 <link href="../site_libs/quarto-html/quarto-syntax-highlighting-587c61ba64f3a5504c4d52d930310e48.css" rel="stylesheet" id="quarto-text-highlighting-styles"><meta charset="utf-8">
   <meta name="generator" content="quarto-1.8.26">
 
-  <meta name="dcterms.date" content="2026-05-09">
+  <meta name="dcterms.date" content="2026-05-14">
   <title>Ultralytics YOLO Foundations: Part 5</title>
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -203,7 +203,7 @@
 <div class="quarto-title-authors">
 </div>
 
-  <p class="date">2026-05-09</p>
+  <p class="date">2026-05-14</p>
 </section>
 <section>
 <section id="deployment" class="title-slide slide level1 sdaia-dark center" data-background-gradient="linear-gradient(135deg, #1C355E, #00C9A7)">
@@ -253,6 +253,141 @@
 </div>
 </div>
 <p><em>Docs Reference: <a href="https://docs.ultralytics.com/modes/predict/">Predict with Exported Models</a></em></p>
+</section>
+<section id="deployment-strategies" class="slide level2">
+<h2>Deployment Strategies</h2>
+<p>Where your model lives depends on your application’s requirements.</p>
+<div class="columns">
+<div class="column" style="width:50%;">
+<h3 id="cloud">☁️ Cloud</h3>
+<ul>
+<li><strong>Scale</strong>: Handle millions of requests.</li>
+<li><strong>Ease</strong>: Managed GPUs (AWS, GCP).</li>
+<li><strong>Tooling</strong>: Kubernetes, Ray Serve.</li>
+<li><em>Best for: SaaS, Web Apps.</em></li>
+</ul>
+</div><div class="column" style="width:50%;">
+<h3 id="edge-local">📱 Edge / Local</h3>
+<ul>
+<li><strong>Latency</strong>: Real-time response (&lt;30ms).</li>
+<li><strong>Privacy</strong>: Data never leaves the device.</li>
+<li><strong>Offline</strong>: Works without internet.</li>
+<li><em>Best for: Robotics, Mobile, Security.</em></li>
+</ul>
+</div></div>
+</section>
+<section id="model-optimization-quantization" class="slide level2">
+<h2>Model Optimization: Quantization</h2>
+<p>Moving from <strong>FP32</strong> (Training) to <strong>FP16</strong> or <strong>INT8</strong> can provide massive speedups.</p>
+<table class="caption-top">
+<thead>
+<tr class="header">
+<th>Precision</th>
+<th>Model Size</th>
+<th>Theoretical Speed</th>
+<th>Relative Accuracy</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><strong>FP32</strong></td>
+<td>100%</td>
+<td>1x (Baseline)</td>
+<td>100% (Baseline)</td>
+</tr>
+<tr class="even">
+<td><strong>FP16</strong></td>
+<td>~50%</td>
+<td>~2x</td>
+<td>Minimal / No Loss</td>
+</tr>
+<tr class="odd">
+<td><strong>INT8</strong></td>
+<td>~25%</td>
+<td>~4x+</td>
+<td>1-3% Typical Drop</td>
+</tr>
+</tbody>
+</table>
+<div class="callout callout-note callout-titled callout-style-default">
+<div class="callout-body">
+<div class="callout-title">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<p><strong>Note</strong></p>
+</div>
+<div class="callout-content">
+<p>Actual gains depend heavily on your target hardware (e.g., NVIDIA Tensor Cores vs.&nbsp;Apple Neural Engine) and your calibration dataset.</p>
+</div>
+</div>
+</div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb5"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb5-1"><a></a><span class="co"># Export with half-precision or INT8 quantization</span></span>
+<span id="cb5-2"><a></a>model.export(<span class="bu">format</span><span class="op">=</span><span class="st">"engine"</span>, half<span class="op">=</span><span class="va">True</span>)     <span class="co"># TensorRT FP16</span></span>
+<span id="cb5-3"><a></a>model.export(<span class="bu">format</span><span class="op">=</span><span class="st">"engine"</span>, int8<span class="op">=</span><span class="va">True</span>)     <span class="co"># TensorRT INT8</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</section>
+<section id="benchmarking-performance" class="slide level2">
+<h2>Benchmarking Performance</h2>
+<p>Don’t guess the performance—measure it on your target hardware.</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb6"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb6-1"><a></a><span class="im">from</span> ultralytics.utils.benchmarks <span class="im">import</span> benchmark</span>
+<span id="cb6-2"><a></a></span>
+<span id="cb6-3"><a></a><span class="co"># Benchmark on current hardware across multiple formats</span></span>
+<span id="cb6-4"><a></a>benchmark(model<span class="op">=</span><span class="st">"yolo26n.pt"</span>, data<span class="op">=</span><span class="st">"coco8.yaml"</span>, device<span class="op">=</span><span class="st">"cpu"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p><strong>Metrics included:</strong> * <strong>Inference time (ms)</strong> per image. * <strong>Throughput (FPS)</strong>. * <strong>Model Size (MB)</strong>. * <strong>ONNX, OpenVINO, TensorRT</strong> comparisons.</p>
+</section>
+<section id="docker-containerization" class="slide level2">
+<h2>Docker &amp; Containerization</h2>
+<p>Avoid “it works on my machine” issues by using standardized environments.</p>
+<div class="panel-tabset">
+<ul id="tabset-3" class="panel-tabset-tabby"><li><a data-tabby-default="" href="#tabset-3-1">Pull Image</a></li><li><a href="#tabset-3-2">Run Container</a></li></ul>
+<div class="tab-content">
+<div id="tabset-3-1">
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb7"><pre class="sourceCode numberSource bash number-lines code-with-copy"><code class="sourceCode bash"><span id="cb7-1"><a></a><span class="co"># Get the official Ultralytics image with GPU support</span></span>
+<span id="cb7-2"><a></a><span class="ex">docker</span> pull ultralytics/ultralytics:latest-python</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<div id="tabset-3-2">
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb8"><pre class="sourceCode numberSource bash number-lines code-with-copy"><code class="sourceCode bash"><span id="cb8-1"><a></a><span class="co"># Run inference inside a container</span></span>
+<span id="cb8-2"><a></a><span class="ex">docker</span> run <span class="at">-it</span> <span class="at">--ipc</span><span class="op">=</span>host <span class="at">--gpus</span> all ultralytics/ultralytics <span class="dt">\</span></span>
+<span id="cb8-3"><a></a>  yolo predict model=yolo26n.pt source=<span class="st">'https://ultralytics.com/images/bus.jpg'</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+</div>
+</div>
+<p><em>Docs Reference: <a href="https://docs.ultralytics.com/guides/docker-quickstart/">Docker Guide</a></em></p>
+</section>
+<section id="edge-mobile-deployment" class="slide level2">
+<h2>Edge &amp; Mobile Deployment</h2>
+<p>Ultralytics supports a wide range of hardware-specific formats.</p>
+<ul>
+<li><strong>NVIDIA Jetson</strong>: TensorRT (<code>.engine</code>)</li>
+<li><strong>Apple (iPhone/Mac)</strong>: CoreML (<code>.mlpackage</code>)</li>
+<li><strong>Android / IoT</strong>: TFLite (<code>.tflite</code>)</li>
+<li><strong>Web Browsers</strong>: TensorFlow.js / ONNX.js</li>
+<li><strong>Vision Sensors</strong>: Sony IMX500 (Raspberry Pi AI Camera).</li>
+</ul>
+<blockquote>
+<p><strong>Pro Tip</strong>: Use the <code>half=True</code> or <code>int8=True</code> argument when exporting for mobile to keep the app size small!</p>
+</blockquote>
+</section>
+<section id="production-best-practices" class="slide level2">
+<h2>Production Best Practices</h2>
+<p>To ensure a smooth transition from development to the real world:</p>
+<ol type="1">
+<li><strong>Warm-up</strong>: Run 1-2 dummy inferences to initialize hardware/drivers before processing live data.</li>
+<li><strong>Environment Parity</strong>: Match your production OS/Drivers to your testing environment (use Docker!).</li>
+<li><strong>Input Validation</strong>: Ensure production images are the same resolution as training (e.g., <code>imgsz=640</code>).</li>
+<li><strong>Monitoring</strong>: Log inference times and confidence scores to detect <strong>Data Drift</strong>.</li>
+</ol>
+</section>
+<section id="ultralytics-hub" class="slide level2">
+<h2>Ultralytics HUB 🚀</h2>
+<p>The all-in-one platform for no-code model management.</p>
+<ul>
+<li><strong>Cloud Training</strong>: Track experiments without managing GPUs.</li>
+<li><strong>Dataset Management</strong>: Label and version your data.</li>
+<li><strong>One-Click Deployment</strong>: Deploy models directly to iOS and Android apps using the HUB App.</li>
+<li><strong>API Access</strong>: Managed endpoints for your custom models.</li>
+</ul>
+<p><em>Check it out at <a href="https://hub.ultralytics.com">hub.ultralytics.com</a></em></p>
 </section></section>
 <section>
 <section id="conclusion" class="title-slide slide level1 sdaia-dark center" data-background-gradient="linear-gradient(135deg, #1C355E, #00C9A7)">
@@ -293,8 +428,8 @@
 <p>Next up: <strong>Part 6 — HuggingFace for Computer Vision</strong></p>
 <ul>
 <li>Zero-shot segmentation with <strong>SAM 3</strong>.</li>
-<li>Visual embeddings for similarity search.</li>
-<li>Vision LLMs for multimodal reasoning.</li>
+<li>Visual embeddings for similarity search with <strong>DINOv3</strong>.</li>
+<li>Vision LLMs for multimodal reasoning (<strong>Qwen 3.5</strong>).</li>
 </ul>
 </section>
 <section id="qa" class="slide level2 sdaia-dark" data-background-color="#1C355E">
