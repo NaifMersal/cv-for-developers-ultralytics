@@ -77,6 +77,122 @@ print(results[0].boxes)
 *Docs Reference: [Predict with Exported Models](https://docs.ultralytics.com/modes/predict/)*
 
 
+## Deployment Strategies
+
+Where your model lives depends on your application's requirements.
+
+::: {.columns}
+::: {.column width="50%"}
+### ☁️ Cloud
+*   **Scale**: Handle millions of requests.
+*   **Ease**: Managed GPUs (AWS, GCP).
+*   **Tooling**: Kubernetes, Ray Serve.
+*   *Best for: SaaS, Web Apps.*
+:::
+
+::: {.column width="50%"}
+### 📱 Edge / Local
+*   **Latency**: Real-time response (<30ms).
+*   **Privacy**: Data never leaves the device.
+*   **Offline**: Works without internet.
+*   *Best for: Robotics, Mobile, Security.*
+:::
+:::
+
+## Model Optimization: Quantization
+
+Moving from **FP32** (Training) to **FP16** or **INT8** can provide massive speedups.
+
+| Precision | Model Size | Theoretical Speed | Relative Accuracy |
+|-----------|------------|-------------------|-------------------|
+| **FP32**  | 100%       | 1x (Baseline)     | 100% (Baseline)   |
+| **FP16**  | ~50%       | ~2x               | Minimal / No Loss |
+| **INT8**  | ~25%       | ~4x+              | 1-3% Typical Drop |
+
+::: {.callout-note}
+Actual gains depend heavily on your target hardware (e.g., NVIDIA Tensor Cores vs. Apple Neural Engine) and your calibration dataset.
+:::
+
+```python
+# Export with half-precision or INT8 quantization
+model.export(format="engine", half=True)     # TensorRT FP16
+model.export(format="engine", int8=True)     # TensorRT INT8
+```
+
+## Benchmarking Performance
+
+Don't guess the performance—measure it on your target hardware.
+
+```python
+from ultralytics.utils.benchmarks import benchmark
+
+# Benchmark on current hardware across multiple formats
+benchmark(model="yolo26n.pt", data="coco8.yaml", device="cpu")
+```
+
+**Metrics included:**
+*   **Inference time (ms)** per image.
+*   **Throughput (FPS)**.
+*   **Model Size (MB)**.
+*   **ONNX, OpenVINO, TensorRT** comparisons.
+
+## Docker & Containerization
+
+Avoid "it works on my machine" issues by using standardized environments.
+
+::: {.panel-tabset}
+
+### Pull Image
+```bash
+# Get the official Ultralytics image with GPU support
+docker pull ultralytics/ultralytics:latest-python
+```
+
+### Run Container
+```bash
+# Run inference inside a container
+docker run -it --ipc=host --gpus all ultralytics/ultralytics \
+  yolo predict model=yolo26n.pt source='https://ultralytics.com/images/bus.jpg'
+```
+
+:::
+
+*Docs Reference: [Docker Guide](https://docs.ultralytics.com/guides/docker-quickstart/)*
+
+
+## Edge & Mobile Deployment
+
+Ultralytics supports a wide range of hardware-specific formats.
+
+*   **NVIDIA Jetson**: TensorRT (`.engine`)
+*   **Apple (iPhone/Mac)**: CoreML (`.mlpackage`)
+*   **Android / IoT**: TFLite (`.tflite`)
+*   **Web Browsers**: TensorFlow.js / ONNX.js
+*   **Vision Sensors**: Sony IMX500 (Raspberry Pi AI Camera).
+
+> **Pro Tip**: Use the `half=True` or `int8=True` argument when exporting for mobile to keep the app size small!
+
+## Production Best Practices
+
+To ensure a smooth transition from development to the real world:
+
+1.  **Warm-up**: Run 1-2 dummy inferences to initialize hardware/drivers before processing live data.
+2.  **Environment Parity**: Match your production OS/Drivers to your testing environment (use Docker!).
+3.  **Input Validation**: Ensure production images are the same resolution as training (e.g., `imgsz=640`).
+4.  **Monitoring**: Log inference times and confidence scores to detect **Data Drift**.
+
+## Ultralytics HUB 🚀
+
+The all-in-one platform for no-code model management.
+
+*   **Cloud Training**: Track experiments without managing GPUs.
+*   **Dataset Management**: Label and version your data.
+*   **One-Click Deployment**: Deploy models directly to iOS and Android apps using the HUB App.
+*   **API Access**: Managed endpoints for your custom models.
+
+*Check it out at [hub.ultralytics.com](https://hub.ultralytics.com)*
+
+
 # Conclusion {.sdaia-dark background-gradient="linear-gradient(135deg, #1C355E, #00C9A7)"}
 
 Module Wrap-up
@@ -117,8 +233,8 @@ Module Wrap-up
 Next up: **Part 6 — HuggingFace for Computer Vision**
 
 - Zero-shot segmentation with **SAM 3**.
-- Visual embeddings for similarity search.
-- Vision LLMs for multimodal reasoning.
+- Visual embeddings for similarity search with **DINOv3**.
+- Vision LLMs for multimodal reasoning (**Qwen 3.5**).
 
 ## Q&A {.sdaia-dark background-color="#1C355E"}
 
