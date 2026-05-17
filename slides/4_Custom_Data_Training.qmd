@@ -484,9 +484,9 @@ Our toy: **2 weights**, **1 feature** (avg red).
 One loss isn't enough → YOLO **sums several**, one per question.
 :::
 
-## YOLO's Loss: Three Signals
+## YOLO26's Loss: Two Signals
 
-Total loss = sum of three components, each catching a different mistake:
+Total loss = sum of two components, each catching a different mistake:
 
 ::: {.fragment .fade-up style="font-size: 0.85em;"}
 | Component | Also called | What it penalizes |
