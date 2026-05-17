@@ -6,6 +6,7 @@ docs/
 
 datasets/
 runs/
+.claude
 
 /.quarto/
 **/*.quarto_ipynb
